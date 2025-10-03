@@ -1,0 +1,5 @@
+<api>
+  <acw-types partial-assembly-name="Xamarin.AndroidX.Media3.Database" module-name="Xamarin.AndroidX.Media3.Database.dll">
+    <type assembly-qualified-name="AndroidX.Media3.Database.IDatabaseProvider, Xamarin.AndroidX.Media3.Database, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="androidx.media3.database.DatabaseProvider" java-key="androidx.media3.database.DatabaseProvider" managed-key="AndroidX.Media3.Database.IDatabaseProvider" partial-assembly-qualified-name="AndroidX.Media3.Database.IDatabaseProvider, Xamarin.AndroidX.Media3.Database" />
+  </acw-types>
+</api>

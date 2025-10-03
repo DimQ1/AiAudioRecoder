@@ -1,0 +1,6 @@
+<api>
+  <acw-types partial-assembly-name="Xamarin.AndroidX.Media3.ExoPlayer.Dash" module-name="Xamarin.AndroidX.Media3.ExoPlayer.Dash.dll">
+    <type assembly-qualified-name="AndroidX.Media3.ExoPlayer.Dash.IDashSegmentIndex, Xamarin.AndroidX.Media3.ExoPlayer.Dash, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="androidx.media3.exoplayer.dash.DashSegmentIndex" java-key="androidx.media3.exoplayer.dash.DashSegmentIndex" managed-key="AndroidX.Media3.ExoPlayer.Dash.IDashSegmentIndex" partial-assembly-qualified-name="AndroidX.Media3.ExoPlayer.Dash.IDashSegmentIndex, Xamarin.AndroidX.Media3.ExoPlayer.Dash" />
+    <type assembly-qualified-name="AndroidX.Media3.ExoPlayer.Dash.PlayerEmsgHandler+IPlayerEmsgCallback, Xamarin.AndroidX.Media3.ExoPlayer.Dash, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="androidx.media3.exoplayer.dash.PlayerEmsgHandler$PlayerEmsgCallback" java-key="androidx.media3.exoplayer.dash.PlayerEmsgHandler$PlayerEmsgCallback" managed-key="AndroidX.Media3.ExoPlayer.Dash.PlayerEmsgHandler.IPlayerEmsgCallback" partial-assembly-qualified-name="AndroidX.Media3.ExoPlayer.Dash.PlayerEmsgHandler+IPlayerEmsgCallback, Xamarin.AndroidX.Media3.ExoPlayer.Dash" />
+  </acw-types>
+</api>
