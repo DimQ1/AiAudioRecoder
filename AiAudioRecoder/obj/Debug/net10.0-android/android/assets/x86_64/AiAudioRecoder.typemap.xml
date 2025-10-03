@@ -1,4 +1,4 @@
-<api type="debug" assembly-name="AiAudioRecoder" mvid="1f33410a5825455c8029eb941e969d08">
+<api type="debug" assembly-name="AiAudioRecoder" mvid="32c3035081024496ba2d7283d42d6794">
   <java-to-managed>
     <entry java-name="crc641777b775b5a0f72d/MainActivity" managed-name="AiAudioRecoder.MainActivity, AiAudioRecoder" managed-type-token-id="33554441" />
     <entry java-name="crc641777b775b5a0f72d/MainApplication" managed-name="AiAudioRecoder.MainApplication, AiAudioRecoder" managed-type-token-id="33554442" />

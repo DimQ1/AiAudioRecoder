@@ -18,6 +18,8 @@ public static class MauiProgram
 			});
 
 	builder.Services.AddSingleton<AiAudioRecoder.Services.IAudioRecorderService, AiAudioRecoder.Services.AudioRecorderService>();
+	var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "audio_metadata.db3");
+	builder.Services.AddSingleton(new AiAudioRecoder.Services.AudioMetadataDatabase(dbPath));
 
 #if DEBUG
 	builder.Logging.AddDebug();
