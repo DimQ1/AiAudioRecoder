@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Storage;
 using AiAudioRecoder.Models;
+using System.ComponentModel;
 
 namespace AiAudioRecoder;
 
@@ -27,7 +28,16 @@ public partial class ModelsPage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
     private readonly ModelInfoDatabase _modelDb;
-    public ObservableCollection<ModelInfoDb> Models { get; set; }
+    private ObservableCollection<ModelInfoDb>? _models;
+    public ObservableCollection<ModelInfoDb>? Models
+    {
+        get => _models;
+        set
+        {
+            _models = value;
+            OnPropertyChanged(nameof(Models));
+        }
+    }
 
     public ModelsPage(ModelInfoDatabase modelDb)
     {
@@ -35,10 +45,10 @@ public partial class ModelsPage : ContentPage
         Models = new ObservableCollection<ModelInfoDb>();
         InitializeComponent();
         this.BindingContext = this;
-        LoadModelsAsync();
+        _ = LoadModelsAsync();
     }
 
-    private async void LoadModelsAsync()
+    private async Task LoadModelsAsync()
     {
         await _modelDb.EnsureDefaultModelsAsync();
         var models = await _modelDb.GetModelsAsync();
@@ -48,6 +58,7 @@ public partial class ModelsPage : ContentPage
 
     private void UpdateModels()
     {
+        if (Models == null) return;
         var current = Preferences.Get("CurrentModel", "base");
         foreach (var m in Models)
         {
@@ -65,6 +76,7 @@ public partial class ModelsPage : ContentPage
 
     private async void OnModelActionClicked(object sender, EventArgs e)
     {
+        if (Models == null) return;
         var button = sender as Button;
         var name = button?.CommandParameter as string;
         if (name == null) return;
