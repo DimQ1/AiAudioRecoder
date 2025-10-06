@@ -39,7 +39,7 @@ namespace AiAudioRecoder.Services
             if (_isRecording) return Task.FromResult<string?>(null);
             var dateFolder = string.IsNullOrEmpty(folderName) ? DateTime.Now.ToString("yyyy-MM-dd") : folderName;
             var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = Path.Combine(root, "AiAudioRecoder", dateFolder);
+            var dir = Path.Combine(root, "AiAudioRecoder", "audioData", dateFolder);
             Directory.CreateDirectory(dir);
             var name = string.IsNullOrEmpty(fileName) ? $"audio_{DateTime.Now:yyyyMMdd_HHmmss}" : fileName;
             if (source == "system")
