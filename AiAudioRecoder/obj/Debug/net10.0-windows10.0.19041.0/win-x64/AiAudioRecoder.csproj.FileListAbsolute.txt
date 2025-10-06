@@ -329,7 +329,6 @@ E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\AiAudioRecoder.pdb
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\resources.pri
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\Microsoft.Web.WebView2.Core.dll
-E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\CommunityToolkit.Maui.MediaElement.dll
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\Microsoft.Extensions.Configuration.dll
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\Microsoft.Extensions.Configuration.Abstractions.dll
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\Microsoft.Extensions.DependencyInjection.dll
@@ -522,3 +521,11 @@ E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\obj\Debug\net10.0-windows10.0.19041.
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\obj\Debug\net10.0-windows10.0.19041.0\win-x64\qualifiers.txt
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\obj\Debug\net10.0-windows10.0.19041.0\win-x64\qualifiers.txt.intermediate
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\obj\Debug\net10.0-windows10.0.19041.0\win-x64\MultipleQualifiersPerDimensionFound.txt
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\Whisper.net.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.Asio.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.Core.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.Midi.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.Wasapi.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.WinForms.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.WinMM.dll
