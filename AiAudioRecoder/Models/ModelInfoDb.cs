@@ -64,6 +64,27 @@ public class ModelInfoDb : INotifyPropertyChanged
         }
     }
 
+    private bool _isPaused;
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            _isPaused = value;
+            OnPropertyChanged();
+        }
+    }
+    private long _downloadedBytes;
+    public long DownloadedBytes
+    {
+        get => _downloadedBytes;
+        set
+        {
+            _downloadedBytes = value;
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

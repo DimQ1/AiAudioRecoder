@@ -24,6 +24,27 @@ public class BoolToTextConverter : IValueConverter
     }
 }
 
+public class DownloadButtonTextConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is ModelInfoDb model)
+        {
+            if (model.IsDownloading)
+            {
+                return model.IsPaused ? "Возобновить" : "Пауза";
+            }
+            return model.IsDownloaded ? "Выбрать" : "Скачать";
+        }
+        return "Скачать";
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public partial class ModelsPage : ContentPage
 {
     private readonly HttpClient _httpClient = new();
@@ -38,6 +59,9 @@ public partial class ModelsPage : ContentPage
             OnPropertyChanged(nameof(Models));
         }
     }
+
+    private CancellationTokenSource? _downloadCts;
+    private ModelInfoDb? _currentDownloadingModel;
 
     public ModelsPage(ModelInfoDatabase modelDb)
     {
@@ -111,7 +135,21 @@ public partial class ModelsPage : ContentPage
         if (name == null) return;
         var model = Models.FirstOrDefault(m => m.Name == name);
         if (model == null) return;
-        if (!model.IsDownloaded)
+        if (model.IsDownloading)
+        {
+            if (_downloadCts != null && !_downloadCts.Token.IsCancellationRequested)
+            {
+                _downloadCts.Cancel();
+                model.IsPaused = true;
+                model.Status = "На паузе";
+            }
+            else
+            {
+                // Resume
+                await DownloadModel(model);
+            }
+        }
+        else if (!model.IsDownloaded)
         {
             await DownloadModel(model);
         }
@@ -123,6 +161,8 @@ public partial class ModelsPage : ContentPage
 
     private async Task DownloadModel(ModelInfoDb model)
     {
+        _downloadCts = new CancellationTokenSource();
+        _currentDownloadingModel = model;
         string fileName = $"ggml-{model.Name}.bin";
         try
         {
@@ -147,35 +187,46 @@ public partial class ModelsPage : ContentPage
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, fileName);
 
-            // Check if already downloaded and size matches
-            if (File.Exists(path) && new FileInfo(path).Length == model.SizeBytes)
+            long startByte = 0;
+            if (model.IsPaused && File.Exists(path))
             {
-                await DisplayAlertAsync("Успех", $"Модель {fileName} уже загружена!", "OK");
-                model.IsDownloading = false;
-                model.IsDownloaded = true;
-                model.LocalPath = path;
-                model.Status = "Готово";
-                await _modelDb.SaveModelAsync(model);
-                UpdateModels();
-                return;
+                startByte = model.DownloadedBytes;
+                model.IsPaused = false;
             }
 
-            var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            if (startByte > 0)
+            {
+                request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(startByte, null);
+            }
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _downloadCts.Token);
             response.EnsureSuccessStatusCode();
             var totalBytes = response.Content.Headers.ContentLength ?? 0;
-            model.SizeBytes = totalBytes;
-            model.SizeMB = totalBytes / (1024.0 * 1024.0);
-            await _modelDb.SaveModelAsync(model);
-
-            using var contentStream = await response.Content.ReadAsStreamAsync();
-            using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-            var buffer = new byte[8192];
-            var totalBytesRead = 0L;
-            int bytesRead;
-            while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+            if (startByte == 0)
             {
-                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                model.SizeBytes = totalBytes;
+                model.SizeMB = totalBytes / (1024.0 * 1024.0);
+                await _modelDb.SaveModelAsync(model);
+            }
+            else
+            {
+                totalBytes += startByte;
+            }
+
+            using var contentStream = await response.Content.ReadAsStreamAsync(_downloadCts.Token);
+            using var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+            if (startByte > 0)
+            {
+                fileStream.Seek(startByte, SeekOrigin.Begin);
+            }
+            var buffer = new byte[8192];
+            var totalBytesRead = startByte;
+            int bytesRead;
+            while ((bytesRead = await contentStream.ReadAsync(buffer, _downloadCts.Token)) > 0)
+            {
+                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), _downloadCts.Token);
                 totalBytesRead += bytesRead;
+                model.DownloadedBytes = totalBytesRead;
                 if (totalBytes > 0)
                 {
                     var progress = (double)totalBytesRead / totalBytes;
@@ -191,6 +242,11 @@ public partial class ModelsPage : ContentPage
             await _modelDb.SaveModelAsync(model);
             UpdateModels();
         }
+        catch (OperationCanceledException)
+        {
+            model.IsPaused = true;
+            model.Status = "На паузе";
+        }
         catch (Exception ex)
         {
             await DisplayAlertAsync("Ошибка", ex.Message, "OK");
@@ -200,6 +256,9 @@ public partial class ModelsPage : ContentPage
         }
         finally
         {
+            _downloadCts?.Dispose();
+            _downloadCts = null;
+            _currentDownloadingModel = null;
             DownloadProgress.IsVisible = false;
             DownloadProgress.Progress = 0;
         }
@@ -234,5 +293,21 @@ public partial class ModelsPage : ContentPage
     {
         var number = DeviceNumberPicker.SelectedIndex;
         Preferences.Set("DeviceNumber", number);
+    }
+
+    private void OnPauseResumeClicked(object sender, EventArgs e)
+    {
+        if (_currentDownloadingModel != null)
+        {
+            if (_downloadCts != null && !_downloadCts.Token.IsCancellationRequested)
+            {
+                _downloadCts.Cancel();
+            }
+            else
+            {
+                // Resume download
+                _ = DownloadModel(_currentDownloadingModel);
+            }
+        }
     }
 }
