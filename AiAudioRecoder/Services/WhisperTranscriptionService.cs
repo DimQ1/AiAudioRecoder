@@ -59,7 +59,8 @@ namespace AiAudioRecoder.Services
 
                 using var factory = WhisperFactory.FromPath(_modelPath, new WhisperFactoryOptions()
                 {
-                    UseGpu = _device == DeviceType.Gpu
+                    UseGpu = _device == DeviceType.Gpu,
+                    GpuDevice = _deviceIndex
                 });
                 // Multiple Runtimes Support: Whisper.net automatically selects the best runtime based on installed packages and platform
                 // Priority: Cuda > Vulkan > CoreML > OpenVino > Cpu > NoAvx

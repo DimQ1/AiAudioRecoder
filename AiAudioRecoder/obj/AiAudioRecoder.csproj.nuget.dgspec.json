@@ -90,11 +90,7 @@
               "target": "Package",
               "version": "[2.2.1, )"
             },
-            "Whisper.net": {
-              "target": "Package",
-              "version": "[1.8.1, )"
-            },
-            "Whisper.net.Runtime": {
+            "Whisper.net.AllRuntimes": {
               "target": "Package",
               "version": "[1.8.1, )"
             },
@@ -152,11 +148,7 @@
               "target": "Package",
               "version": "[2.2.1, )"
             },
-            "Whisper.net": {
-              "target": "Package",
-              "version": "[1.8.1, )"
-            },
-            "Whisper.net.Runtime": {
+            "Whisper.net.AllRuntimes": {
               "target": "Package",
               "version": "[1.8.1, )"
             },
@@ -214,11 +206,7 @@
               "target": "Package",
               "version": "[2.2.1, )"
             },
-            "Whisper.net": {
-              "target": "Package",
-              "version": "[1.8.1, )"
-            },
-            "Whisper.net.Runtime": {
+            "Whisper.net.AllRuntimes": {
               "target": "Package",
               "version": "[1.8.1, )"
             },
@@ -271,11 +259,7 @@
               "target": "Package",
               "version": "[2.2.1, )"
             },
-            "Whisper.net": {
-              "target": "Package",
-              "version": "[1.8.1, )"
-            },
-            "Whisper.net.Runtime": {
+            "Whisper.net.AllRuntimes": {
               "target": "Package",
               "version": "[1.8.1, )"
             },

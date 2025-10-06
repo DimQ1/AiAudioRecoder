@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "iCyEX4pBdB0=",
+  "dgSpecHash": "WLTj/A6lk00=",
   "success": true,
   "projectFilePath": "E:\\Learnig\\AI\\AiAudioRecoder\\AiAudioRecoder\\AiAudioRecoder.csproj",
   "expectedPackageFiles": [
@@ -55,7 +55,15 @@
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net\\1.8.1\\whisper.net.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.allruntimes\\1.8.1\\whisper.net.allruntimes.1.8.1.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime\\1.8.1\\whisper.net.runtime.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.coreml\\1.8.1\\whisper.net.runtime.coreml.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.cuda\\1.8.1\\whisper.net.runtime.cuda.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.cuda.linux\\1.8.1\\whisper.net.runtime.cuda.linux.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.cuda.windows\\1.8.1\\whisper.net.runtime.cuda.windows.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.noavx\\1.8.1\\whisper.net.runtime.noavx.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.openvino\\1.8.1\\whisper.net.runtime.openvino.1.8.1.nupkg.sha512",
+    "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\whisper.net.runtime.vulkan\\1.8.1\\whisper.net.runtime.vulkan.1.8.1.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\xamarin.android.glide\\4.16.0.14\\xamarin.android.glide.4.16.0.14.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\xamarin.android.glide.annotations\\4.16.0.14\\xamarin.android.glide.annotations.4.16.0.14.nupkg.sha512",
     "C:\\Users\\dzmitry.shchamialiou\\.nuget\\packages\\xamarin.android.glide.disklrucache\\4.16.0.14\\xamarin.android.glide.disklrucache.4.16.0.14.nupkg.sha512",

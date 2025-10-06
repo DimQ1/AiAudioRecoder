@@ -794,10 +794,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -3559,10 +3614,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -6324,10 +6434,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -9089,10 +9254,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -11854,10 +12074,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -14619,10 +14894,65 @@
           }
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       },
       "Xamarin.Android.Glide/4.16.0.14": {
@@ -17341,10 +17671,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -18046,10 +18431,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -18751,10 +19191,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -19456,10 +19951,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -20161,10 +20711,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -20866,10 +21471,65 @@
           "lib/net9.0-ios18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -21691,10 +22351,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -22403,10 +23118,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -23115,10 +23885,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -23824,10 +24649,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -24536,10 +25416,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -25248,10 +26183,65 @@
           "lib/net9.0-maccatalyst18.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -26343,10 +27333,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -27263,10 +28308,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -28183,10 +29283,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -29100,10 +30255,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -30020,10 +31230,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     },
@@ -30950,10 +32215,65 @@
           "lib/net9.0/Whisper.net.dll": {}
         }
       },
+      "Whisper.net.AllRuntimes/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net": "1.8.1",
+          "Whisper.net.Runtime": "1.8.1",
+          "Whisper.net.Runtime.CoreML": "1.8.1",
+          "Whisper.net.Runtime.Cuda": "1.8.1",
+          "Whisper.net.Runtime.NoAvx": "1.8.1",
+          "Whisper.net.Runtime.OpenVino": "1.8.1",
+          "Whisper.net.Runtime.Vulkan": "1.8.1"
+        }
+      },
       "Whisper.net.Runtime/1.8.1": {
         "type": "package",
         "build": {
           "build/Whisper.net.Runtime.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.CoreML/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.CoreML.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda/1.8.1": {
+        "type": "package",
+        "dependencies": {
+          "Whisper.net.Runtime.Cuda.Linux": "1.8.1",
+          "Whisper.net.Runtime.Cuda.Windows": "1.8.1"
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Linux.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Cuda.Windows.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.NoAvx/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.NoAvx.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.OpenVino/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.OpenVino.targets": {}
+        }
+      },
+      "Whisper.net.Runtime.Vulkan/1.8.1": {
+        "type": "package",
+        "build": {
+          "build/Whisper.net.Runtime.Vulkan.targets": {}
         }
       }
     }
@@ -33583,6 +34903,18 @@
         "whisper.net.nuspec"
       ]
     },
+    "Whisper.net.AllRuntimes/1.8.1": {
+      "sha512": "5IxjXJQqbqvVs2C2GAFO5RURnCxkQ6FThTnD+d+Osfv5vr6q/Kz4b1zvA2wNknEvhJfTknVV7M7Uuc7zeMG/Aw==",
+      "type": "package",
+      "path": "whisper.net.allruntimes/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/readme.md",
+        "whisper.net.allruntimes.1.8.1.nupkg.sha512",
+        "whisper.net.allruntimes.nuspec"
+      ]
+    },
     "Whisper.net.Runtime/1.8.1": {
       "sha512": "DW2JhlBbt0W5W+cIP8Uevt5+7XnjPIsG9b5FyAdeB9taNk9w1WFw9W7TYSNaqgyEbEHHPNOXA6hl+yrmBwOfsQ==",
       "type": "package",
@@ -33673,6 +35005,168 @@
         "content/readme.md",
         "whisper.net.runtime.1.8.1.nupkg.sha512",
         "whisper.net.runtime.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.CoreML/1.8.1": {
+      "sha512": "PDZbcC88D8+6wmwbu4uL6yEOgCsKtgYriGLAGqrOdJGMwP4qFShmZUcAr/gebCDITPIApt/zhpQ5+9qz5napUg==",
+      "type": "package",
+      "path": "whisper.net.runtime.coreml/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.CoreML.targets",
+        "build/ggml-metal.metal",
+        "build/ios-device/libggml-base-whisper.dylib",
+        "build/ios-device/libggml-blas-whisper.dylib",
+        "build/ios-device/libggml-cpu-whisper.dylib",
+        "build/ios-device/libggml-whisper.dylib",
+        "build/ios-device/libwhisper.coreml.dylib",
+        "build/ios-device/libwhisper.dylib",
+        "build/ios-simulator/libggml-base-whisper.dylib",
+        "build/ios-simulator/libggml-blas-whisper.dylib",
+        "build/ios-simulator/libggml-cpu-whisper.dylib",
+        "build/ios-simulator/libggml-whisper.dylib",
+        "build/ios-simulator/libwhisper.coreml.dylib",
+        "build/ios-simulator/libwhisper.dylib",
+        "build/maccatalyst/libggml-base-whisper.dylib",
+        "build/maccatalyst/libggml-blas-whisper.dylib",
+        "build/maccatalyst/libggml-cpu-whisper.dylib",
+        "build/maccatalyst/libggml-whisper.dylib",
+        "build/maccatalyst/libwhisper.coreml.dylib",
+        "build/maccatalyst/libwhisper.dylib",
+        "build/macos-arm64/libggml-base-whisper.dylib",
+        "build/macos-arm64/libggml-blas-whisper.dylib",
+        "build/macos-arm64/libggml-cpu-whisper.dylib",
+        "build/macos-arm64/libggml-metal-whisper.dylib",
+        "build/macos-arm64/libggml-whisper.dylib",
+        "build/macos-arm64/libwhisper.coreml.dylib",
+        "build/macos-arm64/libwhisper.dylib",
+        "build/macos-x64/libggml-base-whisper.dylib",
+        "build/macos-x64/libggml-blas-whisper.dylib",
+        "build/macos-x64/libggml-cpu-whisper.dylib",
+        "build/macos-x64/libggml-whisper.dylib",
+        "build/macos-x64/libwhisper.coreml.dylib",
+        "build/macos-x64/libwhisper.dylib",
+        "content/readme.md",
+        "whisper.net.runtime.coreml.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.coreml.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.Cuda/1.8.1": {
+      "sha512": "mRJuOYIDHvQVqfa/SFLzFqt2xb/FIWYKRAhG0io5VemCdPprIF6MNTCMPkoXnVrnSoHo7FcVv0KawlmkCh7EpA==",
+      "type": "package",
+      "path": "whisper.net.runtime.cuda/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/readme.md",
+        "whisper.net.runtime.cuda.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.cuda.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.Cuda.Linux/1.8.1": {
+      "sha512": "ZFqbMprb73yGQRxWYM1wwSVLPd78bg7kSfmhcnO8RbwuDe2iV6gp9iW2MCSE7aXSKs3uQTxQeMQLi26yvxg/Cg==",
+      "type": "package",
+      "path": "whisper.net.runtime.cuda.linux/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.Cuda.Linux.targets",
+        "build/linux-x64/libggml-base-whisper.so",
+        "build/linux-x64/libggml-cpu-whisper.so",
+        "build/linux-x64/libggml-cuda-whisper.so",
+        "build/linux-x64/libggml-whisper.so",
+        "build/linux-x64/libwhisper.so",
+        "content/readme.md",
+        "whisper.net.runtime.cuda.linux.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.cuda.linux.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.Cuda.Windows/1.8.1": {
+      "sha512": "3ZeuzZw5EUyFf1579LxFtzUQb6/uPhNt+fmWOe9gKYNJnCN1XKHNt2NtMVzrN6WZWaqT35ut+gywG8Gz8rIlbQ==",
+      "type": "package",
+      "path": "whisper.net.runtime.cuda.windows/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.Cuda.Windows.targets",
+        "build/win-x64/ggml-base-whisper.dll",
+        "build/win-x64/ggml-cpu-whisper.dll",
+        "build/win-x64/ggml-cuda-whisper.dll",
+        "build/win-x64/ggml-whisper.dll",
+        "build/win-x64/whisper.dll",
+        "content/readme.md",
+        "whisper.net.runtime.cuda.windows.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.cuda.windows.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.NoAvx/1.8.1": {
+      "sha512": "KADZ74RhKi+LlaoNiHgbuTwpdfqFMgpymPn6cfB1C2PZAqCaEc1ICwLsC5R1Dg/8ff/Bmd46GmexnsaulFjcvw==",
+      "type": "package",
+      "path": "whisper.net.runtime.noavx/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.NoAvx.targets",
+        "build/linux-x64/libggml-base-whisper.so",
+        "build/linux-x64/libggml-cpu-whisper.so",
+        "build/linux-x64/libggml-whisper.so",
+        "build/linux-x64/libwhisper.so",
+        "build/win-x64/ggml-base-whisper.dll",
+        "build/win-x64/ggml-cpu-whisper.dll",
+        "build/win-x64/ggml-whisper.dll",
+        "build/win-x64/whisper.dll",
+        "build/win-x86/ggml-base-whisper.dll",
+        "build/win-x86/ggml-cpu-whisper.dll",
+        "build/win-x86/ggml-whisper.dll",
+        "build/win-x86/whisper.dll",
+        "content/readme.md",
+        "whisper.net.runtime.noavx.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.noavx.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.OpenVino/1.8.1": {
+      "sha512": "CrewKf9Vv94crvBTQZZw7IDxZqdZC49IQfhC52IzKHPe2vxKDyubwUS2xhQeTIhLChSADa9wRG3OVuEWr7XqrA==",
+      "type": "package",
+      "path": "whisper.net.runtime.openvino/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.OpenVino.targets",
+        "build/linux-x64/libggml-base-whisper.so",
+        "build/linux-x64/libggml-cpu-whisper.so",
+        "build/linux-x64/libggml-whisper.so",
+        "build/linux-x64/libwhisper.so",
+        "build/win-x64/ggml-base-whisper.dll",
+        "build/win-x64/ggml-cpu-whisper.dll",
+        "build/win-x64/ggml-whisper.dll",
+        "build/win-x64/whisper.dll",
+        "content/readme.md",
+        "whisper.net.runtime.openvino.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.openvino.nuspec"
+      ]
+    },
+    "Whisper.net.Runtime.Vulkan/1.8.1": {
+      "sha512": "hZmqxZZ6foU3WVmrewuFguIrodMkfb/7uyitBBPrZipo55jK16t/xxKUsWMLETYgEgGVwkZ33YNu8i3+4Kbjpg==",
+      "type": "package",
+      "path": "whisper.net.runtime.vulkan/1.8.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Whisper.net.Runtime.Vulkan.targets",
+        "build/linux-x64/libggml-base-whisper.so",
+        "build/linux-x64/libggml-cpu-whisper.so",
+        "build/linux-x64/libggml-vulkan-whisper.so",
+        "build/linux-x64/libggml-whisper.so",
+        "build/linux-x64/libwhisper.so",
+        "build/win-x64/ggml-base-whisper.dll",
+        "build/win-x64/ggml-cpu-whisper.dll",
+        "build/win-x64/ggml-vulkan-whisper.dll",
+        "build/win-x64/ggml-whisper.dll",
+        "build/win-x64/whisper.dll",
+        "content/readme.md",
+        "whisper.net.runtime.vulkan.1.8.1.nupkg.sha512",
+        "whisper.net.runtime.vulkan.nuspec"
       ]
     },
     "Xamarin.Android.Glide/4.16.0.14": {
@@ -36061,8 +37555,7 @@
       "Microsoft.NET.ILLink.Tasks >= 10.0.0-rc.1.25451.107",
       "NAudio >= 2.2.1",
       "NAudio.Wasapi >= 2.2.1",
-      "Whisper.net >= 1.8.1",
-      "Whisper.net.Runtime >= 1.8.1",
+      "Whisper.net.AllRuntimes >= 1.8.1",
       "sqlite-net-pcl >= 1.9.172"
     ],
     "net10.0-ios18.5": [
@@ -36071,8 +37564,7 @@
       "Microsoft.NET.ILLink.Tasks >= 10.0.0-rc.1.25451.107",
       "NAudio >= 2.2.1",
       "NAudio.Wasapi >= 2.2.1",
-      "Whisper.net >= 1.8.1",
-      "Whisper.net.Runtime >= 1.8.1",
+      "Whisper.net.AllRuntimes >= 1.8.1",
       "sqlite-net-pcl >= 1.9.172"
     ],
     "net10.0-maccatalyst18.5": [
@@ -36081,8 +37573,7 @@
       "Microsoft.NET.ILLink.Tasks >= 10.0.0-rc.1.25451.107",
       "NAudio >= 2.2.1",
       "NAudio.Wasapi >= 2.2.1",
-      "Whisper.net >= 1.8.1",
-      "Whisper.net.Runtime >= 1.8.1",
+      "Whisper.net.AllRuntimes >= 1.8.1",
       "sqlite-net-pcl >= 1.9.172"
     ],
     "net10.0-windows10.0.19041": [
@@ -36090,8 +37581,7 @@
       "Microsoft.Maui.Controls >= 10.0.0-rc.1.25452.6",
       "NAudio >= 2.2.1",
       "NAudio.Wasapi >= 2.2.1",
-      "Whisper.net >= 1.8.1",
-      "Whisper.net.Runtime >= 1.8.1",
+      "Whisper.net.AllRuntimes >= 1.8.1",
       "sqlite-net-pcl >= 1.9.172"
     ]
   },
@@ -36185,11 +37675,7 @@
             "target": "Package",
             "version": "[2.2.1, )"
           },
-          "Whisper.net": {
-            "target": "Package",
-            "version": "[1.8.1, )"
-          },
-          "Whisper.net.Runtime": {
+          "Whisper.net.AllRuntimes": {
             "target": "Package",
             "version": "[1.8.1, )"
           },
@@ -36247,11 +37733,7 @@
             "target": "Package",
             "version": "[2.2.1, )"
           },
-          "Whisper.net": {
-            "target": "Package",
-            "version": "[1.8.1, )"
-          },
-          "Whisper.net.Runtime": {
+          "Whisper.net.AllRuntimes": {
             "target": "Package",
             "version": "[1.8.1, )"
           },
@@ -36309,11 +37791,7 @@
             "target": "Package",
             "version": "[2.2.1, )"
           },
-          "Whisper.net": {
-            "target": "Package",
-            "version": "[1.8.1, )"
-          },
-          "Whisper.net.Runtime": {
+          "Whisper.net.AllRuntimes": {
             "target": "Package",
             "version": "[1.8.1, )"
           },
@@ -36366,11 +37844,7 @@
             "target": "Package",
             "version": "[2.2.1, )"
           },
-          "Whisper.net": {
-            "target": "Package",
-            "version": "[1.8.1, )"
-          },
-          "Whisper.net.Runtime": {
+          "Whisper.net.AllRuntimes": {
             "target": "Package",
             "version": "[1.8.1, )"
           },
