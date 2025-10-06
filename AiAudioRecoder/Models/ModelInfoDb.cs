@@ -53,6 +53,17 @@ public class ModelInfoDb : INotifyPropertyChanged
         }
     }
 
+    private string _status = "";
+    public string Status
+    {
+        get => _status;
+        set
+        {
+            _status = value;
+            OnPropertyChanged();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

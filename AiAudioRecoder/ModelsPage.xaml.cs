@@ -72,6 +72,22 @@ public partial class ModelsPage : ContentPage
         {
             m.IsDownloaded = !string.IsNullOrEmpty(m.LocalPath) && File.Exists(m.LocalPath);
             m.IsCurrent = m.Name == current;
+            if (m.IsDownloading)
+            {
+                m.Status = "Скачивается";
+            }
+            else if (m.IsDownloaded && !string.IsNullOrEmpty(m.LocalPath))
+            {
+                var fileSize = new FileInfo(m.LocalPath).Length;
+                if (fileSize == m.SizeBytes)
+                    m.Status = "Готово";
+                else
+                    m.Status = "Ошибка";
+            }
+            else
+            {
+                m.Status = "Не скачано";
+            }
         }
     }
 
@@ -106,6 +122,7 @@ public partial class ModelsPage : ContentPage
         try
         {
             model.IsDownloading = true;
+            model.Status = "Скачивается";
             model.Progress = 0;
             await DisplayAlertAsync("Загрузка", $"Скачивание модели {model.Name}...", "OK");
             var ggmlType = model.Name switch
@@ -114,6 +131,9 @@ public partial class ModelsPage : ContentPage
                 "base" => GgmlType.Base,
                 "small" => GgmlType.Small,
                 "medium" => GgmlType.Medium,
+                "large" => GgmlType.LargeV2,
+                "large-v2" => GgmlType.LargeV2,
+                "large-v3" => GgmlType.LargeV3,
                 _ => GgmlType.Base
             };
             var url = $"https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-{model.Name}.bin";
@@ -129,6 +149,7 @@ public partial class ModelsPage : ContentPage
                 model.IsDownloading = false;
                 model.IsDownloaded = true;
                 model.LocalPath = path;
+                model.Status = "Готово";
                 await _modelDb.SaveModelAsync(model);
                 UpdateModels();
                 return;
@@ -161,6 +182,7 @@ public partial class ModelsPage : ContentPage
             model.IsDownloading = false;
             model.IsDownloaded = true;
             model.LocalPath = path;
+            model.Status = "Готово";
             await _modelDb.SaveModelAsync(model);
             UpdateModels();
         }
@@ -168,6 +190,7 @@ public partial class ModelsPage : ContentPage
         {
             await DisplayAlertAsync("Ошибка", ex.Message, "OK");
             model.IsDownloading = false;
+            model.Status = "Ошибка";
             model.Progress = 0;
         }
         finally
