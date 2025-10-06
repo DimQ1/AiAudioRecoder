@@ -69,12 +69,32 @@ public partial class ModelsPage : ContentPage
         Models = new ObservableCollection<ModelInfoDb>();
         InitializeComponent();
         this.BindingContext = this;
-        var deviceStr = Preferences.Get("DeviceType", "CPU");
-        DevicePicker.SelectedIndex = deviceStr == "GPU" ? 1 : 0;
-        DeviceNumberPicker.IsVisible = deviceStr == "GPU";
-        var deviceNumber = Preferences.Get("DeviceNumber", 0);
-        DeviceNumberPicker.SelectedIndex = deviceNumber;
         _ = LoadModelsAsync();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        // Update models from folder after page appears
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var modelsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "models");
+                await _modelDb.UpdateFromFolderAsync(modelsDir);
+                // Reload models on main thread
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    var models = await _modelDb.GetModelsAsync();
+                    Models = new ObservableCollection<ModelInfoDb>(models);
+                    UpdateModels();
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating models from folder: {ex.Message}");
+            }
+        });
     }
 
     private async Task LoadModelsAsync()

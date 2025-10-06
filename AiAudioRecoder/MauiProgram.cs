@@ -37,8 +37,8 @@ public static class MauiProgram
         var modelPath = Path.Combine(modelDir, $"ggml-{currentModel}.bin");
         if (!File.Exists(modelPath))
         {
-            // Автоматическая загрузка текущей модели при первом запуске
-            DownloadModelAsync(currentModel, modelDir).Wait();
+            // Автоматическая загрузка текущей модели при первом запуске (асинхронно)
+            _ = DownloadModelAsync(currentModel, modelDir);
         }
         var deviceStr = Preferences.Get("DeviceType", "CPU");
         var device = deviceStr == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
@@ -48,14 +48,6 @@ public static class MauiProgram
         );
         var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
-
-        // Asynchronously update models from folder
-        _ = Task.Run(async () =>
-        {
-            var modelDb = new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath);
-            var modelsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "models");
-            await modelDb.UpdateFromFolderAsync(modelsDir);
-        });
 
 #if DEBUG
         builder.Logging.AddDebug();
