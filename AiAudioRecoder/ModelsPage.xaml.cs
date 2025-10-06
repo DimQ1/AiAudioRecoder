@@ -307,12 +307,14 @@ public partial class ModelsPage : ContentPage
         var device = DevicePicker.SelectedItem?.ToString() ?? "CPU";
         Preferences.Set("DeviceType", device);
         DeviceNumberPicker.IsVisible = device == "GPU";
+        DisplayAlertAsync("Уведомление", "Изменения устройства вступят в силу после перезапуска приложения.", "OK");
     }
 
     private void OnDeviceNumberChanged(object sender, EventArgs e)
     {
         var number = DeviceNumberPicker.SelectedIndex;
         Preferences.Set("DeviceNumber", number);
+        DisplayAlertAsync("Уведомление", "Изменения номера устройства вступят в силу после перезапуска приложения.", "OK");
     }
 
     private void OnPauseResumeClicked(object sender, EventArgs e)

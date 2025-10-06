@@ -54,7 +54,7 @@
                             </StackLayout>
                             <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0:F1} MB'}" VerticalOptions="Center" />
                             <Label Grid.Column="3" Text="{Binding Status}" VerticalOptions="Center" />
-                            <Button Grid.Column="4" Text="{Binding IsDownloading, Converter={StaticResource DownloadButtonTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
+                            <Button Grid.Column="4" Text="{Binding ., Converter={StaticResource DownloadButtonTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
