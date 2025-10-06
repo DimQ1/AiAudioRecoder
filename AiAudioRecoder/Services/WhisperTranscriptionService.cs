@@ -30,16 +30,18 @@ namespace AiAudioRecoder.Services
                 tempPath = Path.GetTempFileName() + ".wav";
                 using (var reader = new WaveFileReader(audioFilePath))
                 {
-                    using (var resampler = new WaveFormatConversionStream(new WaveFormat(16000, 1), reader))
+                    IWaveProvider provider = reader;
+                    if (reader.WaveFormat.SampleRate != 16000 || reader.WaveFormat.Channels != 1)
                     {
-                        using (var output = new WaveFileWriter(tempPath, new WaveFormat(16000, 1)))
+                        provider = new NAudio.Wave.MediaFoundationResampler(provider, new WaveFormat(16000, 1));
+                    }
+                    using (var output = new WaveFileWriter(tempPath, new WaveFormat(16000, 1)))
+                    {
+                        var buffer = new float[4096];
+                        int samplesRead;
+                        while ((samplesRead = provider.ToSampleProvider().Read(buffer, 0, buffer.Length)) > 0)
                         {
-                            var buffer = new byte[4096];
-                            int bytesRead;
-                            while ((bytesRead = resampler.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                output.Write(buffer, 0, bytesRead);
-                            }
+                            output.WriteSamples(buffer, 0, samplesRead);
                         }
                     }
                 }
