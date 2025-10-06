@@ -1,0 +1,41 @@
+{
+    "version": "0.2.1",
+    "configurations": [
+        {
+            "name": "Debug Windows",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-windows",
+            "program": "${workspaceFolder}/AiAudioRecoder/bin/Debug/net10.0-windows10.0.19041.0/win-x64/AiAudioRecoder.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AiAudioRecoder",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug Android",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-android",
+            "program": "${workspaceFolder}/AiAudioRecoder/bin/Debug/net10.0-android/AiAudioRecoder.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AiAudioRecoder",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug iOS Simulator",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-ios",
+            "program": "${workspaceFolder}/AiAudioRecoder/bin/Debug/net10.0-iossimulator-x64/AiAudioRecoder.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AiAudioRecoder",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}
