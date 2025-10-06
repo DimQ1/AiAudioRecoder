@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Net.Http;
 using System.IO;
 using Whisper.net.Ggml;
@@ -23,7 +24,8 @@ public static class MauiProgram
             AiAudioRecoder.Services.IAudioRecorderService,
             AiAudioRecoder.Services.AudioRecorderService
         >();
-        var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "audio_metadata.db3");
+        var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Databases", "audio_metadata.db3");
+        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
         builder.Services.AddSingleton(new AiAudioRecoder.Services.AudioMetadataDatabase(dbPath));
         // Путь к модели: используем текущую модель из Preferences, по умолчанию base
         var docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -39,7 +41,8 @@ public static class MauiProgram
         builder.Services.AddSingleton(
             new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath)
         );
-        var modelDbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "models.db3");
+        var modelDbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Databases", "models.db3");
+        Directory.CreateDirectory(Path.GetDirectoryName(modelDbPath)!);
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
 
 #if DEBUG
