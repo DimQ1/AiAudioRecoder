@@ -45,6 +45,7 @@ public partial class ModelsPage : ContentPage
         Models = new ObservableCollection<ModelInfoDb>();
         InitializeComponent();
         this.BindingContext = this;
+        DevicePicker.SelectedIndex = Preferences.Get("DeviceType", "CPU") == "GPU" ? 1 : 0;
         _ = LoadModelsAsync();
     }
 
@@ -216,5 +217,11 @@ public partial class ModelsPage : ContentPage
             Preferences.Set("CurrentModel", model.Name);
             UpdateModels();
         }
+    }
+
+    private void OnDeviceChanged(object sender, EventArgs e)
+    {
+        var device = DevicePicker.SelectedItem?.ToString() ?? "CPU";
+        Preferences.Set("DeviceType", device);
     }
 }

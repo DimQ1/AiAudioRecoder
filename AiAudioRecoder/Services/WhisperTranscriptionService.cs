@@ -2,17 +2,26 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Whisper.net;
+using Whisper.net.Ggml;
 using NAudio.Wave;
 
 namespace AiAudioRecoder.Services
 {
+    public enum DeviceType
+    {
+        Cpu,
+        Gpu
+    }
+
     public class WhisperTranscriptionService
     {
         private readonly string _modelPath;
+        private readonly DeviceType _device;
 
-        public WhisperTranscriptionService(string modelPath)
+        public WhisperTranscriptionService(string modelPath, DeviceType device = DeviceType.Cpu)
         {
             _modelPath = modelPath;
+            _device = device;
         }
 
         public async Task<string> TranscribeAsync(string audioFilePath)

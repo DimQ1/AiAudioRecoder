@@ -13,6 +13,14 @@
     <ScrollView>
         <VerticalStackLayout Padding="30,0" Spacing="25">
             <Label Text="Модели Whisper:" />
+            <Picker x:Name="DevicePicker" Title="Устройство" SelectedIndexChanged="OnDeviceChanged">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type sys:String}">
+                        <x:String>CPU</x:String>
+                        <x:String>GPU</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
             <Grid ColumnDefinitions="50,*,100,100,100" ColumnSpacing="10" Padding="0,10">
                 <Label Grid.Column="0" Text="" FontAttributes="Bold" HorizontalOptions="Center" />
                 <Label Grid.Column="1" Text="Название" FontAttributes="Bold" />

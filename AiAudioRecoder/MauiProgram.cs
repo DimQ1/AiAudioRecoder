@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.IO;
 using Whisper.net.Ggml;
 using Microsoft.Maui.Storage;
+using AiAudioRecoder.Services;
 
 namespace AiAudioRecoder;
 
@@ -39,8 +40,10 @@ public static class MauiProgram
             // Автоматическая загрузка текущей модели при первом запуске
             DownloadModelAsync(currentModel, modelDir).Wait();
         }
+        var deviceStr = Preferences.Get("DeviceType", "CPU");
+        var device = deviceStr == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
         builder.Services.AddSingleton(
-            new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath)
+            new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath, device)
         );
         var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
