@@ -43,4 +43,57 @@ public class ModelInfoDatabase
             }
         }
     }
+
+    public async Task UpdateFromFolderAsync(string modelsDir)
+    {
+        var models = await GetModelsAsync();
+        var existingNames = models.Where(m => m.Name != null).ToDictionary(m => m.Name!);
+
+        // Scan folder for ggml-*.bin files
+        if (Directory.Exists(modelsDir))
+        {
+            var files = Directory.GetFiles(modelsDir, "ggml-*.bin");
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                var modelName = fileName.Replace("ggml-", "").Replace(".bin", "");
+                var fileInfo = new FileInfo(file);
+                var sizeBytes = fileInfo.Length;
+
+                if (existingNames.TryGetValue(modelName, out var model))
+                {
+                    // Update existing
+                    model.IsDownloaded = true;
+                    model.LocalPath = file;
+                    model.SizeBytes = sizeBytes;
+                    model.SizeMB = sizeBytes / (1024.0 * 1024.0);
+                    await SaveModelAsync(model);
+                }
+                else
+                {
+                    // Add new
+                    var newModel = new ModelInfoDb
+                    {
+                        Name = modelName,
+                        SizeBytes = sizeBytes,
+                        SizeMB = sizeBytes / (1024.0 * 1024.0),
+                        IsDownloaded = true,
+                        LocalPath = file
+                    };
+                    await SaveModelAsync(newModel);
+                }
+            }
+
+            // Check for models in DB but file not exists
+            foreach (var model in models)
+            {
+                if (!string.IsNullOrEmpty(model.LocalPath) && !File.Exists(model.LocalPath))
+                {
+                    model.IsDownloaded = false;
+                    model.LocalPath = "";
+                    await SaveModelAsync(model);
+                }
+            }
+        }
+    }
 }

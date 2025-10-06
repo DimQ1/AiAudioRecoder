@@ -45,6 +45,14 @@ public static class MauiProgram
         var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
 
+        // Asynchronously update models from folder
+        _ = Task.Run(async () =>
+        {
+            var modelDb = new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath);
+            var modelsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "models");
+            await modelDb.UpdateFromFolderAsync(modelsDir);
+        });
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
