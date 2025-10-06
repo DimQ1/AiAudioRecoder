@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AiAudioRecoder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+23ba8f7ea9d3daed8775674fe01850a60a7d3db9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+304c8ad3bc986370e32377d0fe3886e886877720")]
 [assembly: System.Reflection.AssemblyProductAttribute("AiAudioRecoder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AiAudioRecoder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

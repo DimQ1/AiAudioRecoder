@@ -16,19 +16,30 @@ namespace AiAudioRecoder.Services
         public async Task<string> TranscribeAsync(string audioFilePath)
         {
             if (!File.Exists(_modelPath))
-                throw new FileNotFoundException($"Файл модели Whisper не найден: {_modelPath}. Пожалуйста, скачайте модель через интерфейс приложения.");
-
-            using var factory = WhisperFactory.FromPath(_modelPath);
-            using var processor = factory.CreateBuilder()
-                .WithLanguage("auto")
-                .Build();
-            using var audioStream = File.OpenRead(audioFilePath);
-            var text = string.Empty;
-            await foreach (var result in processor.ProcessAsync(audioStream))
             {
-                text += result.Text + " ";
+                System.Diagnostics.Debug.WriteLine($"Model not found: {_modelPath}. Skipping transcription.");
+                return "Транскрипция недоступна: модель не загружена.";
             }
-            return text.Trim();
+
+            try
+            {
+                using var factory = WhisperFactory.FromPath(_modelPath);
+                using var processor = factory.CreateBuilder()
+                    .WithLanguage("auto")
+                    .Build();
+                using var audioStream = File.OpenRead(audioFilePath);
+                var text = string.Empty;
+                await foreach (var result in processor.ProcessAsync(audioStream))
+                {
+                    text += result.Text + " ";
+                }
+                return text.Trim();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Transcription error: {ex.Message}");
+                return "Ошибка транскрипции.";
+            }
         }
     }
 }
