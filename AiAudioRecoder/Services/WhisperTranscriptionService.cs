@@ -10,7 +10,8 @@ namespace AiAudioRecoder.Services
     public enum DeviceType
     {
         Cpu,
-        Gpu
+        Cuda,
+        OpenCL
     }
 
     public class WhisperTranscriptionService
@@ -56,9 +57,11 @@ namespace AiAudioRecoder.Services
                 }
 
                 using var factory = WhisperFactory.FromPath(_modelPath);
-                using var processor = factory.CreateBuilder()
-                    .WithLanguage("auto")
-                    .Build();
+                var builder = factory.CreateBuilder()
+                    .WithLanguage("auto");
+                // Multiple runtimes support: if runtime packages are installed, Whisper.net automatically selects the best backend (CPU, OpenCL, etc.)
+                // For explicit control, use builder.WithCuda(true), builder.WithClblast(true), etc. when available
+                using var processor = builder.Build();
                 using var audioStream = File.OpenRead(tempPath);
                 var text = string.Empty;
                 await foreach (var result in processor.ProcessAsync(audioStream))

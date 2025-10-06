@@ -45,7 +45,14 @@ public partial class ModelsPage : ContentPage
         Models = new ObservableCollection<ModelInfoDb>();
         InitializeComponent();
         this.BindingContext = this;
-        DevicePicker.SelectedIndex = Preferences.Get("DeviceType", "CPU") == "GPU" ? 1 : 0;
+        var deviceStr = Preferences.Get("DeviceType", "CPU");
+        DevicePicker.SelectedIndex = deviceStr switch
+        {
+            "CPU" => 0,
+            "CUDA" => 1,
+            "OpenCL" => 2,
+            _ => 0
+        };
         _ = LoadModelsAsync();
     }
 

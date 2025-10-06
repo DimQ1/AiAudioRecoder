@@ -64,6 +64,7 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="Whisper.net" Version="1.8.1" />
 		<PackageReference Include="Whisper.net.Runtime" Version="1.8.1" />
+		<PackageReference Include="Whisper.net.Runtime.Clblast" Version="1.5.0" />
 	</ItemGroup>
 
 </Project>

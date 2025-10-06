@@ -17,7 +17,8 @@
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type sys:String}">
                         <x:String>CPU</x:String>
-                        <x:String>GPU</x:String>
+                        <x:String>CUDA</x:String>
+                        <x:String>OpenCL</x:String>
                     </x:Array>
                 </Picker.ItemsSource>
             </Picker>
