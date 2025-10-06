@@ -12,6 +12,7 @@
           "Microsoft.Extensions.Logging.Debug": "10.0.0-rc.1.25451.107",
           "Microsoft.Maui.Controls": "10.0.0-rc.1.25452.6",
           "NAudio": "2.2.1",
+          "NAudio.Wasapi": "2.2.1",
           "Whisper.net": "1.8.1",
           "sqlite-net-pcl": "1.9.172",
           "Microsoft.Web.WebView2.Core.Projection": "1.0.3179.45",
