@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.IO;
 using Microsoft.Maui.Essentials;
+using System.Threading.Tasks;
+
 namespace AiAudioRecoder;
 
 public partial class MainPage : ContentPage
@@ -16,6 +18,8 @@ public partial class MainPage : ContentPage
         (Services.AudioMetadataDatabase)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.AudioMetadataDatabase))!;
     private Services.WhisperTranscriptionService _whisper =>
         (Services.WhisperTranscriptionService)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.WhisperTranscriptionService))!;
+    private TaskCompletionSource<bool>? _recordingTcs;
+    private bool _isRecordingInProgress = false;
 
     public MainPage()
     {
@@ -92,6 +96,7 @@ public partial class MainPage : ContentPage
 
     private async void OnRecordAndTranscribeClicked(object? sender, EventArgs e)
     {
+        if (_isRecordingInProgress) return;
         try
         {
             // Запрос разрешения на микрофон для Android/iOS
@@ -109,8 +114,20 @@ public partial class MainPage : ContentPage
             var source = SystemAudioSwitch.IsToggled ? "system" : "mic";
             var start = DateTime.Now;
             var filePath = await _recorder.StartRecordingAsync(string.Empty, string.Empty, source);
-            // Здесь можно добавить UI-индикацию записи и кнопку "Стоп"
-            await Task.Delay(5000); // Имитация записи 5 секунд
+            if (string.IsNullOrEmpty(filePath))
+            {
+                await DisplayAlertAsync("Ошибка", "Не удалось начать запись.", "OK");
+                return;
+            }
+
+            _recordingTcs = new TaskCompletionSource<bool>();
+            _isRecordingInProgress = true;
+            RecordButton.IsVisible = false;
+            StopButton.IsVisible = true;
+
+            // Ожидаем остановки
+            await _recordingTcs.Task;
+
             await _recorder.StopRecordingAsync();
             var end = DateTime.Now;
 
@@ -134,6 +151,18 @@ public partial class MainPage : ContentPage
         {
             await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
+        finally
+        {
+            _isRecordingInProgress = false;
+            RecordButton.IsVisible = true;
+            StopButton.IsVisible = false;
+            _recordingTcs = null;
+        }
+    }
+
+    private void OnStopRecordingClicked(object? sender, EventArgs e)
+    {
+        _recordingTcs?.SetResult(true);
     }
 
     private async void OnShowRecordsClicked(object? sender, EventArgs e)
