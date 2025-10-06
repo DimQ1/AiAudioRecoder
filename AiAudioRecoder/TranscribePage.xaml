@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AiAudioRecoder.TranscribePage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+
+            <Label Text="Выберите аудиофайл для транскрипции:" />
+            <Button
+                x:Name="PickFileButton"
+                Text="Выбрать файл"
+                Clicked="OnPickFileClicked"
+                HorizontalOptions="Fill" />
+            <Label x:Name="FileLabel" Text="Файл не выбран" IsVisible="True" />
+            <ProgressBar x:Name="TranscribeProgress" IsVisible="False" Progress="0" />
+            <Button
+                x:Name="TranscribeButton"
+                Text="Транскрибировать"
+                Clicked="OnTranscribeClicked"
+                IsEnabled="False"
+                HorizontalOptions="Fill" />
+            <Label x:Name="ResultLabel" Text="" IsVisible="False" />
+            <Button
+                Text="Показать записи"
+                Clicked="OnShowRecordsClicked"
+                HorizontalOptions="Fill" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

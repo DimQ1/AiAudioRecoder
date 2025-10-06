@@ -6,9 +6,13 @@
     xmlns:local="clr-namespace:AiAudioRecoder"
     Title="AiAudioRecoder">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <Tab Title="Запись" Icon="record.png">
+            <ShellContent ContentTemplate="{DataTemplate local:RecordPage}" />
+        </Tab>
+        <Tab Title="Транскрибировать" Icon="transcribe.png">
+            <ShellContent ContentTemplate="{DataTemplate local:TranscribePage}" />
+        </Tab>
+    </TabBar>
 
 </Shell>

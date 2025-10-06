@@ -23,10 +23,11 @@ namespace AiAudioRecoder.Services
                 return "Транскрипция недоступна: модель не загружена.";
             }
 
+            string? tempPath = null;
             try
             {
                 // Resample audio to 16kHz mono for Whisper compatibility
-                var tempPath = Path.GetTempFileName() + ".wav";
+                tempPath = Path.GetTempFileName() + ".wav";
                 using (var reader = new WaveFileReader(audioFilePath))
                 {
                     using (var resampler = new WaveFormatConversionStream(new WaveFormat(16000, 1), reader))
@@ -53,14 +54,27 @@ namespace AiAudioRecoder.Services
                 {
                     text += result.Text + " ";
                 }
-                // Cleanup temp file
-                File.Delete(tempPath);
                 return text.Trim();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Transcription error: {ex.Message}");
                 return "Ошибка транскрипции.";
+            }
+            finally
+            {
+                // Cleanup temp file safely
+                if (tempPath != null && File.Exists(tempPath))
+                {
+                    try
+                    {
+                        File.Delete(tempPath);
+                    }
+                    catch (IOException ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Could not delete temp file {tempPath}: {ex.Message}");
+                    }
+                }
             }
         }
     }
