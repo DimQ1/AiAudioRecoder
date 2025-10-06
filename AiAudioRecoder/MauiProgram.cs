@@ -41,15 +41,10 @@ public static class MauiProgram
             DownloadModelAsync(currentModel, modelDir).Wait();
         }
         var deviceStr = Preferences.Get("DeviceType", "CPU");
-        var device = deviceStr switch
-        {
-            "CPU" => AiAudioRecoder.Services.DeviceType.Cpu,
-            "CUDA" => AiAudioRecoder.Services.DeviceType.Cuda,
-            "OpenCL" => AiAudioRecoder.Services.DeviceType.OpenCL,
-            _ => AiAudioRecoder.Services.DeviceType.Cpu
-        };
+        var device = deviceStr == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
+        var deviceIndex = Preferences.Get("DeviceNumber", 0);
         builder.Services.AddSingleton(
-            new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath, device)
+            new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath, device, deviceIndex)
         );
         var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));

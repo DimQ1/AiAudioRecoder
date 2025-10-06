@@ -46,13 +46,10 @@ public partial class ModelsPage : ContentPage
         InitializeComponent();
         this.BindingContext = this;
         var deviceStr = Preferences.Get("DeviceType", "CPU");
-        DevicePicker.SelectedIndex = deviceStr switch
-        {
-            "CPU" => 0,
-            "CUDA" => 1,
-            "OpenCL" => 2,
-            _ => 0
-        };
+        DevicePicker.SelectedIndex = deviceStr == "GPU" ? 1 : 0;
+        DeviceNumberPicker.IsVisible = deviceStr == "GPU";
+        var deviceNumber = Preferences.Get("DeviceNumber", 0);
+        DeviceNumberPicker.SelectedIndex = deviceNumber;
         _ = LoadModelsAsync();
     }
 
@@ -230,5 +227,12 @@ public partial class ModelsPage : ContentPage
     {
         var device = DevicePicker.SelectedItem?.ToString() ?? "CPU";
         Preferences.Set("DeviceType", device);
+        DeviceNumberPicker.IsVisible = device == "GPU";
+    }
+
+    private void OnDeviceNumberChanged(object sender, EventArgs e)
+    {
+        var number = DeviceNumberPicker.SelectedIndex;
+        Preferences.Set("DeviceNumber", number);
     }
 }
