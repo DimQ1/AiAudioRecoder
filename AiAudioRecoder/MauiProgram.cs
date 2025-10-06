@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.IO;
 using Whisper.net.Ggml;
+using Microsoft.Maui.Storage;
 
 namespace AiAudioRecoder;
 
@@ -24,17 +25,16 @@ public static class MauiProgram
         >();
         var dbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "audio_metadata.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Services.AudioMetadataDatabase(dbPath));
-        // Путь к модели: по умолчанию ищем скачанную ggml-base.bin в MyDocuments, fallback на tiny если нет
+        // Путь к модели: используем текущую модель из Preferences, по умолчанию base
         var docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         var modelDir = Path.Combine(docsPath, "AiAudioRecoder", "models");
         Directory.CreateDirectory(modelDir);
-        var baseModelPath = Path.Combine(modelDir, "ggml-base.bin");
-        var modelPath = baseModelPath;
-        if (!File.Exists(baseModelPath))
+        var currentModel = Preferences.Get("CurrentModel", "base");
+        var modelPath = Path.Combine(modelDir, $"ggml-{currentModel}.bin");
+        if (!File.Exists(modelPath))
         {
-            // Автоматическая загрузка base модели при первом запуске
-            DownloadModelAsync("base", modelDir).Wait();
-            modelPath = baseModelPath;
+            // Автоматическая загрузка текущей модели при первом запуске
+            DownloadModelAsync(currentModel, modelDir).Wait();
         }
         builder.Services.AddSingleton(
             new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath)

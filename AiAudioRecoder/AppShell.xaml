@@ -13,6 +13,9 @@
         <Tab Title="Транскрибировать" Icon="transcribe.png">
             <ShellContent ContentTemplate="{DataTemplate local:TranscribePage}" />
         </Tab>
+        <Tab Title="Модели" Icon="model.png">
+            <ShellContent ContentTemplate="{DataTemplate local:ModelsPage}" />
+        </Tab>
     </TabBar>
 
 </Shell>

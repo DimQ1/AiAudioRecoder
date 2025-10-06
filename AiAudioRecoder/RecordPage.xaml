@@ -9,23 +9,6 @@
             Padding="30,0"
             Spacing="25">
 
-            <Label Text="Выберите модель Whisper:" />
-            <Picker x:Name="ModelPicker" Title="Модель Whisper">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type sys:String}">
-                        <x:String>tiny</x:String>
-                        <x:String>base</x:String>
-                        <x:String>small</x:String>
-                        <x:String>medium</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
-            <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
-            <Button
-                x:Name="DownloadButton"
-                Text="Скачать выбранную модель"
-                Clicked="OnDownloadModelClicked"
-                HorizontalOptions="Fill" />
             <Label Text="Источник записи:" />
             <Switch x:Name="SystemAudioSwitch" IsToggled="False" />
             <Label Text="Микрофон (выкл.) / Система (вкл.)" />

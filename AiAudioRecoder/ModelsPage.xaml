@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:local="clr-namespace:AiAudioRecoder"
+             x:Class="AiAudioRecoder.ModelsPage">
+
+    <ContentPage.Resources>
+        <local:BoolToTextConverter x:Key="BoolToTextConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,0" Spacing="25">
+            <Label Text="Модели Whisper:" />
+            <Grid ColumnDefinitions="50,*,100,100" ColumnSpacing="10" Padding="0,10">
+                <Label Grid.Column="0" Text="Текущая" FontAttributes="Bold" HorizontalOptions="Center" />
+                <Label Grid.Column="1" Text="Название" FontAttributes="Bold" />
+                <Label Grid.Column="2" Text="Размер" FontAttributes="Bold" />
+                <Label Grid.Column="3" Text="Действие" FontAttributes="Bold" />
+            </Grid>
+            <CollectionView x:Name="ModelsCollectionView" ItemsSource="{Binding Models}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="50,*,100,100" ColumnSpacing="10" Padding="0,10">
+                            <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0} MB'}" VerticalOptions="Center" />
+                            <Button Grid.Column="3" Text="{Binding IsDownloaded, Converter={StaticResource BoolToTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
