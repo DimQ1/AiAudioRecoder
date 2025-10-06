@@ -1,0 +1,105 @@
+# .NET Core
+bin/
+obj/
+.vs/
+.vscode/settings.json
+!/.vscode/tasks.json
+!/.vscode/launch.json
+!/.vscode/extensions.json
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleasePublic/
+x64/
+build/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.nupkg
+*.snupkg
+
+# Visual Studio files
+.vs/
+!.vs/config/
+!.vs/slnx.sqlite
+
+# Visual Studio Code files
+.vscode/settings.json
+
+# Dependency directories
+packages/
+*.csproj.nuget.dgspec.json
+*.csproj.user
+*.cache
+*.nupkg
+*.snupkg
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/launch.json
+.vscode/tasks.json
+!.vscode/extensions.json
+
+# MAUI specific
+bin/Debug/
+bin/Release/
+obj/Debug/
+obj/Release/
+
+# Generated files
+Generated/
+GeneratedFiles/
+
+# User profile
+*.[Uu]ser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug*/
+[Rr]elease*/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Visual Studio / Rider
+.vs/
+!.vs/config/
+!.vs/slnx.sqlite
+
+# Visual Studio Code
+.vscode/settings.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
