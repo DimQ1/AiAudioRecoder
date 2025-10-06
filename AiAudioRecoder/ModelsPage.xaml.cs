@@ -35,6 +35,26 @@ public class ModelInfo : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+    private bool _isDownloading;
+    public bool IsDownloading
+    {
+        get => _isDownloading;
+        set
+        {
+            _isDownloading = value;
+            OnPropertyChanged();
+        }
+    }
+    private double _progress;
+    public double Progress
+    {
+        get => _progress;
+        set
+        {
+            _progress = value;
+            OnPropertyChanged();
+        }
+    }
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
@@ -120,11 +140,14 @@ public partial class ModelsPage : ContentPage
 
     private async Task DownloadModel(string modelName)
     {
+        var model = Models.FirstOrDefault(m => m.Name == modelName);
+        if (model == null) return;
+
         string fileName = $"ggml-{modelName}.bin";
         try
         {
-            DownloadProgress.IsVisible = true;
-            DownloadProgress.Progress = 0;
+            model.IsDownloading = true;
+            model.Progress = 0;
             await DisplayAlert("Загрузка", $"Скачивание модели {modelName}...", "OK");
             var ggmlType = modelName switch
             {
@@ -143,7 +166,7 @@ public partial class ModelsPage : ContentPage
             if (File.Exists(path))
             {
                 await DisplayAlert("Успех", $"Модель {fileName} уже существует!", "OK");
-                DownloadProgress.IsVisible = false;
+                model.IsDownloading = false;
                 UpdateModels();
                 return;
             }
@@ -163,16 +186,19 @@ public partial class ModelsPage : ContentPage
                 if (totalBytes > 0)
                 {
                     var progress = (double)totalBytesRead / totalBytes;
-                    DownloadProgress.Progress = progress;
+                    model.Progress = progress;
                     await MainThread.InvokeOnMainThreadAsync(() => { });
                 }
             }
             await DisplayAlert("Успех", $"Модель {fileName} успешно загружена!", "OK");
+            model.IsDownloading = false;
             UpdateModels();
         }
         catch (Exception ex)
         {
             await DisplayAlert("Ошибка", ex.Message, "OK");
+            model.IsDownloading = false;
+            model.Progress = 0;
         }
         finally
         {
@@ -185,6 +211,5 @@ public partial class ModelsPage : ContentPage
     {
         Preferences.Set("CurrentModel", name);
         UpdateModels();
-        await DisplayAlert("Успех", $"Модель {name} установлена как текущая.", "OK");
     }
 }

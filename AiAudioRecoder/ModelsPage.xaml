@@ -13,7 +13,7 @@
         <VerticalStackLayout Padding="30,0" Spacing="25">
             <Label Text="Модели Whisper:" />
             <Grid ColumnDefinitions="50,*,100,100" ColumnSpacing="10" Padding="0,10">
-                <Label Grid.Column="0" Text="Текущая" FontAttributes="Bold" HorizontalOptions="Center" />
+                <Label Grid.Column="0" Text="" FontAttributes="Bold" HorizontalOptions="Center" />
                 <Label Grid.Column="1" Text="Название" FontAttributes="Bold" />
                 <Label Grid.Column="2" Text="Размер" FontAttributes="Bold" />
                 <Label Grid.Column="3" Text="Действие" FontAttributes="Bold" />
@@ -23,7 +23,10 @@
                     <DataTemplate>
                         <Grid ColumnDefinitions="50,*,100,100" ColumnSpacing="10" Padding="0,10">
                             <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="{Binding Name}" VerticalOptions="Center" />
+                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding Name}" />
+                                <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5" />
+                            </StackLayout>
                             <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0} MB'}" VerticalOptions="Center" />
                             <Button Grid.Column="3" Text="{Binding IsDownloaded, Converter={StaticResource BoolToTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
                         </Grid>
