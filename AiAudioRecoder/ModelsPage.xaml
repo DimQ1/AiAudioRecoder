@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:local="clr-namespace:AiAudioRecoder"
+             xmlns:models="clr-namespace:AiAudioRecoder.Models"
              x:Class="AiAudioRecoder.ModelsPage">
 
     <ContentPage.Resources>
@@ -20,14 +21,14 @@
             </Grid>
             <CollectionView x:Name="ModelsCollectionView" ItemsSource="{Binding Models}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:ModelInfoDb">
                         <Grid ColumnDefinitions="50,*,100,100" ColumnSpacing="10" Padding="0,10">
                             <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
                             <StackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label Text="{Binding Name}" />
                                 <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5" />
                             </StackLayout>
-                            <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0} MB'}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0:F1} MB'}" VerticalOptions="Center" />
                             <Button Grid.Column="3" Text="{Binding IsDownloaded, Converter={StaticResource BoolToTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
                         </Grid>
                     </DataTemplate>

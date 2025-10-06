@@ -39,6 +39,8 @@ public static class MauiProgram
         builder.Services.AddSingleton(
             new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath)
         );
+        var modelDbPath = Path.Combine(FileSystem.Current.AppDataDirectory, "models.db3");
+        builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
 
 #if DEBUG
         builder.Logging.AddDebug();
