@@ -56,12 +56,16 @@ namespace AiAudioRecoder.Services
                     }
                 }
 
-                using var factory = WhisperFactory.FromPath(_modelPath);
-                var builder = factory.CreateBuilder()
-                    .WithLanguage("auto");
-                // Multiple runtimes support: if runtime packages are installed, Whisper.net automatically selects the best backend (CPU, OpenCL, etc.)
-                // For explicit control, use builder.WithCuda(true), builder.WithClblast(true), etc. when available
-                using var processor = builder.Build();
+                using var factory = WhisperFactory.FromPath(_modelPath, new WhisperFactoryOptions()
+                {
+                    UseGpu = _device == DeviceType.Cuda || _device == DeviceType.OpenCL
+                });
+                // Multiple Runtimes Support: Whisper.net automatically selects the best runtime based on installed packages and platform
+                // Priority: Cuda > Vulkan > CoreML > OpenVino > Cpu > NoAvx
+                // To customize, use WhisperFactory.FromPath(path, new RuntimeOptions { RuntimeLibraryOrder = [...] })
+                using var processor = factory.CreateBuilder()
+                    .WithLanguage("auto")
+                    .Build();
                 using var audioStream = File.OpenRead(tempPath);
                 var text = string.Empty;
                 await foreach (var result in processor.ProcessAsync(audioStream))
