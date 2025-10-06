@@ -24,8 +24,9 @@ public static class MauiProgram
             AiAudioRecoder.Services.IAudioRecorderService,
             AiAudioRecoder.Services.AudioRecorderService
         >();
-        var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Databases", "audio_metadata.db3");
-        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+        var dbRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "Databases");
+        Directory.CreateDirectory(dbRoot);
+        var dbPath = Path.Combine(dbRoot, "audio_metadata.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Services.AudioMetadataDatabase(dbPath));
         // Путь к модели: используем текущую модель из Preferences, по умолчанию base
         var docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -41,8 +42,7 @@ public static class MauiProgram
         builder.Services.AddSingleton(
             new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath)
         );
-        var modelDbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Databases", "models.db3");
-        Directory.CreateDirectory(Path.GetDirectoryName(modelDbPath)!);
+        var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
 
 #if DEBUG
