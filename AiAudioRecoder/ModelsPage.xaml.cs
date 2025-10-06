@@ -52,6 +52,14 @@ public partial class ModelsPage : ContentPage
     {
         await _modelDb.EnsureDefaultModelsAsync();
         var models = await _modelDb.GetModelsAsync();
+        foreach (var m in models)
+        {
+            if (m.SizeMB == 0 && m.SizeBytes > 0)
+            {
+                m.SizeMB = m.SizeBytes / (1024.0 * 1024.0);
+                await _modelDb.SaveModelAsync(m);
+            }
+        }
         Models = new ObservableCollection<ModelInfoDb>(models);
         UpdateModels();
     }
