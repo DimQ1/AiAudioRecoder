@@ -37,11 +37,11 @@ namespace AiAudioRecoder.Services
         public Task<string?> StartRecordingAsync(string? folderName = null, string? fileName = null, string source = "mic")
         {
             if (_isRecording) return Task.FromResult<string?>(null);
-            var dateFolder = folderName ?? DateTime.Now.ToString("yyyy-MM-dd");
+            var dateFolder = string.IsNullOrEmpty(folderName) ? DateTime.Now.ToString("yyyy-MM-dd") : folderName;
             var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = Path.Combine(root, "AiAudioRecoder", dateFolder);
             Directory.CreateDirectory(dir);
-            var name = fileName ?? $"audio_{DateTime.Now:yyyyMMdd_HHmmss}";
+            var name = string.IsNullOrEmpty(fileName) ? $"audio_{DateTime.Now:yyyyMMdd_HHmmss}" : fileName;
             if (source == "system")
                 name += "_system";
             name += ".wav";

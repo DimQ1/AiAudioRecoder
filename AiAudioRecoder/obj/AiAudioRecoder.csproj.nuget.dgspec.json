@@ -94,6 +94,10 @@
               "target": "Package",
               "version": "[1.8.1, )"
             },
+            "Whisper.net.Runtime": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
             "sqlite-net-pcl": {
               "target": "Package",
               "version": "[1.9.172, )"
@@ -149,6 +153,10 @@
               "version": "[2.2.1, )"
             },
             "Whisper.net": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
+            "Whisper.net.Runtime": {
               "target": "Package",
               "version": "[1.8.1, )"
             },
@@ -210,6 +218,10 @@
               "target": "Package",
               "version": "[1.8.1, )"
             },
+            "Whisper.net.Runtime": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
             "sqlite-net-pcl": {
               "target": "Package",
               "version": "[1.9.172, )"
@@ -260,6 +272,10 @@
               "version": "[2.2.1, )"
             },
             "Whisper.net": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
+            "Whisper.net.Runtime": {
               "target": "Package",
               "version": "[1.8.1, )"
             },

@@ -529,3 +529,15 @@ E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.Wasapi.dll
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.WinForms.dll
 E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\NAudio.WinMM.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-arm64\whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-arm64\ggml-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-arm64\ggml-base-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-arm64\ggml-cpu-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x64\whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x64\ggml-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x64\ggml-base-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x64\ggml-cpu-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x86\whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x86\ggml-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x86\ggml-base-whisper.dll
+E:\Learnig\AI\AiAudioRecoder\AiAudioRecoder\bin\Debug\net10.0-windows10.0.19041.0\win-x64\runtimes\win-x86\ggml-cpu-whisper.dll
