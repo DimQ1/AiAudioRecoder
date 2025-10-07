@@ -1,10 +1,13 @@
-﻿using Whisper.net;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using Whisper.net;
 using Whisper.net.Ggml;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.IO;
 using Microsoft.Maui.Essentials;
 using System.Threading.Tasks;
+using Microsoft.Maui.Dispatching;
 
 namespace AiAudioRecoder;
 
@@ -20,6 +23,9 @@ public partial class MainPage : ContentPage
         (Services.WhisperTranscriptionService)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.WhisperTranscriptionService))!;
     private TaskCompletionSource<bool>? _recordingTcs;
     private bool _isRecordingInProgress = false;
+    private CancellationTokenSource? _downloadCancellationTokenSource;
+    private bool _isDownloadInProgress = false;
+    private string? _currentDownloadPath;
 
     public MainPage()
     {
@@ -31,13 +37,28 @@ public partial class MainPage : ContentPage
 
     private async void OnDownloadModelClicked(object? sender, EventArgs e)
     {
+        if (_isDownloadInProgress)
+        {
+            // Cancel download
+            _downloadCancellationTokenSource?.Cancel();
+            return;
+        }
+
         var modelName = ModelPicker.SelectedItem?.ToString() ?? "base";
         string fileName = $"ggml-{modelName}.bin";
+        string? path = null;
+        
         try
         {
             DownloadProgress.IsVisible = true;
             DownloadProgress.Progress = 0;
-            await DisplayAlertAsync("Загрузка", $"Скачивание модели {modelName}...", "OK");
+            DownloadButton.Text = "Отмена загрузки";
+            _isDownloadInProgress = true;
+            _downloadCancellationTokenSource = new CancellationTokenSource();
+            
+            // Show alert after button click
+            _ = DisplayAlertAsync("Загрузка", $"Скачивание модели {modelName}...", "OK");
+            
             // Определяем тип модели и URL (из HuggingFace whisper.cpp)
             var ggmlType = modelName switch
             {
@@ -52,46 +73,80 @@ public partial class MainPage : ContentPage
             var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = Path.Combine(root, "AiAudioRecoder", "models");
             Directory.CreateDirectory(dir);
-            var path = Path.Combine(dir, fileName);
+            path = Path.Combine(dir, fileName);
 
             if (File.Exists(path))
             {
                 await DisplayAlertAsync("Успех", $"Модель {fileName} уже существует в {path}!", "OK");
-                DownloadProgress.IsVisible = false;
+                ResetDownloadUI();
                 return;
             }
 
-            var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, _downloadCancellationTokenSource.Token);
             response.EnsureSuccessStatusCode();
             var totalBytes = response.Content.Headers.ContentLength ?? -1;
-            using var contentStream = await response.Content.ReadAsStreamAsync();
+            
+            using var contentStream = await response.Content.ReadAsStreamAsync(_downloadCancellationTokenSource.Token);
             using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             var buffer = new byte[8192];
             var totalBytesRead = 0L;
             int bytesRead;
-            while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+            
+            while ((bytesRead = await contentStream.ReadAsync(buffer, _downloadCancellationTokenSource.Token)) > 0)
             {
-                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), _downloadCancellationTokenSource.Token);
                 totalBytesRead += bytesRead;
-                if (totalBytes > 0)
+                
+                if (totalBytes > 0 && !(_downloadCancellationTokenSource.Token.IsCancellationRequested))
                 {
-                    var progress = (double)totalBytesRead / totalBytes;
-                    DownloadProgress.Progress = progress;
-                    await MainThread.InvokeOnMainThreadAsync(() => { });
+                    var progress = Math.Min(1.0, (double)totalBytesRead / totalBytes);
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        DownloadProgress.Progress = progress;
+                    });
                 }
             }
-            // Обновляем путь модели в сервисе, если нужно (но сервис инициализирован с фиксированным путём, так что перезапуск приложения)
-            await DisplayAlertAsync("Успех", $"Модель {fileName} успешно загружена в {path}!", "OK");
+            
+            if (!_downloadCancellationTokenSource.Token.IsCancellationRequested)
+            {
+                await DisplayAlertAsync("Успех", $"Модель {fileName} успешно загружена в {path}!", "OK");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            await DisplayAlertAsync("Отменено", "Загрузка модели была отменена.", "OK");
+            // Delete partial file if cancelled
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                try { File.Delete(path); } catch { }
+        }
+        catch (HttpRequestException ex) when (ex.Message.Contains("cancelled"))
+        {
+            await DisplayAlertAsync("Отменено", "Загрузка модели была отменена.", "OK");
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                try { File.Delete(path); } catch { }
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось загрузить модель: {ex.Message}", "OK");
         }
         finally
         {
+            ResetDownloadUI();
+        }
+    }
+
+    private void ResetDownloadUI()
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
             DownloadProgress.IsVisible = false;
             DownloadProgress.Progress = 0;
-        }
+            DownloadButton.Text = "Скачать выбранную модель";
+            _isDownloadInProgress = false;
+        });
+        
+        _downloadCancellationTokenSource?.Dispose();
+        _downloadCancellationTokenSource = null;
     }
 
     private async void OnRecordAndTranscribeClicked(object? sender, EventArgs e)

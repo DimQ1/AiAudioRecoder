@@ -9,6 +9,13 @@
     <ContentPage.Resources>
         <local:BoolToTextConverter x:Key="BoolToTextConverter" />
         <local:DownloadButtonTextConverter x:Key="DownloadButtonTextConverter" />
+        <Style x:Key="ModelBorderStyle" TargetType="Grid">
+            <Style.Triggers>
+                <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
+                    <Setter Property="Background" Value="LightBlue" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </ContentPage.Resources>
 
     <ScrollView>
@@ -47,7 +54,7 @@
             <CollectionView x:Name="ModelsCollectionView" ItemsSource="{Binding Models}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ModelInfoDb">
-                        <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="0,10">
+                        <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="0,10" Style="{StaticResource ModelBorderStyle}">
                             <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
                             <StackLayout Grid.Column="1" VerticalOptions="Center">
                                 <Label Text="{Binding Name}" />
@@ -61,6 +68,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <Label Text="{Binding Models.Count, StringFormat='Количество моделей: {0}'}" />
             <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
         </VerticalStackLayout>
     </ScrollView>

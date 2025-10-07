@@ -7,7 +7,6 @@ using Android.Media;
 #if IOS
 using AVFoundation;
 #endif
-using Microsoft.Maui.Storage;
 #if WINDOWS
 using NAudio.Wave;
 using NAudio.Wasapi;
@@ -53,7 +52,10 @@ namespace AiAudioRecoder.Services
                 try
                 {
                     _loopback = new WasapiLoopbackCapture();
-                    _loopback.DataAvailable += OnDataAvailable;
+                    _loopback.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                    {
+                        _writer?.Write(e.Buffer, 0, e.BytesRecorded);
+                    };
                     _writer = new WaveFileWriter(_filePath, _loopback.WaveFormat);
                     _loopback.StartRecording();
                 }
@@ -74,7 +76,10 @@ namespace AiAudioRecoder.Services
                 {
                     _waveIn = new WaveInEvent();
                     _waveIn.WaveFormat = new WaveFormat(44100, 1); // 44.1kHz, mono
-                    _waveIn.DataAvailable += OnDataAvailable;
+                    _waveIn.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                    {
+                        _writer?.Write(e.Buffer, 0, e.BytesRecorded);
+                    };
                     _writer = new WaveFileWriter(_filePath, _waveIn.WaveFormat);
                     _waveIn.StartRecording();
                 }
@@ -92,11 +97,6 @@ namespace AiAudioRecoder.Services
 
             _isRecording = true;
             return Task.FromResult<string?>(_filePath);
-        }
-
-        private void OnDataAvailable(object? sender, WaveInEventArgs e)
-        {
-            _writer?.Write(e.Buffer, 0, e.BytesRecorded);
         }
 
         public Task StopRecordingAsync()

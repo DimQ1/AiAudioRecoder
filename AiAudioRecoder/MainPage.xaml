@@ -10,7 +10,7 @@
             Spacing="25">
 
             <Label Text="Выберите модель Whisper:" />
-            <Picker x:Name="ModelPicker" Title="Модель Whisper">
+            <Picker x:Name="ModelPicker">
                 <Picker.ItemsSource>
                     <x:Array Type="{x:Type sys:String}">
                         <x:String>tiny</x:String>
@@ -43,6 +43,7 @@
                 TextColor="White"
                 HorizontalOptions="Fill" />
             <Button
+                x:Name="ShowRecordsButton"
                 Text="Показать записи"
                 Clicked="OnShowRecordsClicked"
                 HorizontalOptions="Fill" />

@@ -101,8 +101,10 @@ public partial class ModelsPage : ContentPage
     {
         await _modelDb.EnsureDefaultModelsAsync();
         var models = await _modelDb.GetModelsAsync();
+        System.Diagnostics.Debug.WriteLine($"Loaded {models.Count} models");
         foreach (var m in models)
         {
+            System.Diagnostics.Debug.WriteLine($"Model: {m.Name}, SizeMB: {m.SizeMB}");
             if (m.SizeMB == 0 && m.SizeBytes > 0)
             {
                 m.SizeMB = m.SizeBytes / (1024.0 * 1024.0);
