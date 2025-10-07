@@ -9,10 +9,13 @@
     <ContentPage.Resources>
         <local:BoolToTextConverter x:Key="BoolToTextConverter" />
         <local:DownloadButtonTextConverter x:Key="DownloadButtonTextConverter" />
-        <Style x:Key="ModelBorderStyle" TargetType="Grid">
+        <Style x:Key="ModelBorderStyle" TargetType="Border">
+            <Setter Property="Stroke" Value="Transparent" />
+            <Setter Property="StrokeThickness" Value="0" />
             <Style.Triggers>
-                <DataTrigger TargetType="Grid" Binding="{Binding IsCurrent}" Value="True">
-                    <Setter Property="Background" Value="LightBlue" />
+                <DataTrigger TargetType="Border" Binding="{Binding IsCurrent}" Value="True">
+                    <Setter Property="Stroke" Value="Blue" />
+                    <Setter Property="StrokeThickness" Value="2" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -54,17 +57,19 @@
             <CollectionView x:Name="ModelsCollectionView" ItemsSource="{Binding Models}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ModelInfoDb">
-                        <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="0,10" Style="{StaticResource ModelBorderStyle}">
-                            <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
-                            <StackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label Text="{Binding Name}" />
-                                <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5" />
-                            </StackLayout>
-                            <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0:F1} MB'}" VerticalOptions="Center" />
-                            <Label Grid.Column="3" Text="{Binding Status}" VerticalOptions="Center" />
-                            <Button Grid.Column="4" Text="{Binding ., Converter={StaticResource DownloadButtonTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
-                            <Button Grid.Column="5" Text="Удалить" IsVisible="{Binding IsDownloaded}" Clicked="OnDeleteClicked" CommandParameter="{Binding Name}" />
-                        </Grid>
+                        <Border Style="{StaticResource ModelBorderStyle}">
+                            <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="5,10">
+                                <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" />
+                                    <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5" />
+                                </StackLayout>
+                                <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0:F1} MB'}" VerticalOptions="Center" />
+                                <Label Grid.Column="3" Text="{Binding Status}" VerticalOptions="Center" />
+                                <Button Grid.Column="4" Text="{Binding ., Converter={StaticResource DownloadButtonTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
+                                <Button Grid.Column="5" Text="Удалить" IsVisible="{Binding IsDownloaded}" Clicked="OnDeleteClicked" CommandParameter="{Binding Name}" />
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

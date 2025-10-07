@@ -47,7 +47,7 @@ public class DownloadButtonTextConverter : IValueConverter
 
 public partial class ModelsPage : ContentPage
 {
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromMinutes(10) };
     private readonly ModelInfoDatabase _modelDb;
     private ObservableCollection<ModelInfoDb>? _models;
     public ObservableCollection<ModelInfoDb>? Models
@@ -160,6 +160,7 @@ public partial class ModelsPage : ContentPage
         if (model.IsDownloading)
         {
             // Cancel download
+            System.Diagnostics.Debug.WriteLine($"Canceling download for {model.Name}");
             if (_downloadCts != null && !_downloadCts.Token.IsCancellationRequested)
             {
                 _downloadCts.Cancel();
@@ -181,6 +182,10 @@ public partial class ModelsPage : ContentPage
                     }
                 }
             }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Cannot cancel: CTS is null or already canceled");
+            }
         }
         else if (!model.IsDownloaded)
         {
@@ -199,6 +204,7 @@ public partial class ModelsPage : ContentPage
         string fileName = $"ggml-{model.Name}.bin";
         try
         {
+            System.Diagnostics.Debug.WriteLine($"Starting download for {model.Name}");
             model.IsDownloading = true;
             model.Status = "Скачивается";
             model.Progress = 0;
@@ -215,6 +221,7 @@ public partial class ModelsPage : ContentPage
                 _ => GgmlType.Base
             };
             var url = $"https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-{model.Name}.bin";
+            System.Diagnostics.Debug.WriteLine($"URL: {url}");
             var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = Path.Combine(root, "AiAudioRecoder", "models");
             Directory.CreateDirectory(dir);
@@ -223,7 +230,12 @@ public partial class ModelsPage : ContentPage
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _downloadCts.Token);
             response.EnsureSuccessStatusCode();
-            var totalBytes = response.Content.Headers.ContentLength ?? 0;
+            var totalBytes = response.Content.Headers.ContentLength ?? model.SizeBytes;
+            if (totalBytes == 0)
+            {
+                totalBytes = model.SizeBytes; // Fallback to stored size
+            }
+            System.Diagnostics.Debug.WriteLine($"Total bytes: {totalBytes}");
             model.SizeBytes = totalBytes;
             model.SizeMB = totalBytes / (1024.0 * 1024.0);
             await _modelDb.SaveModelAsync(model);
@@ -245,6 +257,7 @@ public partial class ModelsPage : ContentPage
                     await MainThread.InvokeOnMainThreadAsync(() => { });
                 }
             }
+            System.Diagnostics.Debug.WriteLine($"Download completed for {model.Name}");
             await DisplayAlertAsync("Успех", $"Модель {fileName} успешно загружена!", "OK");
             model.IsDownloading = false;
             model.IsDownloaded = true;
@@ -255,11 +268,13 @@ public partial class ModelsPage : ContentPage
         }
         catch (OperationCanceledException)
         {
+            System.Diagnostics.Debug.WriteLine($"Download canceled for {model.Name}");
             model.IsDownloading = false;
             model.Status = "Отменено";
         }
         catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Download error for {model.Name}: {ex.Message}");
             await DisplayAlertAsync("Ошибка", ex.Message, "OK");
             model.IsDownloading = false;
             model.Status = "Ошибка";
