@@ -1,5 +1,0 @@
-<api>
-  <acw-types partial-assembly-name="Xamarin.AndroidX.Media3.Container" module-name="Xamarin.AndroidX.Media3.Container.dll">
-    <type assembly-qualified-name="AndroidX.Media3.Container.ReorderingSeiMessageQueue+ISeiConsumer, Xamarin.AndroidX.Media3.Container, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="androidx.media3.container.ReorderingSeiMessageQueue$SeiConsumer" java-key="androidx.media3.container.ReorderingSeiMessageQueue$SeiConsumer" managed-key="AndroidX.Media3.Container.ReorderingSeiMessageQueue.ISeiConsumer" partial-assembly-qualified-name="AndroidX.Media3.Container.ReorderingSeiMessageQueue+ISeiConsumer, Xamarin.AndroidX.Media3.Container" />
-  </acw-types>
-</api>
