@@ -32,7 +32,7 @@ public class DownloadButtonTextConverter : IValueConverter
         {
             if (model.IsDownloading)
             {
-                return model.IsPaused ? "Возобновить" : "Пауза";
+                return "Отмена";
             }
             return model.IsDownloaded ? "Выбрать" : "Скачать";
         }
@@ -157,16 +157,27 @@ public partial class ModelsPage : ContentPage
         if (model == null) return;
         if (model.IsDownloading)
         {
+            // Cancel download
             if (_downloadCts != null && !_downloadCts.Token.IsCancellationRequested)
             {
                 _downloadCts.Cancel();
-                model.IsPaused = true;
-                model.Status = "На паузе";
-            }
-            else
-            {
-                // Resume
-                await DownloadModel(model);
+                model.IsDownloading = false;
+                model.Status = "Отменено";
+                // Delete partial file
+                if (!string.IsNullOrEmpty(model.LocalPath) && File.Exists(model.LocalPath))
+                {
+                    try
+                    {
+                        File.Delete(model.LocalPath);
+                        model.LocalPath = "";
+                        model.IsDownloaded = false;
+                        await _modelDb.SaveModelAsync(model);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error deleting partial file: {ex.Message}");
+                    }
+                }
             }
         }
         else if (!model.IsDownloaded)
@@ -207,40 +218,18 @@ public partial class ModelsPage : ContentPage
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, fileName);
 
-            long startByte = 0;
-            if (model.IsPaused && File.Exists(path))
-            {
-                startByte = model.DownloadedBytes;
-                model.IsPaused = false;
-            }
-
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            if (startByte > 0)
-            {
-                request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(startByte, null);
-            }
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _downloadCts.Token);
             response.EnsureSuccessStatusCode();
             var totalBytes = response.Content.Headers.ContentLength ?? 0;
-            if (startByte == 0)
-            {
-                model.SizeBytes = totalBytes;
-                model.SizeMB = totalBytes / (1024.0 * 1024.0);
-                await _modelDb.SaveModelAsync(model);
-            }
-            else
-            {
-                totalBytes += startByte;
-            }
+            model.SizeBytes = totalBytes;
+            model.SizeMB = totalBytes / (1024.0 * 1024.0);
+            await _modelDb.SaveModelAsync(model);
 
             using var contentStream = await response.Content.ReadAsStreamAsync(_downloadCts.Token);
-            using var fileStream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
-            if (startByte > 0)
-            {
-                fileStream.Seek(startByte, SeekOrigin.Begin);
-            }
+            using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             var buffer = new byte[8192];
-            var totalBytesRead = startByte;
+            var totalBytesRead = 0L;
             int bytesRead;
             while ((bytesRead = await contentStream.ReadAsync(buffer, _downloadCts.Token)) > 0)
             {
@@ -264,8 +253,8 @@ public partial class ModelsPage : ContentPage
         }
         catch (OperationCanceledException)
         {
-            model.IsPaused = true;
-            model.Status = "На паузе";
+            model.IsDownloading = false;
+            model.Status = "Отменено";
         }
         catch (Exception ex)
         {
@@ -329,6 +318,37 @@ public partial class ModelsPage : ContentPage
             {
                 // Resume download
                 _ = DownloadModel(_currentDownloadingModel);
+            }
+        }
+    }
+
+    private async void OnDeleteClicked(object sender, EventArgs e)
+    {
+        if (Models == null) return;
+        var button = sender as Button;
+        var name = button?.CommandParameter as string;
+        if (name == null) return;
+        var model = Models.FirstOrDefault(m => m.Name == name);
+        if (model == null || !model.IsDownloaded || string.IsNullOrEmpty(model.LocalPath)) return;
+
+        var result = await DisplayAlertAsync("Подтверждение", $"Удалить модель {model.Name}?", "Да", "Нет");
+        if (result)
+        {
+            try
+            {
+                if (File.Exists(model.LocalPath))
+                {
+                    File.Delete(model.LocalPath);
+                }
+                model.IsDownloaded = false;
+                model.LocalPath = "";
+                model.Status = "Не скачано";
+                await _modelDb.SaveModelAsync(model);
+                UpdateModels();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlertAsync("Ошибка", $"Не удалось удалить модель: {ex.Message}", "OK");
             }
         }
     }

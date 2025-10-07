@@ -64,16 +64,6 @@ public class ModelInfoDb : INotifyPropertyChanged
         }
     }
 
-    private bool _isPaused;
-    public bool IsPaused
-    {
-        get => _isPaused;
-        set
-        {
-            _isPaused = value;
-            OnPropertyChanged();
-        }
-    }
     private long _downloadedBytes;
     public long DownloadedBytes
     {
