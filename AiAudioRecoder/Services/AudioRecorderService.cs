@@ -11,6 +11,7 @@ using AVFoundation;
 #if WINDOWS
 using NAudio.Wave;
 using NAudio.Wasapi;
+using NAudio.Wave.SampleProviders; // added for mixing
 #endif
 
 namespace AiAudioRecoder.Services
@@ -32,14 +33,16 @@ namespace AiAudioRecoder.Services
         private WasapiLoopbackCapture? _loopback;
         private WaveFileWriter? _writer;
         
-        // For mixed recording
-        private WaveInEvent? _mixedWaveIn;
-        private WasapiLoopbackCapture? _mixedLoopback;
+        // Mixed recording (new implementation)
+        private WaveInEvent? _mixedMic;
+        private WasapiLoopbackCapture? _mixedSystem;
         private WaveFileWriter? _mixedWriter;
-        private readonly ConcurrentQueue<byte[]> _micBuffer = new();
-        private readonly ConcurrentQueue<byte[]> _systemBuffer = new();
-        private bool _mixingActive;
-        private Task? _mixingTask;
+        private MixingSampleProvider? _mixer;
+        private ISampleProvider? _micSampleProvider;
+        private ISampleProvider? _systemSampleProvider;
+        private CancellationTokenSource? _mixCts;
+        private Task? _mixTask;
+        private MediaFoundationResampler? _systemResampler; // if resampling needed
 #endif
 
         public bool IsRecording => _isRecording;
@@ -63,7 +66,7 @@ namespace AiAudioRecoder.Services
                 try
                 {
                     _loopback = new WasapiLoopbackCapture();
-                    _loopback.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                    _loopback.DataAvailable += (object? sender, WaveInEventArgs e) =>
                     {
                         _writer?.Write(e.Buffer, 0, e.BytesRecorded);
                     };
@@ -76,7 +79,6 @@ namespace AiAudioRecoder.Services
                     return Task.FromResult<string?>(null);
                 }
 #else
-                // Stub for non-Windows: empty file
                 File.WriteAllBytes(_filePath, new byte[0]);
 #endif
             }
@@ -85,9 +87,8 @@ namespace AiAudioRecoder.Services
 #if WINDOWS
                 try
                 {
-                    _waveIn = new WaveInEvent();
-                    _waveIn.WaveFormat = new WaveFormat(44100, 1); // 44.1kHz, mono
-                    _waveIn.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                    _waveIn = new WaveInEvent { WaveFormat = new WaveFormat(44100, 1) }; // mono mic
+                    _waveIn.DataAvailable += (object? sender, WaveInEventArgs e) =>
                     {
                         _writer?.Write(e.Buffer, 0, e.BytesRecorded);
                     };
@@ -114,52 +115,51 @@ namespace AiAudioRecoder.Services
         {
             if (!_isRecording) return Task.CompletedTask;
 #if WINDOWS
-            // Stop mixing if active
-            if (_mixingActive)
+            // Mixed recording stop
+            if (_mixCts != null)
             {
-                _mixingActive = false;
-                if (_mixingTask != null)
-                {
-                    try
-                    {
-                        _mixingTask.Wait(5000);
-                    }
-                    catch { }
-                }
+                try { _mixCts.Cancel(); } catch { }
+                try { _mixTask?.Wait(3000); } catch { }
             }
 
-            if (_mixedWaveIn != null || _mixedLoopback != null)
+            if (_mixedMic != null)
             {
-                CleanupMixedRecording();
+                try { _mixedMic.StopRecording(); } catch { }
+                _mixedMic.Dispose();
+                _mixedMic = null;
             }
-            else if (_loopback != null)
+            if (_mixedSystem != null)
             {
-                try
-                {
-                    _loopback.StopRecording();
-                    _writer?.Dispose();
-                    _loopback.Dispose();
-                    _loopback = null;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error stopping loopback: {ex.Message}");
-                }
+                try { _mixedSystem.StopRecording(); } catch { }
+                _mixedSystem.Dispose();
+                _mixedSystem = null;
             }
-            else if (_waveIn != null)
+            _systemResampler?.Dispose();
+            _systemResampler = null;
+            _mixedWriter?.Dispose();
+            _mixedWriter = null;
+            _mixer = null;
+            _micSampleProvider = null;
+            _systemSampleProvider = null;
+            _mixCts?.Dispose();
+            _mixCts = null;
+
+            // Single source stop (if used)
+            if (_loopback != null)
             {
-                try
-                {
-                    _waveIn.StopRecording();
-                    _writer?.Dispose();
-                    _waveIn.Dispose();
-                    _waveIn = null;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error stopping mic: {ex.Message}");
-                }
+                try { _loopback.StopRecording(); } catch { }
+                _writer?.Dispose();
+                _loopback.Dispose();
+                _loopback = null;
             }
+            if (_waveIn != null)
+            {
+                try { _waveIn.StopRecording(); } catch { }
+                _writer?.Dispose();
+                _waveIn.Dispose();
+                _waveIn = null;
+            }
+            _writer = null;
 #elif ANDROID
             // TODO: Stop MediaRecorder
 #elif IOS
@@ -172,169 +172,111 @@ namespace AiAudioRecoder.Services
         public Task<string?> StartMixedRecordingAsync(string? folderName = null, string? fileName = null)
         {
             if (_isRecording) return Task.FromResult<string?>(null);
-
             var dateFolder = string.IsNullOrEmpty(folderName) ? DateTime.Now.ToString("yyyy-MM-dd") : folderName;
             var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = Path.Combine(root, "AiAudioRecoder", "audioData", dateFolder);
             Directory.CreateDirectory(dir);
             var baseName = string.IsNullOrEmpty(fileName) ? $"audio_{DateTime.Now:yyyyMMdd_HHmmss}" : fileName;
             var mixedPath = Path.Combine(dir, $"{baseName}.wav");
-
 #if WINDOWS
             try
             {
-                // Запускаем запись микрофона
-                _mixedWaveIn = new WaveInEvent();
-                _mixedWaveIn.WaveFormat = new WaveFormat(44100, 1); // Mono input
-                _mixedWaveIn.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                // Mixer works in FLOAT 32 -> we will convert to 16-bit PCM for broader compatibility
+                var mixerFloatFormat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
+                var outputPcmFormat = new WaveFormat(44100, 16, 2);
+
+                // Mic capture (mono 16-bit -> float -> stereo)
+                _mixedMic = new WaveInEvent { WaveFormat = new WaveFormat(44100, 1) };
+                var micBuffered = new BufferedWaveProvider(_mixedMic.WaveFormat) { DiscardOnBufferOverflow = true };
+                _mixedMic.DataAvailable += (s, e) => micBuffered.AddSamples(e.Buffer, 0, e.BytesRecorded);
+                ISampleProvider micSample = micBuffered.ToSampleProvider(); // 16-bit -> float
+                micSample = new MonoToStereoSampleProvider(micSample);
+                _micSampleProvider = micSample;
+
+                // System capture (device format -> resample if needed -> stereo float)
+                _mixedSystem = new WasapiLoopbackCapture();
+                var sysFormat = _mixedSystem.WaveFormat;
+                var sysBuffered = new BufferedWaveProvider(sysFormat) { DiscardOnBufferOverflow = true };
+                _mixedSystem.DataAvailable += (s, e) => sysBuffered.AddSamples(e.Buffer, 0, e.BytesRecorded);
+                ISampleProvider sysSample = sysBuffered.ToSampleProvider();
+                if (sysFormat.SampleRate != 44100 || sysFormat.Channels != 2 || sysFormat.Encoding != WaveFormatEncoding.IeeeFloat)
                 {
-                    // Копируем данные микрофона в буфер
-                    byte[] buffer = new byte[e.BytesRecorded];
-                    Array.Copy(e.Buffer, 0, buffer, 0, e.BytesRecorded);
-                    _micBuffer.Enqueue(buffer);
-                };
-                _mixedWaveIn.StartRecording();
+                    // Resample to 44.1k stereo float
+                    var resampleTarget = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
+                    _systemResampler = new MediaFoundationResampler(sysBuffered, resampleTarget) { ResamplerQuality = 60 };
+                    sysSample = _systemResampler.ToSampleProvider();
+                }
+                _systemSampleProvider = sysSample;
 
-                // Запускаем запись системного аудио
-                _mixedLoopback = new WasapiLoopbackCapture();
-                _mixedLoopback.DataAvailable += (object? sender, NAudio.Wave.WaveInEventArgs e) =>
+                // Build mixer
+                _mixer = new MixingSampleProvider(mixerFloatFormat) { ReadFully = true };
+                _mixer.AddMixerInput(_micSampleProvider);
+                _mixer.AddMixerInput(_systemSampleProvider);
+
+                // Prepare writer with PCM 16-bit format
+                _mixedWriter = new WaveFileWriter(mixedPath, outputPcmFormat);
+                _mixCts = new CancellationTokenSource();
+
+                _mixedMic.StartRecording();
+                _mixedSystem.StartRecording();
+
+                _mixTask = Task.Run(async () =>
                 {
-                    // Копируем данные системного аудио в буфер
-                    byte[] buffer = new byte[e.BytesRecorded];
-                    Array.Copy(e.Buffer, 0, buffer, 0, e.BytesRecorded);
-                    _systemBuffer.Enqueue(buffer);
-                };
-                _mixedLoopback.StartRecording();
-
-                // Создаём Writer для смешанного аудио - используем формат микшера
-                var mixerFormat = new WaveFormat(44100, 16, 2); // 44.1kHz, 16-bit, Stereo
-                _mixedWriter = new WaveFileWriter(mixedPath, mixerFormat);
-
-                // Запускаем поток для микширования
-                _mixingActive = true;
-                _mixingTask = MixAudioAsync();
+                    // 100ms buffer (float samples)
+                    var floatBuffer = new float[mixerFloatFormat.SampleRate / 10 * mixerFloatFormat.Channels];
+                    var pcmBuffer = new byte[floatBuffer.Length * 2]; // 16-bit per sample
+                    try
+                    {
+                        while (!_mixCts!.IsCancellationRequested)
+                        {
+                            int read = _mixer!.Read(floatBuffer, 0, floatBuffer.Length);
+                            if (read > 0)
+                            {
+                                // Convert float [-1,1] -> 16-bit PCM little-endian
+                                int byteIndex = 0;
+                                for (int i = 0; i < read; i++)
+                                {
+                                    var sample = floatBuffer[i];
+                                    if (sample > 1f) sample = 1f; else if (sample < -1f) sample = -1f;
+                                    short pcm = (short)(sample * short.MaxValue);
+                                    pcmBuffer[byteIndex++] = (byte)(pcm & 0xFF);
+                                    pcmBuffer[byteIndex++] = (byte)((pcm >> 8) & 0xFF);
+                                }
+                                _mixedWriter!.Write(pcmBuffer, 0, byteIndex);
+                            }
+                            else
+                            {
+                                await Task.Delay(10, _mixCts.Token);
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException) { }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Mixer loop error: {ex.Message}");
+                    }
+                }, _mixCts.Token);
 
                 _isRecording = true;
                 _filePath = mixedPath;
-
-                System.Diagnostics.Debug.WriteLine($"Started mixed recording to {mixedPath}");
+                System.Diagnostics.Debug.WriteLine($"[AudioRecorder] Mixed recording started: {mixedPath}");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error starting mixed recording: {ex.Message}");
-                CleanupMixedRecording();
+                StopRecordingAsync();
                 return Task.FromResult<string?>(null);
             }
 #else
-            // Stub для не-Windows платформ
             File.WriteAllBytes(mixedPath, new byte[0]);
+            _isRecording = true;
+            _filePath = mixedPath;
 #endif
-
-            return Task.FromResult(mixedPath);
+            return Task.FromResult<string?>(mixedPath);
         }
 
-        private async Task MixAudioAsync()
-        {
 #if WINDOWS
-            try
-            {
-                while (_mixingActive && _isRecording)
-                {
-                    bool hasMic = _micBuffer.TryDequeue(out byte[]? micData);
-                    bool hasSystem = _systemBuffer.TryDequeue(out byte[]? systemData);
-
-                    if (hasMic || hasSystem)
-                    {
-                        // Микшируем два источника в стерео
-                        byte[] micSamples = micData ?? Array.Empty<byte>();
-                        byte[] systemSamples = systemData ?? Array.Empty<byte>();
-
-                        int maxLength = Math.Max(micSamples.Length, systemSamples.Length);
-                        byte[] stereoBuffer = new byte[maxLength];
-
-                        // Микрофон -> левый канал, Система -> правый канал
-                        for (int i = 0; i < maxLength; i += 2)
-                        {
-                            // Левый канал (микрофон)
-                            if (i < micSamples.Length)
-                            {
-                                stereoBuffer[i] = micSamples[i];
-                                if (i + 1 < micSamples.Length)
-                                    stereoBuffer[i + 1] = micSamples[i + 1];
-                            }
-
-                            // Правый канал (система)
-                            if (i < systemSamples.Length)
-                            {
-                                if (i + 2 < stereoBuffer.Length)
-                                    stereoBuffer[i + 2] = systemSamples[i];
-                                if (i + 3 < stereoBuffer.Length && i + 1 < systemSamples.Length)
-                                    stereoBuffer[i + 3] = systemSamples[i + 1];
-                            }
-                        }
-
-                        _mixedWriter?.Write(stereoBuffer, 0, stereoBuffer.Length);
-                    }
-                    else
-                    {
-                        await Task.Delay(10);
-                    }
-                }
-
-                // Записываем оставшиеся данные
-                while (_micBuffer.TryDequeue(out byte[]? remaining))
-                {
-                    _mixedWriter?.Write(remaining, 0, remaining.Length);
-                }
-                while (_systemBuffer.TryDequeue(out byte[]? remaining))
-                {
-                    _mixedWriter?.Write(remaining, 0, remaining.Length);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error in mixed recording: {ex.Message}");
-            }
+        // (Removed old queue-based MixAudioAsync and CleanupMixedRecording - now handled in StopRecordingAsync)
 #endif
-        }
-
-        private void CleanupMixedRecording()
-        {
-#if WINDOWS
-            if (_mixedWaveIn != null)
-            {
-                try
-                {
-                    _mixedWaveIn.StopRecording();
-                    _mixedWaveIn.Dispose();
-                    _mixedWaveIn = null;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error cleaning up mic: {ex.Message}");
-                }
-            }
-
-            if (_mixedLoopback != null)
-            {
-                try
-                {
-                    _mixedLoopback.StopRecording();
-                    _mixedLoopback.Dispose();
-                    _mixedLoopback = null;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error cleaning up loopback: {ex.Message}");
-                }
-            }
-
-            _mixedWriter?.Dispose();
-            _mixedWriter = null;
-            
-            _micBuffer.Clear();
-            _systemBuffer.Clear();
-#endif
-        }
     }
 }
