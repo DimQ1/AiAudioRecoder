@@ -4,7 +4,10 @@ using System.Net.Http;
 using System.IO;
 using Whisper.net.Ggml;
 using Microsoft.Maui.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using AiAudioRecoder.Services;
+using AiAudioRecoder.Models;
+using AiAudioRecoder.Converters;
 
 namespace AiAudioRecoder;
 
@@ -21,37 +24,60 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Services.AddSingleton<
-            AiAudioRecoder.Services.IAudioRecorderService,
-            AiAudioRecoder.Services.AudioRecorderService
-        >();
-        var dbRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "Databases");
-        Directory.CreateDirectory(dbRoot);
-        var dbPath = Path.Combine(dbRoot, "audio_metadata.db3");
-        builder.Services.AddSingleton(new AiAudioRecoder.Services.AudioMetadataDatabase(dbPath));
-        // Путь к модели: используем текущую модель из Preferences, по умолчанию base
-        var docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var modelDir = Path.Combine(docsPath, "AiAudioRecoder", "models");
-        Directory.CreateDirectory(modelDir);
-        var currentModel = Preferences.Get("CurrentModel", "base");
-        var modelPath = Path.Combine(modelDir, $"ggml-{currentModel}.bin");
-        if (!File.Exists(modelPath))
-        {
-            // Автоматическая загрузка текущей модели при первом запуске (асинхронно)
-            _ = DownloadModelAsync(currentModel, modelDir);
-        }
-        var deviceStr = Preferences.Get("DeviceType", "CPU");
-        var device = deviceStr == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
-        var deviceIndex = Preferences.Get("DeviceNumber", 0);
-        builder.Services.AddSingleton(
-            new AiAudioRecoder.Services.WhisperTranscriptionService(modelPath, device, deviceIndex)
-        );
-        var modelDbPath = Path.Combine(dbRoot, "models.db3");
-        builder.Services.AddSingleton(new AiAudioRecoder.Models.ModelInfoDatabase(modelDbPath));
-
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+
+        // Register core services first
+        builder.Services.AddSingleton<IAudioRecorderService, AudioRecorderService>();
+        
+        // Database setup - create logger first
+        var loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+        var logger = loggerFactory.CreateLogger<AudioMetadataDatabase>();
+        
+        var dbRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "Databases");
+        Directory.CreateDirectory(dbRoot);
+        var dbPath = Path.Combine(dbRoot, "audio_metadata.db3");
+        
+        // Create database with logger
+        var audioDb = new AudioMetadataDatabase(dbPath, logger);
+        builder.Services.AddSingleton<AudioMetadataDatabase>(audioDb);
+        
+        // Model setup
+        var docsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var modelDir = Path.Combine(docsPath, "AiAudioRecoder", "models");
+        Directory.CreateDirectory(modelDir);
+        var currentModel = Preferences.Default.Get("CurrentModel", "base");
+        var modelPath = Path.Combine(modelDir, $"ggml-{currentModel}.bin");
+        
+        if (!File.Exists(modelPath))
+        {
+            _ = DownloadModelAsync(currentModel, modelDir);
+        }
+        
+        var deviceStr = Preferences.Default.Get("DeviceType", "CPU");
+        var device = deviceStr == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
+        var deviceIndex = Preferences.Default.Get("DeviceNumber", 0);
+        
+        builder.Services.AddSingleton<WhisperTranscriptionService>(provider => 
+            new WhisperTranscriptionService(modelPath, device, deviceIndex));
+        
+        builder.Services.AddSingleton<TranscriptionQueueService>();
+        
+        var modelDbPath = Path.Combine(dbRoot, "models.db3");
+        builder.Services.AddSingleton(new ModelInfoDatabase(modelDbPath));
+
+        // Register pages
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<RecordPage>();
+        
+        // Register converters
+        builder.Services.AddTransient<DurationConverter>();
+        builder.Services.AddTransient<TranscriptionStatusConverter>();
+        builder.Services.AddTransient<StatusColorConverter>();
+        builder.Services.AddTransient<InverseBoolConverter>();
+        builder.Services.AddTransient<FilePathConverter>();
+        builder.Services.AddTransient<QueueStatusConverter>();
 
         return builder.Build();
     }
@@ -63,16 +89,20 @@ public static class MauiProgram
             var url = $"https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-{modelName}.bin";
             var fileName = $"ggml-{modelName}.bin";
             var path = Path.Combine(modelDir, fileName);
+            
             using var httpClient = new HttpClient();
             var response = await httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
+            
             using var stream = await response.Content.ReadAsStreamAsync();
             using var fileStream = File.Create(path);
             await stream.CopyToAsync(fileStream);
+            
+            System.Diagnostics.Debug.WriteLine($"Model {modelName} downloaded successfully to {path}");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error downloading model: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error downloading model {modelName}: {ex.Message}");
         }
     }
 }

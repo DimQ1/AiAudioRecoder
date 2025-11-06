@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "AiAudioRecoder": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "--launch-profile Debug"
+    },
+    "AiAudioRecoder (Package)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "--profile Debug"
+    },
+    "AiAudioRecoder (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

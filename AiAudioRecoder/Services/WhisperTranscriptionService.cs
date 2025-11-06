@@ -10,27 +10,31 @@ namespace AiAudioRecoder.Services
     public enum DeviceType
     {
         Cpu,
-        Gpu
+        Gpu,
     }
 
     public class WhisperTranscriptionService
     {
-        private readonly string _modelPath;
-        private readonly DeviceType _device;
-        private readonly int _deviceIndex;
+        public string ModelPath { get; set; }
+        public DeviceType Device { get; set; }
+        public int DeviceIndex { get; set; }
 
-        public WhisperTranscriptionService(string modelPath, DeviceType device = DeviceType.Cpu, int deviceIndex = 0)
+        public WhisperTranscriptionService(
+            string modelPath,
+            DeviceType device = DeviceType.Cpu,
+            int deviceIndex = 0
+        )
         {
-            _modelPath = modelPath;
-            _device = device;
-            _deviceIndex = deviceIndex;
+            ModelPath = modelPath;
+            Device = device;
+            DeviceIndex = deviceIndex;
         }
 
         public async Task<string> TranscribeAsync(string audioFilePath)
         {
-            if (!File.Exists(_modelPath))
+            if (!File.Exists(ModelPath))
             {
-                System.Diagnostics.Debug.WriteLine($"Model not found: {_modelPath}. Skipping transcription.");
+                System.Diagnostics.Debug.WriteLine($"Model not found: {ModelPath}. Skipping transcription.");
                 return "Транскрипция недоступна: модель не загружена.";
             }
 
@@ -57,10 +61,10 @@ namespace AiAudioRecoder.Services
                     }
                 }
 
-                using var factory = WhisperFactory.FromPath(_modelPath, new WhisperFactoryOptions()
+                using var factory = WhisperFactory.FromPath(ModelPath, new WhisperFactoryOptions()
                 {
-                    UseGpu = _device == DeviceType.Gpu,
-                    GpuDevice = _deviceIndex
+                    UseGpu = Device == DeviceType.Gpu,
+                    GpuDevice = DeviceIndex
                 });
                 // Multiple Runtimes Support: Whisper.net automatically selects the best runtime based on installed packages and platform
                 // Priority: Cuda > Vulkan > CoreML > OpenVino > Cpu > NoAvx

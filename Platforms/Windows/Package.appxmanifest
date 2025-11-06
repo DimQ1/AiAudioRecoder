@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  IgnorableNamespaces="uap mp uap3">
+
+  <Identity
+    Name="AiAudioRecoder"
+    Publisher="CN=Developer"
+    Version="1.0.0.0" />
+
+  <Properties>
+    <DisplayName>AiAudioRecoder</DisplayName>
+    <PublisherDisplayName>Developer</PublisherDisplayName>
+    <Logo>Assets\Square44x44Logo.png</Logo>
+    <Description>AI Audio Recorder with Whisper transcription</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="ru-ru" />
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="AiAudioRecoder.App">
+      
+      <uap:VisualElements
+        DisplayName="AiAudioRecoder"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        Description="AI Audio Recorder with Whisper transcription"
+        BackgroundColor="transparent">
+        
+        <uap:DefaultTile ShowNameOnTiles="true">
+          <uap:ShowOn>Tile</uap:ShowOn>
+          <uap:ShowOn>StartList</uap:ShowOn>
+          <uap:ShowOn>SearchList</uap:ShowOn>
+          <uap:ShowOn>EndList</uap:ShowOn>
+          <uap:ShowOn>DesktopNotification</uap:ShowOn>
+          <uap:ShowOn>AppList</uap:ShowOn>
+          <uap:ShowOn>Small</uap:ShowOn>
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.scale-200.png" />
+      </uap:VisualElements>
+
+      <!-- Microphone capability -->
+      <Extensions>
+        <uap3:Extension Category="windows.capabilities" EntryPoint="winrt">
+          <uap3:Capability Name="microphone" />
+        </uap3:Extension>
+      </Extensions>
+
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="rescap.runFullTrust" />
+  </Capabilities>
+
+</Package>

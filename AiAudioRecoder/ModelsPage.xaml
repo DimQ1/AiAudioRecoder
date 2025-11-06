@@ -21,7 +21,9 @@
         </Style>
     </ContentPage.Resources>
 
-    <ScrollView>
+    <Grid>
+        <Image Source="dotnet_bot.png" Aspect="AspectFill" Opacity="0.2" />
+        <ScrollView>
         <VerticalStackLayout Padding="30,0" Spacing="25">
             <Label Text="Модели Whisper:" />
             <Picker x:Name="DevicePicker" Title="Устройство" SelectedIndexChanged="OnDeviceChanged">
@@ -77,5 +79,6 @@
             <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
         </VerticalStackLayout>
     </ScrollView>
+    </Grid>
 
 </ContentPage>

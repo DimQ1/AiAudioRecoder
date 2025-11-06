@@ -65,4 +65,10 @@
 	    <PackageReference Include="Whisper.net.AllRuntimes" Version="1.8.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="RecordPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

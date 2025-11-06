@@ -1,79 +1,144 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "build-windows",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
-                "-f",
-                "net10.0-windows10.0.19041.0",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile",
-            "group": "build"
-        },
-        {
-            "label": "build-android",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
-                "-f",
-                "net10.0-android",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile",
-            "group": "build"
-        },
-        {
-            "label": "build-ios",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
-                "-f",
-                "net10.0-ios",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile",
-            "group": "build"
-        },
-        {
-            "label": "publish-android",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
-                "-f",
-                "net10.0-android",
-                "-c",
-                "Release",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": [],
-            "group": "build"
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build-windows",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile",
+			"group": "build"
+		},
+		{
+			"label": "build-android",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
+				"-f",
+				"net10.0-android",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile",
+			"group": "build"
+		},
+		{
+			"label": "build-ios",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
+				"-f",
+				"net10.0-ios",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile",
+			"group": "build"
+		},
+		{
+			"label": "publish-android",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"publish",
+				"${workspaceFolder}/AiAudioRecoder/AiAudioRecoder.csproj",
+				"-f",
+				"net10.0-android",
+				"-c",
+				"Release",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "run-windows",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"--project",
+				"AiAudioRecoder/AiAudioRecoder.csproj"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "run-windows",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"--project",
+				"AiAudioRecoder/AiAudioRecoder.csproj"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "run-windows",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"--project",
+				"AiAudioRecoder/AiAudioRecoder.csproj"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "run-windows",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"--project",
+				"AiAudioRecoder/AiAudioRecoder.csproj"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "run-windows",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"-f",
+				"net10.0-windows10.0.19041.0",
+				"--project",
+				"AiAudioRecoder/AiAudioRecoder.csproj"
+			],
+			"isBackground": false
+		}
+	]
 }

@@ -2,68 +2,58 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-             x:Class="AiAudioRecoder.MainPage">
+             x:Class="AiAudioRecoder.MainPage"
+             Title="AiAudioRecoder">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+    <Grid>
+        <Image Source="dotnet_bot.png" Aspect="AspectFill" Opacity="0.2" />
+        <ScrollView Margin="0,0,0,100">
+            <VerticalStackLayout Padding="30,0" Spacing="25">
 
-            <Label Text="Выберите модель Whisper:" />
-            <Picker x:Name="ModelPicker">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type sys:String}">
-                        <x:String>tiny</x:String>
-                        <x:String>base</x:String>
-                        <x:String>small</x:String>
-                        <x:String>medium</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
-            <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
-            <Button
-                x:Name="DownloadButton"
-                Text="Скачать выбранную модель"
-                Clicked="OnDownloadModelClicked"
-                HorizontalOptions="Fill" />
-            <Label Text="Источник записи:" />
-            <Switch x:Name="SystemAudioSwitch" IsToggled="False" />
-            <Label Text="Микрофон (выкл.) / Система (вкл.)" />
-            <Button
-                x:Name="RecordButton"
-                Text="Записать и транскрибировать"
-                Clicked="OnRecordAndTranscribeClicked"
-                HorizontalOptions="Fill" />
-            <Button
-                x:Name="StopButton"
-                Text="Остановить запись"
-                Clicked="OnStopRecordingClicked"
-                IsVisible="False"
-                BackgroundColor="Red"
-                TextColor="White"
-                HorizontalOptions="Fill" />
-            <Button
-                x:Name="ShowRecordsButton"
-                Text="Показать записи"
-                Clicked="OnShowRecordsClicked"
-                HorizontalOptions="Fill" />
+                <Label Text="Выберите модель Whisper:" FontAttributes="Bold" />
+                <Picker x:Name="ModelPicker" Title="Выберите модель">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type sys:String}">
+                            <x:String>tiny</x:String>
+                            <x:String>base</x:String>
+                            <x:String>small</x:String>
+                            <x:String>medium</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+                
+                <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
+                <Button x:Name="DownloadButton"
+                        Text="Скачать выбранную модель"
+                        Clicked="OnDownloadModelClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
 
-            <CollectionView x:Name="RecordsView" IsVisible="False">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="0,5" Stroke="Gray" StrokeShape="RoundRectangle 8">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding FilePath}" FontAttributes="Bold" />
-                                <Label Text="{Binding StartTime, StringFormat='Начало: {0:yyyy-MM-dd HH:mm:ss}'}" />
-                                <Label Text="{Binding EndTime, StringFormat='Конец: {0:yyyy-MM-dd HH:mm:ss}'}" />
-                                <Label Text="{Binding Summary}" FontAttributes="Italic" />
-                                <Label Text="{Binding Transcription}" LineBreakMode="WordWrap" />
-                            </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label Text="Источник записи:" FontAttributes="Bold" />
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Switch x:Name="SystemAudioSwitch" Grid.Column="0" />
+                    <Label Grid.Column="1" 
+                           Text="Микрофон (выкл.) / Система (вкл.)"
+                           VerticalOptions="Center" />
+                </Grid>
+
+                <Button x:Name="RecordButton"
+                        Text="Записать аудио"
+                        Clicked="OnRecordClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="Green"
+                        TextColor="White" />
+
+                <Button x:Name="ShowRecordsButton"
+                        Text="Показать записи"
+                        Clicked="OnShowRecordsClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 
 </ContentPage>

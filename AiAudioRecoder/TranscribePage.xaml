@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AiAudioRecoder.TranscribePage">
 
-    <ScrollView>
+    <Grid>
+        <Image Source="dotnet_bot.png" Aspect="AspectFill" Opacity="0.2" />
+        <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
@@ -30,5 +32,6 @@
 
         </VerticalStackLayout>
     </ScrollView>
+    </Grid>
 
 </ContentPage>

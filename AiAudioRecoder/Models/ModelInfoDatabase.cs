@@ -13,12 +13,29 @@ public class ModelInfoDatabase
     {
         _db = new SQLiteAsyncConnection(dbPath);
         _db.CreateTableAsync<ModelInfoDb>().Wait();
+        _db.CreateTableAsync<AppSetting>().Wait();
     }
 
     public Task<List<ModelInfoDb>> GetModelsAsync() => _db.Table<ModelInfoDb>().ToListAsync();
     public Task<ModelInfoDb> GetModelAsync(string name) => _db.Table<ModelInfoDb>().Where(m => m.Name == name).FirstOrDefaultAsync();
     public Task<int> SaveModelAsync(ModelInfoDb model) => _db.InsertOrReplaceAsync(model);
     public Task<int> DeleteModelAsync(ModelInfoDb model) => _db.DeleteAsync(model);
+    public async Task<string?> GetSettingAsync(string key)
+    {
+        var setting = await _db.Table<AppSetting>().Where(s => s.Key == key).FirstOrDefaultAsync();
+        return setting?.Value;
+    }
+
+    public Task<int> SetSettingAsync(string key, string value)
+    {
+        var setting = new AppSetting
+        {
+            Key = key,
+            Value = value
+        };
+        return _db.InsertOrReplaceAsync(setting);
+    }
+
     public async Task EnsureDefaultModelsAsync()
     {
         var models = await GetModelsAsync();

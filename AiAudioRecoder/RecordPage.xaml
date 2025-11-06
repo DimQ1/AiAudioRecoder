@@ -1,51 +1,217 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-             x:Class="AiAudioRecoder.RecordPage">
+             xmlns:converters="clr-namespace:AiAudioRecoder.Converters"
+             x:Class="AiAudioRecoder.RecordPage"
+             Title="Records">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:DurationConverter x:Key="DurationConverter" />
+            <converters:TranscriptionStatusConverter x:Key="TranscriptionStatusConverter" />
+            <converters:StatusColorConverter x:Key="StatusColorConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:FilePathConverter x:Key="FilePathConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
-            <Label Text="Источник записи:" />
-            <Switch x:Name="SystemAudioSwitch" IsToggled="False" />
-            <Label Text="Микрофон (выкл.) / Система (вкл.)" />
-            <Button
-                x:Name="RecordButton"
-                Text="Записать"
-                Clicked="OnRecordClicked"
-                HorizontalOptions="Fill" />
-            <Button
-                x:Name="StopButton"
-                Text="Остановить запись"
-                Clicked="OnStopRecordingClicked"
-                IsVisible="False"
-                BackgroundColor="Red"
-                TextColor="White"
-                HorizontalOptions="Fill" />
-            <Button
-                Text="Показать записи"
-                Clicked="OnShowRecordsClicked"
-                HorizontalOptions="Fill" />
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20">
+        
+        <Frame Grid.Row="0" BackgroundColor="LightGray" Padding="10" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                
+                <VerticalStackLayout Grid.ColumnSpan="2" Margin="0,0,0,10">
+                    <Label Text="Record Source:" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,5">
+                        <CheckBox x:Name="MicrophoneCheckBox" 
+                                  Grid.Column="0"
+                                  IsChecked="True" />
+                        <Label Grid.Column="1" 
+                               Text="Microphone"
+                               VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,0,0,10">
+                        <CheckBox x:Name="SystemAudioCheckBox" 
+                                  Grid.Column="0"
+                                  IsChecked="False" />
+                        <Label Grid.Column="1" 
+                               Text="System Audio"
+                               VerticalOptions="Center" />
+                    </Grid>
+                    
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                        <Button x:Name="RecordButton"
+                                Grid.Column="0"
+                                Text="Record"
+                                Clicked="OnRecordClicked"
+                                BackgroundColor="Green"
+                                TextColor="White" />
+                        
+                        <Button x:Name="StopButton"
+                                Grid.Column="1"
+                                Text="Stop Recording"
+                                Clicked="OnStopRecordingClicked"
+                                IsVisible="False"
+                                BackgroundColor="Red"
+                                TextColor="White" />
+                    </Grid>
+                </VerticalStackLayout>
 
-            <CollectionView x:Name="RecordsView" IsVisible="False">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="0,5" Stroke="Gray" StrokeShape="RoundRectangle 8">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding FilePath}" FontAttributes="Bold" />
-                                <Label Text="{Binding StartTime, StringFormat='Начало: {0:yyyy-MM-dd HH:mm:ss}'}" />
-                                <Label Text="{Binding EndTime, StringFormat='Конец: {0:yyyy-MM-dd HH:mm:ss}'}" />
-                                <Label Text="{Binding Summary}" FontAttributes="Italic" />
-                                <Label Text="{Binding Transcription}" LineBreakMode="WordWrap" />
-                            </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </VerticalStackLayout>
-    </ScrollView>
+                <Label Grid.Row="1" 
+                       Grid.ColumnSpan="2"
+                       x:Name="QueueStatusLabel"
+                       Text="Queue: 0 | Active: 0"
+                       FontSize="12"
+                       TextColor="Gray"
+                       HorizontalOptions="Center" />
+                
+            </Grid>
+        </Frame>
+
+        <Frame Grid.Row="1" BackgroundColor="White" Padding="10" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry x:Name="SearchEntry" 
+                       Grid.Column="0"
+                       Placeholder="Search content..."
+                       TextChanged="OnSearchTextChanged" />
+                
+                <Button Grid.Column="1"
+                        Text="Refresh"
+                        Clicked="OnShowRecordsClicked"
+                        BackgroundColor="Blue"
+                        TextColor="White"
+                        Margin="10,0,0,0" />
+            </Grid>
+        </Frame>
+
+        <ProgressBar x:Name="TranscriptionProgress"
+                     Grid.Row="1"
+                     IsVisible="False"
+                     Progress="0"
+                     Margin="0,10,0,0" />
+
+        <ScrollView Grid.Row="2">
+            <Grid RowDefinitions="Auto,*" Margin="0,0,0,10">
+                
+                <Grid Grid.Row="0" 
+                      BackgroundColor="LightBlue"
+                      RowDefinitions="40"
+                      ColumnDefinitions="100,150,150,200,150,100"
+                      ColumnSpacing="1"
+                      RowSpacing="1">
+                    
+                    <Label Grid.Column="0" Text="Date" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                    <Label Grid.Column="1" Text="Duration" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                    <Label Grid.Column="2" Text="Status" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                    <Label Grid.Column="3" Text="Summary" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                    <Label Grid.Column="4" Text="Action" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                    <Label Grid.Column="5" Text="File" 
+                           Style="{StaticResource TableHeaderStyle}" />
+                </Grid>
+
+                <CollectionView x:Name="RecordsView" 
+                                Grid.Row="1"
+                                ItemsSource="{Binding DisplayedRecords}">
+                    
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid RowDefinitions="Auto" 
+                                  ColumnDefinitions="100,150,150,200,150,100"
+                                  ColumnSpacing="1"
+                                  Margin="0,1">
+                                
+                                <Label Grid.Column="0" 
+                                       Text="{Binding EndTime, StringFormat='{0:dd.MM.yyyy HH:mm:ss}'}"
+                                       Style="{StaticResource TableCellStyle}" />
+                                
+                                <Label Grid.Column="1" 
+                                       Text="{Binding Duration, Converter={StaticResource DurationConverter}}"
+                                       Style="{StaticResource TableCellStyle}" />
+                                
+                                <Label Grid.Column="2" 
+                                       Text="{Binding IsTranscribed, Converter={StaticResource TranscriptionStatusConverter}}"
+                                       Style="{StaticResource TableCellStyle}"
+                                       BackgroundColor="{Binding IsTranscribed, Converter={StaticResource StatusColorConverter}}"
+                                       TextColor="White" />
+                                
+                                <Label Grid.Column="3" 
+                                       Text="{Binding Summary}"
+                                       Style="{StaticResource TableCellStyle}" />
+                                
+                                <Button Grid.Column="4"
+                                        x:Name="TranscribeButton"
+                                        CommandParameter="{Binding .}"
+                                        IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}"
+                                        Text="Transcribe"
+                                        Clicked="OnTranscribeClicked"
+                                        Style="{StaticResource TranscribeButtonStyle}" />
+                                
+                                <Label Grid.Column="4"
+                                       IsVisible="{Binding IsTranscribed}"
+                                       Text="?"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       Style="{StaticResource TableCellStyle}"
+                                       BackgroundColor="{StaticResource TranscribedColor}" />
+                                
+                                <Label Grid.Column="5" 
+                                       Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}"
+                                       Style="{StaticResource TableCellStyle}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Spacing="10" 
+                                            HorizontalOptions="Center" 
+                                            VerticalOptions="Center" 
+                                            Margin="20">
+                            <Image Source="dotnet_bot.png" 
+                                   HeightRequest="100" 
+                                   Opacity="0.5" />
+                            <Label Text="No records" 
+                                   FontSize="18" 
+                                   HorizontalOptions="Center" />
+                            <Label Text="Click Record to start" 
+                                   FontSize="14" 
+                                   TextColor="Gray"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </Grid>
+        </ScrollView>
+
+        <Frame Grid.Row="3" BackgroundColor="LightGray" Padding="10">
+            <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="20">
+                <Label Grid.Column="0" 
+                       x:Name="QueueLabel"
+                       Text="Queue: 0 tasks"
+                       FontSize="12" 
+                       TextColor="Gray" />
+                
+                <Label Grid.Column="1" 
+                       x:Name="ActiveLabel"
+                       Text="Active: 0 tasks"
+                       FontSize="12" 
+                       TextColor="Gray" />
+                
+                <Button Grid.Column="2" 
+                        Text="Refresh"
+                        Clicked="OnShowRecordsClicked"
+                        BackgroundColor="Blue"
+                        TextColor="White"
+                        FontSize="12" />
+            </Grid>
+        </Frame>
+
+    </Grid>
 
 </ContentPage>

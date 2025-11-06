@@ -9,6 +9,8 @@ using System.Runtime.CompilerServices;
 using Microsoft.Maui.Storage;
 using AiAudioRecoder.Models;
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
+using AiAudioRecoder.Services;
 
 namespace AiAudioRecoder;
 
@@ -33,6 +35,14 @@ public class DownloadButtonTextConverter : IValueConverter
             if (model.IsDownloading)
             {
                 return "Отмена";
+            }
+            if (model.IsDownloaded && model.Status == "Ошибка")
+            {
+                return "Перескачать";
+            }
+            if (model.Status == "Не скачано")
+            {
+                return "Скачать";
             }
             return model.IsDownloaded ? "Выбрать" : "Скачать";
         }
@@ -86,6 +96,7 @@ public partial class ModelsPage : ContentPage
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     var models = await _modelDb.GetModelsAsync();
+                    models = models.OrderBy(m => m.SizeMB).ToList();
                     Models = new ObservableCollection<ModelInfoDb>(models);
                     UpdateModels();
                 });
@@ -99,8 +110,9 @@ public partial class ModelsPage : ContentPage
 
     private async Task LoadModelsAsync()
     {
-        await _modelDb.EnsureDefaultModelsAsync();
-        var models = await _modelDb.GetModelsAsync();
+    await _modelDb.EnsureDefaultModelsAsync();
+    var models = await _modelDb.GetModelsAsync();
+    await LoadDeviceSettingsAsync();
         System.Diagnostics.Debug.WriteLine($"Loaded {models.Count} models");
         foreach (var m in models)
         {
@@ -111,8 +123,33 @@ public partial class ModelsPage : ContentPage
                 await _modelDb.SaveModelAsync(m);
             }
         }
+        models = models.OrderBy(m => m.SizeMB).ToList();
         Models = new ObservableCollection<ModelInfoDb>(models);
         UpdateModels();
+    }
+
+    private async Task LoadDeviceSettingsAsync()
+    {
+        var deviceType = await _modelDb.GetSettingAsync("DeviceType") ?? "CPU";
+        var deviceNumberStr = await _modelDb.GetSettingAsync("DeviceNumber") ?? "0";
+        if (DevicePicker.ItemsSource is IList<string> deviceItems)
+        {
+            var index = deviceItems.IndexOf(deviceType);
+            DevicePicker.SelectedIndex = index >= 0 ? index : 0;
+        }
+        else
+        {
+            DevicePicker.SelectedIndex = deviceType == "GPU" ? 1 : 0;
+        }
+        if (int.TryParse(deviceNumberStr, out var number))
+        {
+            DeviceNumberPicker.SelectedIndex = number;
+        }
+        else
+        {
+            DeviceNumberPicker.SelectedIndex = 0;
+        }
+        DeviceNumberPicker.IsVisible = (DevicePicker.SelectedItem?.ToString() ?? "CPU") == "GPU";
     }
 
     private void UpdateModels()
@@ -191,6 +228,10 @@ public partial class ModelsPage : ContentPage
         {
             await DownloadModel(model);
         }
+        else if (model.IsDownloaded && model.Status == "Ошибка")
+        {
+            await DownloadModel(model);
+        }
         else
         {
             await SetCurrentModel(model);
@@ -227,10 +268,15 @@ public partial class ModelsPage : ContentPage
             Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, fileName);
 
+            // Get content length first
+            var headRequest = new HttpRequestMessage(HttpMethod.Head, url);
+            var headResponse = await _httpClient.SendAsync(headRequest, _downloadCts.Token);
+            headResponse.EnsureSuccessStatusCode();
+            var totalBytes = headResponse.Content.Headers.ContentLength ?? model.SizeBytes;
+
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _downloadCts.Token);
             response.EnsureSuccessStatusCode();
-            var totalBytes = response.Content.Headers.ContentLength ?? model.SizeBytes;
             if (totalBytes == 0)
             {
                 totalBytes = model.SizeBytes; // Fallback to stored size
@@ -262,15 +308,21 @@ public partial class ModelsPage : ContentPage
             model.IsDownloading = false;
             model.IsDownloaded = true;
             model.LocalPath = path;
-            model.Status = "Готово";
+            var fileSize = new FileInfo(path).Length;
+            if (fileSize == totalBytes)
+                model.Status = "Готово";
+            else
+                model.Status = "Ошибка";
             await _modelDb.SaveModelAsync(model);
-            UpdateModels();
+            await MainThread.InvokeOnMainThreadAsync(() => { });
         }
         catch (OperationCanceledException)
         {
             System.Diagnostics.Debug.WriteLine($"Download canceled for {model.Name}");
             model.IsDownloading = false;
             model.Status = "Отменено";
+            UpdateModels();
+            await MainThread.InvokeOnMainThreadAsync(() => { });
         }
         catch (Exception ex)
         {
@@ -279,6 +331,8 @@ public partial class ModelsPage : ContentPage
             model.IsDownloading = false;
             model.Status = "Ошибка";
             model.Progress = 0;
+            UpdateModels();
+            await MainThread.InvokeOnMainThreadAsync(() => { });
         }
         finally
         {
@@ -304,23 +358,41 @@ public partial class ModelsPage : ContentPage
         else
         {
             Preferences.Set("CurrentModel", model.Name);
+            var service = this.Handler?.MauiContext?.Services?.GetService<AiAudioRecoder.Services.WhisperTranscriptionService>();
+            if (service != null)
+            {
+                service.ModelPath = model.LocalPath;
+            }
             UpdateModels();
+            _ = DisplayAlertAsync("Уведомление", "Модель изменена.", "OK");
         }
     }
 
     private void OnDeviceChanged(object sender, EventArgs e)
     {
         var device = DevicePicker.SelectedItem?.ToString() ?? "CPU";
-        Preferences.Set("DeviceType", device);
+    Preferences.Set("DeviceType", device);
+    _ = _modelDb.SetSettingAsync("DeviceType", device);
         DeviceNumberPicker.IsVisible = device == "GPU";
-        DisplayAlertAsync("Уведомление", "Изменения устройства вступят в силу после перезапуска приложения.", "OK");
+        var service = this.Handler?.MauiContext?.Services?.GetService<AiAudioRecoder.Services.WhisperTranscriptionService>();
+        if (service != null)
+        {
+            service.Device = device == "GPU" ? AiAudioRecoder.Services.DeviceType.Gpu : AiAudioRecoder.Services.DeviceType.Cpu;
+        }
+        _ = DisplayAlertAsync("Уведомление", "Изменения устройства применены.", "OK");
     }
 
     private void OnDeviceNumberChanged(object sender, EventArgs e)
     {
         var number = DeviceNumberPicker.SelectedIndex;
-        Preferences.Set("DeviceNumber", number);
-        DisplayAlertAsync("Уведомление", "Изменения номера устройства вступят в силу после перезапуска приложения.", "OK");
+    Preferences.Set("DeviceNumber", number);
+    _ = _modelDb.SetSettingAsync("DeviceNumber", number.ToString());
+        var service = this.Handler?.MauiContext?.Services?.GetService<AiAudioRecoder.Services.WhisperTranscriptionService>();
+        if (service != null)
+        {
+            service.DeviceIndex = number;
+        }
+        _ = DisplayAlertAsync("Уведомление", "Изменения номера устройства применены.", "OK");
     }
 
     private void OnPauseResumeClicked(object sender, EventArgs e)
@@ -362,6 +434,7 @@ public partial class ModelsPage : ContentPage
                 model.Status = "Не скачано";
                 await _modelDb.SaveModelAsync(model);
                 UpdateModels();
+                await MainThread.InvokeOnMainThreadAsync(() => { });
             }
             catch (Exception ex)
             {
