@@ -151,7 +151,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             await _db.AddMetadataAsync(_currentRecording);
 
             RecordButton.BackgroundColor = Colors.Green;
-            RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+            RecordButton.Text = "Записать";
             _isRecordingInProgress = false;
             RecordButton.IsEnabled = true;
 
@@ -178,7 +178,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             if (_isRecordingInProgress == false)
             {
                 RecordButton.BackgroundColor = Colors.Green;
-                RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+                RecordButton.Text = "Записать";
                 RecordButton.IsEnabled = true;
             }
         }
@@ -404,7 +404,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private void ResetRecordButton()
     {
         RecordButton.IsEnabled = true;
-        RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+        RecordButton.Text = "Записать";
         RecordButton.BackgroundColor = Colors.Green;
     }
 

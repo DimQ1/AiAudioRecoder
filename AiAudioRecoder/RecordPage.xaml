@@ -39,9 +39,10 @@
                     </FlexLayout>
                     
                     <Grid ColumnDefinitions="*" Margin="0,10,0,0">
+                        <!-- Record button updated -->
                         <Button x:Name="RecordButton"
                                 Grid.Column="0"
-                                Text="Record and transcribe"
+                                Text="Записать"
                                 Clicked="OnRecordClicked"
                                 BackgroundColor="Green"
                                 TextColor="White" />
