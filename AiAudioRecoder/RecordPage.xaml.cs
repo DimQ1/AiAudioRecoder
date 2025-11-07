@@ -27,6 +27,8 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private TaskCompletionSource<bool>? _recordingTcs;
     private AudioFileMetadata? _currentRecording;
 
+    private bool _autoTranscribe = true;
+
     public RecordPage(Services.IAudioRecorderService recorder, 
                      Services.AudioMetadataDatabase db,
                      Services.TranscriptionQueueService transcriptionQueue,
@@ -72,65 +74,57 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
 
     #region Event Handlers
 
+    private void OnAutoTranscribeChanged(object sender, CheckedChangedEventArgs e)
+    {
+        _autoTranscribe = e.Value;
+    }
+
     private async void OnRecordClicked(object? sender, EventArgs e)
     {
-        if (_isRecordingInProgress || _isTranscribing) 
+        // Toggle stop if already recording
+        if (_isRecordingInProgress)
         {
-            await DisplayAlertAsync("Информация", "Действие уже выполняется", "OK");
+            _recordingTcs?.SetResult(true);
+            return;
+        }
+        if (_isTranscribing)
+        {
+            await DisplayAlertAsync("Информация", "Транскрипция выполняется", "OK");
             return;
         }
 
-        // Check if at least one source is selected
         bool recordMic = MicrophoneCheckBox?.IsChecked == true;
         bool recordSystem = SystemAudioCheckBox?.IsChecked == true;
-
         if (!recordMic && !recordSystem)
         {
-            await DisplayAlertAsync("Ошибка", "Выберите хотя бы один источник записи (Микрофон или Системное аудио)", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите хотя бы один источник записи", "OK");
             return;
         }
 
         try
         {
             var status = await CheckMicrophonePermissionAsync();
-            if (status != PermissionStatus.Granted)
+            if (status != PermissionStatus.Granted && recordMic)
             {
-                await DisplayAlertAsync("Ошибка", "Разрешение на микрофон не предоставлено.", "OK");
+                await DisplayAlertAsync("Ошибка", "Нет разрешения на микрофон", "OK");
                 return;
             }
 
             var start = DateTime.Now;
-            
             RecordButton.IsEnabled = false;
             RecordButton.Text = "Запись...";
-            
-            string? filePath = null;
 
+            string? filePath = null;
             if (recordMic && recordSystem)
-            {
-                // Mixed recording - both sources in one file
                 filePath = await _recorder.StartMixedRecordingAsync(string.Empty, string.Empty);
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    await DisplayAlertAsync("Ошибка", "Не удалось начать запись.", "OK");
-                    ResetRecordButton();
-                    return;
-                }
-            }
             else if (recordMic)
-            {
-                // Microphone only
                 filePath = await _recorder.StartRecordingAsync(string.Empty, string.Empty, "mic");
-            }
             else
-            {
-                // System audio only
                 filePath = await _recorder.StartRecordingAsync(string.Empty, string.Empty, "system");
-            }
 
             if (string.IsNullOrEmpty(filePath))
             {
-                await DisplayAlertAsync("Ошибка", "Не удалось начать запись.", "OK");
+                await DisplayAlertAsync("Ошибка", "Не удалось начать запись", "OK");
                 ResetRecordButton();
                 return;
             }
@@ -139,40 +133,39 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             {
                 FilePath = filePath,
                 StartTime = start,
-                EndTime = DateTime.Now,
+                EndTime = start,
                 IsTranscribed = false
             };
 
             _recordingTcs = new TaskCompletionSource<bool>();
             _isRecordingInProgress = true;
-            RecordButton.IsVisible = false;
-            StopButton.IsVisible = true;
-            StopButton.IsEnabled = true;
+            RecordButton.IsEnabled = true;
+            RecordButton.Text = "Остановить запись";
+            RecordButton.BackgroundColor = Colors.Red;
 
-            // Wait for stop
-            await _recordingTcs.Task;
+            await _recordingTcs.Task; // wait stop
+            RecordButton.IsEnabled = false;
 
-            // Immediately disable stop button
-            StopButton.IsEnabled = false;
-            
             await _recorder.StopRecordingAsync();
             _currentRecording.EndTime = DateTime.Now;
-
-            // Save recording metadata (without transcription)
             await _db.AddMetadataAsync(_currentRecording);
 
-            // Ask user if they want to transcribe
-            var transcribe = await DisplayAlertAsync(
-                "Запись завершена", 
-                $"Запись сохранена: {_currentRecording.FilePath}\nДлительность: {_currentRecording.EndTime - _currentRecording.StartTime}\n\nХотите распознать аудио?", 
-                "Да", "Нет");
+            RecordButton.BackgroundColor = Colors.Green;
+            RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+            _isRecordingInProgress = false;
+            RecordButton.IsEnabled = true;
 
-            if (transcribe)
+            if (_autoTranscribe)
             {
                 await StartTranscriptionAsync(_currentRecording);
             }
+            else
+            {
+                var transcribe = await DisplayAlertAsync("Запись завершена", "Распознать аудио?", "Да", "Нет");
+                if (transcribe)
+                    await StartTranscriptionAsync(_currentRecording);
+            }
 
-            // Refresh the records list
             await LoadRecordsAsync();
         }
         catch (Exception ex)
@@ -182,7 +175,12 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         }
         finally
         {
-            ResetRecordingState();
+            if (_isRecordingInProgress == false)
+            {
+                RecordButton.BackgroundColor = Colors.Green;
+                RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+                RecordButton.IsEnabled = true;
+            }
         }
     }
 
@@ -393,18 +391,12 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             _isRecordingInProgress = false;
-            RecordButton.IsVisible = true;
-            StopButton.IsVisible = false;
-            StopButton.IsEnabled = true;
-            StopButton.Text = "Остановить запись";
-            StopButton.BackgroundColor = Colors.Red;
             RecordButton.IsEnabled = true;
-            RecordButton.Text = "Записать и транскрибировать";
-            
+            RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+            RecordButton.BackgroundColor = Colors.Green;
             var progressBar = Content?.FindByName("TranscriptionProgress") as ProgressBar;
             if (progressBar != null)
                 progressBar.IsVisible = false;
-            
             _recordingTcs = null;
         });
     }
@@ -412,7 +404,8 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private void ResetRecordButton()
     {
         RecordButton.IsEnabled = true;
-        RecordButton.Text = "Записать и транскрибировать";
+        RecordButton.Text = _autoTranscribe ? "Записать и транскрибировать" : "Записать";
+        RecordButton.BackgroundColor = Colors.Green;
     }
 
     private async Task<PermissionStatus> CheckMicrophonePermissionAsync()
