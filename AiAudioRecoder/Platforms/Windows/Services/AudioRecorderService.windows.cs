@@ -85,7 +85,7 @@ public partial class AudioRecorderService
             }
             _systemSampleProvider = new MutingSampleProvider(sysSample, () => _systemEnabled);
 
-            _mixer = new MixingSampleProvider(mixerFloat) { ReadFully = true };
+            _mixer = new MixingSampleProvider(mixerFloat) { ReadFully = false }; // do not auto fill silence (prevents faster-than-real-time)
             _mixer.AddMixerInput(_micSampleProvider);
             _mixer.AddMixerInput(_systemSampleProvider);
 
@@ -94,19 +94,24 @@ public partial class AudioRecorderService
             _mixedMic.StartRecording();
             _mixedSystem.StartRecording();
 
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             _mixTask = Task.Run(async () =>
             {
-                var floatBuffer = new float[mixerFloat.SampleRate / 10 * mixerFloat.Channels]; // ~100ms
-                var pcmBuffer = new byte[floatBuffer.Length * 2];
+                int framesPerChunk = mixerFloat.SampleRate / 10; // 100ms target
+                int samplesPerChunk = framesPerChunk * mixerFloat.Channels;
+                var floatBuffer = new float[samplesPerChunk];
+                var pcmBuffer = new byte[samplesPerChunk * 2];
+                long totalFramesWritten = 0;
                 try
                 {
                     while (!_mixCts!.IsCancellationRequested)
                     {
-                        int read = _mixer!.Read(floatBuffer, 0, floatBuffer.Length);
-                        if (read > 0)
+                        int readSamples = _mixer!.Read(floatBuffer, 0, samplesPerChunk);
+                        if (readSamples > 0)
                         {
+                            int framesRead = readSamples / mixerFloat.Channels;
                             int idx = 0;
-                            for (int i = 0; i < read; i++)
+                            for (int i = 0; i < readSamples; i++)
                             {
                                 var sample = floatBuffer[i];
                                 if (sample > 1f) sample = 1f; else if (sample < -1f) sample = -1f;
@@ -115,10 +120,21 @@ public partial class AudioRecorderService
                                 pcmBuffer[idx++] = (byte)((pcm >> 8) & 0xFF);
                             }
                             _mixedWriter!.Write(pcmBuffer, 0, idx);
+                            totalFramesWritten += framesRead;
+
+                            // Pace to real-time: expected elapsed for written frames
+                            double expectedMs = totalFramesWritten * 1000.0 / mixerFloat.SampleRate;
+                            double actualMs = sw.Elapsed.TotalMilliseconds;
+                            int delayMs = (int)(expectedMs - actualMs);
+                            if (delayMs > 0)
+                            {
+                                try { await Task.Delay(delayMs, _mixCts.Token); } catch { }
+                            }
                         }
                         else
                         {
-                            await Task.Delay(10, _mixCts.Token);
+                            // No data yet - short wait
+                            try { await Task.Delay(5, _mixCts.Token); } catch { }
                         }
                     }
                 }
