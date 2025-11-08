@@ -11,10 +11,6 @@ namespace AiAudioRecoder.Services;
 
 public partial class AudioRecorderService
 {
-    private WaveInEvent? _waveIn; // legacy single-source (unused now)
-    private WasapiLoopbackCapture? _loopback; // legacy single-source (unused now)
-    private WaveFileWriter? _writer; // legacy single-source (unused now)
-
     // Mixed recording
     private WaveInEvent? _mixedMic;
     private WasapiLoopbackCapture? _mixedSystem;
@@ -171,7 +167,6 @@ public partial class AudioRecorderService
         _mixedWriter?.Dispose(); _mixedWriter = null;
         _mixer = null; _micSampleProvider = null; _systemSampleProvider = null;
         _mixCts?.Dispose(); _mixCts = null;
-        _waveIn = null; _loopback = null; _writer = null;
         _isRecording = false;
         return Task.CompletedTask;
     }

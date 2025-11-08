@@ -24,7 +24,7 @@ public partial class MainPage : ContentPage
     {
         if (string.IsNullOrEmpty(ModelPicker.SelectedItem?.ToString()))
         {
-            await DisplayAlert("Ошибка", "Выберите модель для скачивания", "OK");
+            await DisplayAlertAsync("Ошибка", "Выберите модель для скачивания", "OK");
             return;
         }
 
@@ -41,11 +41,11 @@ public partial class MainPage : ContentPage
                 await Task.Delay(300); // Simulate download time
             }
 
-            await DisplayAlert("Успех", $"Модель '{ModelPicker.SelectedItem}' успешно скачана!", "OK");
+            await DisplayAlertAsync("Успех", $"Модель '{ModelPicker.SelectedItem}' успешно скачана!", "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось скачать модель: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось скачать модель: {ex.Message}", "OK");
         }
         finally
         {
@@ -58,7 +58,7 @@ public partial class MainPage : ContentPage
     {
         if (_isRecording)
         {
-            await DisplayAlert("Информация", "Запись уже идет", "OK");
+            await DisplayAlertAsync("Информация", "Запись уже идет", "OK");
             return;
         }
 
@@ -78,12 +78,12 @@ public partial class MainPage : ContentPage
             }
             else
             {
-                await DisplayAlert("Ошибка", "Для записи требуется разрешение на использование микрофона", "OK");
+                await DisplayAlertAsync("Ошибка", "Для записи требуется разрешение на использование микрофона", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось проверить разрешения: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось проверить разрешения: {ex.Message}", "OK");
         }
     }
 
@@ -96,7 +96,7 @@ public partial class MainPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Ошибка", $"Не удалось открыть записи: {ex.Message}", "OK");
+            await DisplayAlertAsync("Ошибка", $"Не удалось открыть записи: {ex.Message}", "OK");
         }
     }
 

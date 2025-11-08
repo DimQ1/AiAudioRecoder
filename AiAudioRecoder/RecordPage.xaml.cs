@@ -140,9 +140,11 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             RecordButton.Text = "Остановить запись";
             RecordButton.BackgroundColor = Colors.Red;
 
-            // Allow toggling sources on the fly
-            MicrophoneCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
-            SystemAudioCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
+            // Allow toggling sources on the fly (null-safe)
+            if (MicrophoneCheckBox != null)
+                MicrophoneCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
+            if (SystemAudioCheckBox != null)
+                SystemAudioCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
 
             await _recordingTcs.Task; // wait stop
             RecordButton.IsEnabled = false;
@@ -228,7 +230,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
         SearchText = e.NewTextValue;
     }
@@ -246,7 +248,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     {
         try
         {
-            IsBusy = true;
+            // IsBusy deprecated - consider binding to an ActivityIndicator via a ViewModel property
             
             var allRecords = await _db.GetAllAsync();
             _allRecords.Clear();
@@ -267,7 +269,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         }
         finally
         {
-            IsBusy = false;
+            // Finished loading
         }
     }
 

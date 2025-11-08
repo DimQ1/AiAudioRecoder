@@ -13,10 +13,10 @@ namespace AiAudioRecoder.Services
     public class AudioMetadataDatabase
     {
         private readonly SQLiteAsyncConnection _db;
-        private readonly ILogger<AudioMetadataDatabase> _logger;
+        private readonly ILogger<AudioMetadataDatabase>? _logger;
         private bool _isInitialized = false;
 
-        public AudioMetadataDatabase(string dbPath, ILogger<AudioMetadataDatabase> logger = null)
+        public AudioMetadataDatabase(string dbPath, ILogger<AudioMetadataDatabase>? logger = null)
         {
             _db = new SQLiteAsyncConnection(dbPath);
             _logger = logger;
