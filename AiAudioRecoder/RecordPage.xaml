@@ -65,7 +65,11 @@
                 <Entry x:Name="SearchEntry" 
                        Grid.Column="0"
                        Placeholder="Search content..."
-                       TextChanged="OnSearchTextChanged" />
+                       TextChanged="OnSearchTextChanged"
+					   TextColor="Black" 
+					   PlaceholderColor="Gray"
+					   BackgroundColor="White"
+					   />
                 
                 <Button Grid.Column="1"
                         Text="Refresh"
