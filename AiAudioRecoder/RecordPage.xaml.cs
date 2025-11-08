@@ -26,6 +26,8 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private bool _isTranscribing = false;
     private TaskCompletionSource<bool>? _recordingTcs;
     private AudioFileMetadata? _currentRecording;
+    private string _sortColumn = "Date"; // Default sort by EndTime
+    private bool _sortAscending = false; // Newest first by default
 
     private bool _autoTranscribe = true;
 
@@ -288,11 +290,11 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(SearchText))
         {
+            var baseList = _allRecords.ToList();
+            var sorted = ApplySort(baseList);
             _displayedRecords.Clear();
-            foreach (var record in _allRecords)
-            {
+            foreach (var record in sorted)
                 _displayedRecords.Add(record);
-            }
         }
         else
         {
@@ -300,15 +302,101 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _ = Task.Run(async () =>
             {
                 var searchResults = await _db.SearchAsync(SearchText, true);
+                var sorted = ApplySort(searchResults);
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     _displayedRecords.Clear();
-                    foreach (var record in searchResults)
-                    {
+                    foreach (var record in sorted)
                         _displayedRecords.Add(record);
-                    }
                 });
             });
+        }
+    }
+
+    private List<AudioFileMetadata> ApplySort(IEnumerable<AudioFileMetadata> source)
+    {
+        IOrderedEnumerable<AudioFileMetadata> ordered = _sortColumn switch
+        {
+            "Date" => _sortAscending ? source.OrderBy(r => r.EndTime) : source.OrderByDescending(r => r.EndTime),
+            "Duration" => _sortAscending ? source.OrderBy(r => r.Duration) : source.OrderByDescending(r => r.Duration),
+            "Status" => _sortAscending ? source.OrderBy(r => r.IsTranscribed) : source.OrderByDescending(r => r.IsTranscribed),
+            "Summary" => _sortAscending ? source.OrderBy(r => r.Summary) : source.OrderByDescending(r => r.Summary),
+            "File" => _sortAscending ? source.OrderBy(r => r.FilePath) : source.OrderByDescending(r => r.FilePath),
+            _ => _sortAscending ? source.OrderBy(r => r.EndTime) : source.OrderByDescending(r => r.EndTime)
+        };
+        return ordered.ToList();
+    }
+
+    private void OnHeaderTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is Label lbl && !string.IsNullOrWhiteSpace(lbl.ClassId))
+        {
+            var col = lbl.ClassId;
+            if (_sortColumn == col)
+            {
+                _sortAscending = !_sortAscending; // toggle direction
+            }
+            else
+            {
+                _sortColumn = col;
+                _sortAscending = true; // start ascending for a new column
+            }
+            ApplySearchFilter();
+        }
+    }
+
+    private async void OnDeleteClicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            AudioFileMetadata? metadata = null;
+            if (sender is Button btn)
+            {
+                var parent = btn.Parent;
+                while (parent != null && metadata == null)
+                {
+                    if (parent.BindingContext is AudioFileMetadata m) metadata = m;
+                    parent = parent.Parent;
+                }
+            }
+            if (metadata == null)
+            {
+                await DisplayAlertAsync("Ошибка", "Не удалось определить запись для удаления", "OK");
+                return;
+            }
+
+            bool confirm = await DisplayAlertAsync("Удаление", "Удалить запись и связанный файл?", "Да", "Нет");
+            if (!confirm) return;
+
+            // Cancel any active transcription for this file
+            if (_transcriptionQueue.IsTranscribing(metadata.FilePath))
+            {
+                _transcriptionQueue.CancelByFilePath(metadata.FilePath);
+            }
+
+            // Delete the physical file if exists
+            try
+            {
+                if (System.IO.File.Exists(metadata.FilePath))
+                {
+                    System.IO.File.Delete(metadata.FilePath);
+                }
+            }
+            catch (Exception exFile)
+            {
+                _logger.LogWarning(exFile, "Failed to delete file {FilePath}", metadata.FilePath);
+                // Continue with metadata deletion
+            }
+
+            await _db.DeleteAsync(metadata.Id);
+            _allRecords.Remove(metadata);
+            _displayedRecords.Remove(metadata);
+            await DisplayAlertAsync("Успех", "Запись удалена", "OK");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting record");
+            await DisplayAlertAsync("Ошибка", ex.Message, "OK");
         }
     }
 
@@ -433,11 +521,13 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
 
     #region INotifyPropertyChanged
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    // Hide base implementation intentionally to support INotifyPropertyChanged explicit usage
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
-    protected virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
+    protected new virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        base.OnPropertyChanged(propertyName);
     }
 
     #endregion

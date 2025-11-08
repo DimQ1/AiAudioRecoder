@@ -12,6 +12,19 @@
             <converters:StatusColorConverter x:Key="StatusColorConverter" />
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:FilePathConverter x:Key="FilePathConverter" />
+            <!-- Table header style added to ensure sticky header has consistent appearance -->
+            <Style x:Key="TableHeaderStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="BackgroundColor" Value="LightBlue" />
+                <Setter Property="Padding" Value="6,4" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="TableCellStyle" TargetType="Label">
+                <Setter Property="Padding" Value="6,4" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="LineBreakMode" Value="TailTruncation" />
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -86,104 +99,56 @@
                      Progress="0"
                      Margin="0,10,0,0" />
 
-        <ScrollView Grid.Row="2">
-            <Grid RowDefinitions="Auto,*" Margin="0,0,0,10">
-                
-                <Grid Grid.Row="0" 
-                      BackgroundColor="LightBlue"
-                      RowDefinitions="40"
-                      ColumnDefinitions="100,150,150,200,150,100"
-                      ColumnSpacing="1"
-                      RowSpacing="1">
-                    
-                    <Label Grid.Column="0" Text="Date" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                    <Label Grid.Column="1" Text="Duration" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                    <Label Grid.Column="2" Text="Status" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                    <Label Grid.Column="3" Text="Summary" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                    <Label Grid.Column="4" Text="Action" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                    <Label Grid.Column="5" Text="File" 
-                           Style="{StaticResource TableHeaderStyle}" />
-                </Grid>
-
-                <CollectionView x:Name="RecordsView" 
-                                Grid.Row="1"
-                                ItemsSource="{Binding DisplayedRecords}">
-                    
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="0,0,0,10">
+            <!-- Sticky header row: labels now clickable for sorting -->
+            <Grid Grid.Row="0" BackgroundColor="LightBlue" RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" RowSpacing="1">
+                <Label Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="1" Text="Duration" ClassId="Duration" Style="{StaticResource TableHeaderStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="2" Text="Status" ClassId="Status" Style="{StaticResource TableHeaderStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="3" Text="Summary" ClassId="Summary" Style="{StaticResource TableHeaderStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="4" Text="Action" Style="{StaticResource TableHeaderStyle}" />
+                <Label Grid.Column="5" Text="File" ClassId="File" Style="{StaticResource TableHeaderStyle}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+            <ScrollView Grid.Row="1">
+                <CollectionView x:Name="RecordsView" ItemsSource="{Binding DisplayedRecords}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Grid RowDefinitions="Auto" 
-                                  ColumnDefinitions="100,150,150,200,150,100"
-                                  ColumnSpacing="1"
-                                  Margin="0,1">
-                                
-                                <Label Grid.Column="0" 
-                                       Text="{Binding EndTime, StringFormat='{0:dd.MM.yyyy HH:mm:ss}'}"
-                                       Style="{StaticResource TableCellStyle}" />
-                                
-                                <Label Grid.Column="1" 
-                                       Text="{Binding Duration, Converter={StaticResource DurationConverter}}"
-                                       Style="{StaticResource TableCellStyle}" />
-                                
-                                <Label Grid.Column="2" 
-                                       Text="{Binding IsTranscribed, Converter={StaticResource TranscriptionStatusConverter}}"
-                                       Style="{StaticResource TableCellStyle}"
-                                       BackgroundColor="{Binding IsTranscribed, Converter={StaticResource StatusColorConverter}}"
-                                       TextColor="White" />
-                                
-                                <Label Grid.Column="3" 
-                                       Text="{Binding Summary}"
-                                       Style="{StaticResource TableCellStyle}" />
-                                
-                                <Button Grid.Column="4"
-                                        x:Name="TranscribeButton"
-                                        CommandParameter="{Binding .}"
-                                        IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}"
-                                        Text="Transcribe"
-                                        Clicked="OnTranscribeClicked"
-                                        Style="{StaticResource TranscribeButtonStyle}" />
-                                
-                                <Label Grid.Column="4"
-                                       IsVisible="{Binding IsTranscribed}"
-                                       Text="?"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="20"
-                                       FontAttributes="Bold"
-                                       Style="{StaticResource TableCellStyle}"
-                                       BackgroundColor="{StaticResource TranscribedColor}" />
-                                
-                                <Label Grid.Column="5" 
-                                       Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}"
-                                       Style="{StaticResource TableCellStyle}" />
+                            <Grid RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" Padding="0">
+                                <Label Grid.Column="0" Style="{StaticResource TableCellStyle}" Text="{Binding EndTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" />
+                                <Label Grid.Column="1" Style="{StaticResource TableCellStyle}" Text="{Binding Duration, Converter={StaticResource DurationConverter}}" />
+                                <Label Grid.Column="2" Style="{StaticResource TableCellStyle}" Text="{Binding IsTranscribed, Converter={StaticResource TranscriptionStatusConverter}}" TextColor="{Binding IsTranscribed, Converter={StaticResource StatusColorConverter}}" />
+                                <Label Grid.Column="3" Style="{StaticResource TableCellStyle}" Text="{Binding Summary}" />
+                                <HorizontalStackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <Button Text="Transcribe" FontSize="10" Padding="4" Clicked="OnTranscribeClicked" IsEnabled="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Button Text="Delete" FontSize="10" Padding="4" BackgroundColor="Tomato" TextColor="White" Clicked="OnDeleteClicked" />
+                                </HorizontalStackLayout>
+                                <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" />
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                    
-                    <CollectionView.EmptyView>
-                        <VerticalStackLayout Spacing="10" 
-                                            HorizontalOptions="Center" 
-                                            VerticalOptions="Center" 
-                                            Margin="20">
-                            <Image Source="dotnet_bot.png" 
-                                   HeightRequest="100" 
-                                   Opacity="0.5" />
-                            <Label Text="No records" 
-                                   FontSize="18" 
-                                   HorizontalOptions="Center" />
-                            <Label Text="Click Record to start" 
-                                   FontSize="14" 
-                                   TextColor="Gray"
-                                   HorizontalOptions="Center" />
-                        </VerticalStackLayout>
-                    </CollectionView.EmptyView>
                 </CollectionView>
-            </Grid>
-        </ScrollView>
+            </ScrollView>
+        </Grid>
 
         <Frame Grid.Row="3" BackgroundColor="LightGray" Padding="10">
             <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="20">

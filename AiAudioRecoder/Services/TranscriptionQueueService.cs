@@ -144,6 +144,51 @@ namespace AiAudioRecoder.Services
             }
         }
 
+        /// <summary>
+        /// Cancel any queued or running transcription for a given file path.
+        /// Returns true if at least one task was cancelled or removed.
+        /// </summary>
+        public bool CancelByFilePath(string filePath)
+        {
+            bool cancelled = false;
+            lock (_lock)
+            {
+                foreach (var task in _tasks)
+                {
+                    if (task.Metadata.FilePath == filePath)
+                    {
+                        if (task.Status == TranscriptionTaskStatus.Queued)
+                        {
+                            task.Status = TranscriptionTaskStatus.Cancelled;
+                            task.Completion.TrySetCanceled();
+                            cancelled = true;
+                        }
+                        else if (task.Status == TranscriptionTaskStatus.Running)
+                        {
+                            task.Cancellation.Cancel();
+                            cancelled = true;
+                        }
+                    }
+                }
+            }
+            if (cancelled)
+            {
+                _logger.LogInformation("Cancelled transcription(s) for {FilePath}", filePath);
+            }
+            return cancelled;
+        }
+
+        /// <summary>
+        /// Determines if a file currently has an active (queued or running) transcription task.
+        /// </summary>
+        public bool IsTranscribing(string filePath)
+        {
+            lock (_lock)
+            {
+                return _tasks.Exists(t => t.Metadata.FilePath == filePath && (t.Status == TranscriptionTaskStatus.Queued || t.Status == TranscriptionTaskStatus.Running));
+            }
+        }
+
         public void StopProcessing()
         {
             _running = false;
