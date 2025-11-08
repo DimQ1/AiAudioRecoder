@@ -1,6 +1,7 @@
 # .NET Core
 *bin/
 *obj/
+/.vs/
 .vs/
 .vscode/settings.json
 !/.vscode/tasks.json
