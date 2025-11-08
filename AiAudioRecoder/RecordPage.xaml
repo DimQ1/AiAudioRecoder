@@ -30,7 +30,7 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20">
         
-        <Frame Grid.Row="0" BackgroundColor="LightGray" Padding="10" Margin="0,0,0,10">
+    <Border Grid.Row="0" BackgroundColor="LightGray" Padding="10" Margin="0,0,0,10" StrokeThickness="0">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                 
                 <VerticalStackLayout Grid.ColumnSpan="2" Margin="0,0,0,10">
@@ -71,9 +71,9 @@
                        HorizontalOptions="Center" />
                 
             </Grid>
-        </Frame>
+    </Border>
 
-        <Frame Grid.Row="1" BackgroundColor="White" Padding="10" Margin="0,0,0,10">
+    <Border Grid.Row="1" BackgroundColor="White" Padding="10" Margin="0,0,0,10" StrokeThickness="0">
             <Grid ColumnDefinitions="*,Auto">
                 <Entry x:Name="SearchEntry" 
                        Grid.Column="0"
@@ -91,7 +91,7 @@
                         TextColor="White"
                         Margin="10,0,0,0" />
             </Grid>
-        </Frame>
+    </Border>
 
         <ProgressBar x:Name="TranscriptionProgress"
                      Grid.Row="1"
@@ -102,28 +102,28 @@
         <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="0,0,0,10">
             <!-- Sticky header row: labels now clickable for sorting -->
             <Grid Grid.Row="0" BackgroundColor="LightBlue" RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" RowSpacing="1">
-                <Label Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
+                <Label x:Name="DateHeader" Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Column="1" Text="Duration" ClassId="Duration" Style="{StaticResource TableHeaderStyle}">
+                <Label x:Name="DurationHeader" Grid.Column="1" Text="Duration" ClassId="Duration" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Column="2" Text="Status" ClassId="Status" Style="{StaticResource TableHeaderStyle}">
+                <Label x:Name="StatusHeader" Grid.Column="2" Text="Status" ClassId="Status" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Column="3" Text="Summary" ClassId="Summary" Style="{StaticResource TableHeaderStyle}">
+                <Label x:Name="SummaryHeader" Grid.Column="3" Text="Summary" ClassId="Summary" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
                     </Label.GestureRecognizers>
                 </Label>
                 <Label Grid.Column="4" Text="Action" Style="{StaticResource TableHeaderStyle}" />
-                <Label Grid.Column="5" Text="File" ClassId="File" Style="{StaticResource TableHeaderStyle}">
+                <Label x:Name="FileHeader" Grid.Column="5" Text="File" ClassId="File" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
                     </Label.GestureRecognizers>
@@ -150,7 +150,7 @@
             </ScrollView>
         </Grid>
 
-        <Frame Grid.Row="3" BackgroundColor="LightGray" Padding="10">
+    <Border Grid.Row="3" BackgroundColor="LightGray" Padding="10" StrokeThickness="0">
             <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="20">
                 <Label Grid.Column="0" 
                        x:Name="QueueLabel"
@@ -171,7 +171,7 @@
                         TextColor="White"
                         FontSize="12" />
             </Grid>
-        </Frame>
+    </Border>
 
     </Grid>
 

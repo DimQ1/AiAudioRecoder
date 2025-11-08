@@ -342,6 +342,36 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
                 _sortAscending = true; // start ascending for a new column
             }
             ApplySearchFilter();
+            UpdateSortIndicators();
+        }
+    }
+
+    private void UpdateSortIndicators()
+    {
+        // Clear all headers text base labels exist in XAML with x:Name
+        try
+        {
+            void SetHeader(Label? header, string baseText)
+            {
+                if (header == null) return;
+                if (string.Equals(_sortColumn, header.ClassId, StringComparison.OrdinalIgnoreCase))
+                {
+                    header.Text = baseText + (_sortAscending ? " ▲" : " ▼");
+                }
+                else
+                {
+                    header.Text = baseText;
+                }
+            }
+            SetHeader(this.FindByName("DateHeader") as Label, "Date");
+            SetHeader(this.FindByName("DurationHeader") as Label, "Duration");
+            SetHeader(this.FindByName("StatusHeader") as Label, "Status");
+            SetHeader(this.FindByName("SummaryHeader") as Label, "Summary");
+            SetHeader(this.FindByName("FileHeader") as Label, "File");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed updating sort indicators");
         }
     }
 
@@ -365,14 +395,17 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
                 return;
             }
 
-            bool confirm = await DisplayAlertAsync("Удаление", "Удалить запись и связанный файл?", "Да", "Нет");
-            if (!confirm) return;
+            bool isTranscribing = _transcriptionQueue.IsTranscribing(metadata.FilePath);
 
-            // Cancel any active transcription for this file
-            if (_transcriptionQueue.IsTranscribing(metadata.FilePath))
+            if (isTranscribing)
             {
+                bool confirmCancel = await DisplayAlertAsync("Идет транскрипция", "Транскрипция в процессе. Остановить и удалить запись?", "Да", "Нет");
+                if (!confirmCancel) return;
                 _transcriptionQueue.CancelByFilePath(metadata.FilePath);
             }
+
+            bool confirm = await DisplayAlertAsync("Удаление", "Удалить запись и связанный файл?", "Да", "Нет");
+            if (!confirm) return;
 
             // Delete the physical file if exists
             try
@@ -466,6 +499,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             }
             
             UpdateQueueStatusUI();
+            UpdateSortIndicators();
             
             // Force UI refresh
             OnPropertyChanged(nameof(QueueCount));
