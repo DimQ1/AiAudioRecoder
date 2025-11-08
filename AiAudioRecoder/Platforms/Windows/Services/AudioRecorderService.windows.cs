@@ -26,19 +26,35 @@ public partial class AudioRecorderService
     {
         private readonly ISampleProvider _source;
         private readonly Func<bool> _enabledFunc;
-        public MutingSampleProvider(ISampleProvider source, Func<bool> enabledFunc)
+        private readonly Action<double>? _levelCallback;
+        public MutingSampleProvider(ISampleProvider source, Func<bool> enabledFunc, Action<double>? levelCallback)
         {
             _source = source;
             _enabledFunc = enabledFunc;
+            _levelCallback = levelCallback;
         }
         public WaveFormat WaveFormat => _source.WaveFormat;
         public int Read(float[] buffer, int offset, int count)
         {
             int read = _source.Read(buffer, offset, count);
+            double level = 0;
+            if (read > 0)
+            {
+                double sumSquares = 0;
+                for (int i = 0; i < read; i++)
+                {
+                    var sample = buffer[offset + i];
+                    sumSquares += sample * sample;
+                }
+                level = Math.Sqrt(sumSquares / read);
+            }
+
             if (!_enabledFunc())
             {
                 Array.Clear(buffer, offset, read); // mute samples
+                level = 0;
             }
+            _levelCallback?.Invoke(level);
             return read;
         }
     }
@@ -66,7 +82,7 @@ public partial class AudioRecorderService
             var micBuffer = new BufferedWaveProvider(_mixedMic.WaveFormat) { DiscardOnBufferOverflow = true };
             _mixedMic.DataAvailable += (s, e) => micBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
             var micStereo = new MonoToStereoSampleProvider(micBuffer.ToSampleProvider());
-            _micSampleProvider = new MutingSampleProvider(micStereo, () => _micEnabled);
+            _micSampleProvider = new MutingSampleProvider(micStereo, () => _micEnabled, ReportMicLevel);
 
             // System capture device always started to allow enabling later
             _mixedSystem = new WasapiLoopbackCapture();
@@ -79,7 +95,7 @@ public partial class AudioRecorderService
                 _systemResampler = new MediaFoundationResampler(sysBuffer, WaveFormat.CreateIeeeFloatWaveFormat(44100, 2)) { ResamplerQuality = 60 }; // 44.1k stereo float
                 sysSample = _systemResampler.ToSampleProvider();
             }
-            _systemSampleProvider = new MutingSampleProvider(sysSample, () => _systemEnabled);
+            _systemSampleProvider = new MutingSampleProvider(sysSample, () => _systemEnabled, ReportSystemLevel);
 
             _mixer = new MixingSampleProvider(mixerFloat) { ReadFully = false }; // do not auto fill silence (prevents faster-than-real-time)
             _mixer.AddMixerInput(_micSampleProvider);
@@ -89,6 +105,8 @@ public partial class AudioRecorderService
             _mixCts = new CancellationTokenSource();
             _mixedMic.StartRecording();
             _mixedSystem.StartRecording();
+            ReportMicLevel(0);
+            ReportSystemLevel(0);
 
             var sw = System.Diagnostics.Stopwatch.StartNew();
             _mixTask = Task.Run(async () =>
@@ -168,6 +186,8 @@ public partial class AudioRecorderService
         _mixer = null; _micSampleProvider = null; _systemSampleProvider = null;
         _mixCts?.Dispose(); _mixCts = null;
         _isRecording = false;
+        ReportMicLevel(0);
+        ReportSystemLevel(0);
         return Task.CompletedTask;
     }
 }

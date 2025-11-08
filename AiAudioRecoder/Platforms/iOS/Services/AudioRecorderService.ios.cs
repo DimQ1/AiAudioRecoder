@@ -51,6 +51,8 @@ public partial class AudioRecorderService
         {
             _iosStream?.Write(buffer, 0, buffer.Length);
             _dataBytes += buffer.Length;
+            ReportMicLevel(0);
+            ReportSystemLevel(0);
             try { await Task.Delay(100, token); } catch { }
         }
     }
@@ -69,6 +71,8 @@ public partial class AudioRecorderService
         _iosCts?.Dispose(); _iosCts = null;
         _iosWriteTask = null;
         _isRecording = false;
+        ReportMicLevel(0);
+        ReportSystemLevel(0);
         return Task.CompletedTask;
     }
 

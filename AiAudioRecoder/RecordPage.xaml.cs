@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Essentials;
 using AiAudioRecoder.Models;
 using AiAudioRecoder.Services;
+using AiAudioRecoder.Views;
 
 namespace AiAudioRecoder;
 
@@ -30,6 +31,9 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private bool _sortAscending = false; // Newest first by default
 
     private bool _autoTranscribe = true;
+    private double _micLevel;
+    private double _systemLevel;
+    private bool _levelEventsAttached;
 
     public RecordPage(Services.IAudioRecorderService recorder, 
                      Services.AudioMetadataDatabase db,
@@ -53,6 +57,28 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             SearchEntry.TextChanged += OnSearchTextChanged;
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (!_levelEventsAttached)
+        {
+            _recorder.MicLevelChanged += OnRecorderMicLevelChanged;
+            _recorder.SystemLevelChanged += OnRecorderSystemLevelChanged;
+            _levelEventsAttached = true;
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        if (_levelEventsAttached)
+        {
+            _recorder.MicLevelChanged -= OnRecorderMicLevelChanged;
+            _recorder.SystemLevelChanged -= OnRecorderSystemLevelChanged;
+            _levelEventsAttached = false;
+        }
+    }
+
     #region Properties
 
     public string SearchText
@@ -72,6 +98,34 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     public int QueueCount => _transcriptionQueue.QueueCount;
     public int ActiveTranscriptions => _transcriptionQueue.ActiveTranscriptions;
 
+    public double MicLevel
+    {
+        get => _micLevel;
+        private set
+        {
+            var clamped = Math.Clamp(value, 0, 1);
+            if (Math.Abs(_micLevel - clamped) > 0.001)
+            {
+                _micLevel = clamped;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double SystemLevel
+    {
+        get => _systemLevel;
+        private set
+        {
+            var clamped = Math.Clamp(value, 0, 1);
+            if (Math.Abs(_systemLevel - clamped) > 0.001)
+            {
+                _systemLevel = clamped;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     #endregion
 
     #region Event Handlers
@@ -79,6 +133,16 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private void OnAutoTranscribeChanged(object sender, CheckedChangedEventArgs e)
     {
         _autoTranscribe = e.Value;
+    }
+
+    private void OnRecorderMicLevelChanged(double level)
+    {
+        Microsoft.Maui.ApplicationModel.MainThread.BeginInvokeOnMainThread(() => MicLevel = level);
+    }
+
+    private void OnRecorderSystemLevelChanged(double level)
+    {
+        Microsoft.Maui.ApplicationModel.MainThread.BeginInvokeOnMainThread(() => SystemLevel = level);
     }
 
     private async void OnRecordClicked(object? sender, EventArgs e)
@@ -152,6 +216,13 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             await _recorder.StopRecordingAsync();
             _currentRecording.EndTime = DateTime.Now;
             await _db.AddMetadataAsync(_currentRecording);
+            MicLevel = 0;
+            SystemLevel = 0;
+
+            if (MicrophoneCheckBox != null)
+                MicrophoneCheckBox.CheckedChanged -= OnSourceToggleDuringRecording;
+            if (SystemAudioCheckBox != null)
+                SystemAudioCheckBox.CheckedChanged -= OnSourceToggleDuringRecording;
 
             RecordButton.BackgroundColor = Colors.Green;
             RecordButton.Text = "Записать";
@@ -183,7 +254,14 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
                 RecordButton.BackgroundColor = Colors.Green;
                 RecordButton.Text = "Записать";
                 RecordButton.IsEnabled = true;
+                MicLevel = 0;
+                SystemLevel = 0;
             }
+
+            if (MicrophoneCheckBox != null)
+                MicrophoneCheckBox.CheckedChanged -= OnSourceToggleDuringRecording;
+            if (SystemAudioCheckBox != null)
+                SystemAudioCheckBox.CheckedChanged -= OnSourceToggleDuringRecording;
         }
     }
 
@@ -193,6 +271,22 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         {
             _recordingTcs?.SetResult(true);
         }
+    }
+
+    private async void OnCellTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Label label && label.BindingContext is AudioFileMetadata metadata)
+        {
+            var column = string.IsNullOrWhiteSpace(label.ClassId) ? "Value" : label.ClassId;
+            var displayedText = label.Text ?? string.Empty;
+            await ShowCellDetailAsync(metadata, column, displayedText);
+        }
+    }
+
+    private Task ShowCellDetailAsync(AudioFileMetadata metadata, string column, string displayedText)
+    {
+        var detailPage = new Views.RecordDetailPage(metadata, column, displayedText);
+        return Navigation.PushModalAsync(detailPage);
     }
 
     private async void OnTranscribeClicked(object? sender, EventArgs e)

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AiAudioRecoder.Views.RecordDetailPage"
+             Title="Record Detail"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray950}}">
+    <ContentPage.Content>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Label x:Name="TitleLabel"
+                   Text="Details"
+                   FontAttributes="Bold"
+                   FontSize="22"
+                   TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+
+            <ScrollView x:Name="ContentScroll" IsVisible="False">
+                <Label x:Name="ContentLabel"
+                       FontSize="16"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
+            </ScrollView>
+
+            <ScrollView x:Name="TranscriptionScroll" IsVisible="False">
+                <Label x:Name="TranscriptionLabel"
+                       FontSize="16"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
+            </ScrollView>
+
+            <Border x:Name="PlaybackPanel"
+                    IsVisible="False"
+                    StrokeThickness="1"
+                    Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalOptions="Center">
+            <Button x:Name="PlayPauseButton"
+                WidthRequest="48"
+                HeightRequest="48"
+                CornerRadius="24"
+                Text="Play"
+                Clicked="OnPlayPauseClicked" />
+                        <VerticalStackLayout Grid.Column="1" Spacing="8">
+                            <Slider x:Name="PositionSlider"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Value="0"
+                                    IsEnabled="False" />
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Label x:Name="CurrentTimeLabel"
+                                       Text="00:00"
+                                       FontSize="12"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                                <Label Grid.Column="1"
+                                       x:Name="DurationLabel"
+                                       Text="00:00"
+                                       FontSize="12"
+                                       HorizontalOptions="End"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="Закрыть"
+                    Clicked="OnCloseClicked"
+                    HorizontalOptions="End"
+                    WidthRequest="140" />
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

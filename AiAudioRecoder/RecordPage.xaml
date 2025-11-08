@@ -52,6 +52,19 @@
                             <Label Text="Transcribe after" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                         </HorizontalStackLayout>
                     </FlexLayout>
+
+                    <HorizontalStackLayout Spacing="20" Margin="0,0,0,10">
+                        <VerticalStackLayout WidthRequest="220">
+                            <Label Text="Microphone Level" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                            <ProgressBar Progress="{Binding MicLevel}" HeightRequest="10" Margin="0,4,0,0" />
+                            <Label Text="{Binding MicLevel, StringFormat='Mic Level: {0:P0}'}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout WidthRequest="220">
+                            <Label Text="System Level" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                            <ProgressBar Progress="{Binding SystemLevel}" HeightRequest="10" Margin="0,4,0,0" />
+                            <Label Text="{Binding SystemLevel, StringFormat='System Level: {0:P0}'}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
                     
                     <Grid ColumnDefinitions="*" Margin="0,10,0,0">
                         <!-- Record button updated -->
@@ -136,15 +149,35 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" Padding="0">
-                                <Label Grid.Column="0" Style="{StaticResource TableCellStyle}" Text="{Binding EndTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" />
-                                <Label Grid.Column="1" Style="{StaticResource TableCellStyle}" Text="{Binding Duration, Converter={StaticResource DurationConverter}}" />
-                                <Label Grid.Column="2" Style="{StaticResource TableCellStyle}" Text="{Binding IsTranscribed, Converter={StaticResource TranscriptionStatusConverter}}" TextColor="{Binding IsTranscribed, Converter={StaticResource StatusColorConverter}}" />
-                                <Label Grid.Column="3" Style="{StaticResource TableCellStyle}" Text="{Binding Summary}" />
+                                <Label Grid.Column="0" Style="{StaticResource TableCellStyle}" Text="{Binding EndTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" ClassId="Date">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCellTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="1" Style="{StaticResource TableCellStyle}" Text="{Binding Duration, Converter={StaticResource DurationConverter}}" ClassId="Duration">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCellTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="2" Style="{StaticResource TableCellStyle}" Text="{Binding IsTranscribed, Converter={StaticResource TranscriptionStatusConverter}}" TextColor="{Binding IsTranscribed, Converter={StaticResource StatusColorConverter}}" ClassId="Status">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCellTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="3" Style="{StaticResource TableCellStyle}" Text="{Binding Summary}" ClassId="Summary">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCellTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                                 <HorizontalStackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
                                     <Button Text="Transcribe" FontSize="10" Padding="4" Clicked="OnTranscribeClicked" IsEnabled="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
                                     <Button Text="Delete" FontSize="10" Padding="4" BackgroundColor="Tomato" TextColor="White" Clicked="OnDeleteClicked" />
                                 </HorizontalStackLayout>
-                                <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" />
+                                <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" ClassId="File">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnCellTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

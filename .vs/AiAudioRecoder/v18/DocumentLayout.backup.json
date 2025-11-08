@@ -105,8 +105,26 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 16,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RecordPage.xaml",
+              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\RecordPage.xaml",
+              "RelativeDocumentMoniker": "AiAudioRecoder\\RecordPage.xaml",
+              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\RecordPage.xaml",
+              "RelativeToolTip": "AiAudioRecoder\\RecordPage.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-11-08T18:44:04.361Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{c6f34f0d-7ae5-4f3a-be61-fe0c21ae9eb8}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
@@ -173,19 +191,6 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "RecordPage.xaml",
-              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\RecordPage.xaml",
-              "RelativeDocumentMoniker": "AiAudioRecoder\\RecordPage.xaml",
-              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\RecordPage.xaml",
-              "RelativeToolTip": "AiAudioRecoder\\RecordPage.xaml",
-              "ViewState": "AgIAADMAAAAAAAAAAAAAAGYAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-11-08T18:44:04.361Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
               "Title": "WhisperTranscriptionService.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\Services\\WhisperTranscriptionService.cs",
@@ -194,7 +199,8 @@
               "RelativeToolTip": "AiAudioRecoder\\Services\\WhisperTranscriptionService.cs",
               "ViewState": "AgIAADUAAAAAAAAAAAAswCIAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:38:32.033Z"
+              "WhenOpened": "2025-10-15T18:38:32.033Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -204,9 +210,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\Services\\TranscriptionQueueService.cs",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\Services\\TranscriptionQueueService.cs",
               "RelativeToolTip": "AiAudioRecoder\\Services\\TranscriptionQueueService.cs",
-              "ViewState": "AgIAAIYAAAAAAAAAAAAgwDoAAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAADQAAAAAAAAAAAAgwDQAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:11:50.917Z"
+              "WhenOpened": "2025-10-15T18:11:50.917Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -218,7 +225,8 @@
               "RelativeToolTip": "AiAudioRecoder\\Converters\\TableConverters.cs",
               "ViewState": "AgIAAAoAAAAAAAAAAAAQwHUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:11:50.778Z"
+              "WhenOpened": "2025-10-15T18:11:50.778Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -228,9 +236,10 @@
               "RelativeDocumentMoniker": "Platforms\\Windows\\Package.appxmanifest",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\Platforms\\Windows\\Package.appxmanifest",
               "RelativeToolTip": "Platforms\\Windows\\Package.appxmanifest",
-              "ViewState": "AgIAAEYAAAAAAAAAAAAAAEYAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEQAAAAAAAAAAABBwEYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001793|",
-              "WhenOpened": "2025-10-15T14:22:07.127Z"
+              "WhenOpened": "2025-10-15T14:22:07.127Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -242,7 +251,8 @@
               "RelativeToolTip": "AiAudioRecoder\\AppShell.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:38:30.304Z"
+              "WhenOpened": "2025-10-15T18:38:30.304Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -252,7 +262,7 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\RecordPage.xaml.cs",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\RecordPage.xaml.cs",
               "RelativeToolTip": "AiAudioRecoder\\RecordPage.xaml.cs",
-              "ViewState": "AgIAANIAAAAAAAAAAAArwFYAAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAEwAAAAAAAAAAAArwEwAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-06T15:51:40.026Z",
               "EditorCaption": ""
@@ -267,7 +277,8 @@
               "RelativeToolTip": "AiAudioRecoder\\MauiProgram.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAQwB8AAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-03T21:09:04.536Z"
+              "WhenOpened": "2025-10-03T21:09:04.536Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -279,7 +290,8 @@
               "RelativeToolTip": "AiAudioRecoder\\Services\\AudioMetadataDatabase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:11:48.092Z"
+              "WhenOpened": "2025-10-15T18:11:48.092Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -289,9 +301,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\App.xaml.cs",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\App.xaml.cs",
               "RelativeToolTip": "AiAudioRecoder\\App.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:38:29.971Z"
+              "WhenOpened": "2025-10-15T18:38:29.971Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -303,7 +316,8 @@
               "RelativeToolTip": "AiAudioRecoder\\AppShell.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-10-15T18:38:30.134Z"
+              "WhenOpened": "2025-10-15T18:38:30.134Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -315,7 +329,8 @@
               "RelativeToolTip": "AiAudioRecoder\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
               "ViewState": "AgIAAAEAAAAAAAAAAAAkwBkAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T14:24:06.262Z"
+              "WhenOpened": "2025-10-15T14:24:06.262Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -327,7 +342,8 @@
               "RelativeToolTip": "AiAudioRecoder\\Models\\ModelInfoDatabase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:38:32.547Z"
+              "WhenOpened": "2025-10-15T18:38:32.547Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -339,7 +355,8 @@
               "RelativeToolTip": "Assets\\Square44x44Logo.png",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
-              "WhenOpened": "2025-10-15T18:38:33.025Z"
+              "WhenOpened": "2025-10-15T18:38:33.025Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -351,7 +368,8 @@
               "RelativeToolTip": "Platforms\\Windows\\LaunchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-15T18:38:33.219Z"
+              "WhenOpened": "2025-10-15T18:38:33.219Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -363,7 +381,8 @@
               "RelativeToolTip": "Assets\\Square150x150Logo.png",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001533|",
-              "WhenOpened": "2025-10-15T18:38:33.726Z"
+              "WhenOpened": "2025-10-15T18:38:33.726Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -371,8 +390,10 @@
               "Title": "WhisperProcessor.cs",
               "DocumentMoniker": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\acd510f21c38fa5359c2d1e33e033bafb6f380e5c26f00530ee8534317ac499f\\WhisperProcessor.cs",
               "ToolTip": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\acd510f21c38fa5359c2d1e33e033bafb6f380e5c26f00530ee8534317ac499f\\WhisperProcessor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T15:48:44.37Z"
+              "WhenOpened": "2025-10-15T15:48:44.37Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -382,9 +403,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\Models\\AudioFileMetadata.cs",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\Models\\AudioFileMetadata.cs",
               "RelativeToolTip": "AiAudioRecoder\\Models\\AudioFileMetadata.cs",
-              "ViewState": "AgIAACMAAAAAAAAAAMBdwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACAAAAAAAAAAACBnwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:11:48.449Z"
+              "WhenOpened": "2025-10-15T18:11:48.449Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -394,9 +416,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\App.xaml",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\App.xaml",
               "RelativeToolTip": "AiAudioRecoder\\App.xaml",
-              "ViewState": "AgIAADUAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADIAAAAAAAAAAIBJwAEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-10-15T18:12:49.773Z"
+              "WhenOpened": "2025-10-15T18:12:49.773Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -406,9 +429,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\ModelsPage.xaml",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\ModelsPage.xaml",
               "RelativeToolTip": "AiAudioRecoder\\ModelsPage.xaml",
-              "ViewState": "AgIAACcAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACQAAAAAAAAAAIBZwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-10-15T14:18:47.471Z"
+              "WhenOpened": "2025-10-15T14:18:47.471Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -420,7 +444,8 @@
               "RelativeToolTip": "AiAudioRecoder\\GlobalXmlns.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T14:18:42.133Z"
+              "WhenOpened": "2025-10-15T14:18:42.133Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -430,9 +455,10 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\MainPage.xaml.cs",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\MainPage.xaml.cs",
               "RelativeToolTip": "AiAudioRecoder\\MainPage.xaml.cs",
-              "ViewState": "AgIAAHQAAAAAAAAAAEBlwH0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHEAAAAAAAAAAKBrwH0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T08:17:21.023Z"
+              "WhenOpened": "2025-10-07T08:17:21.023Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -442,7 +468,7 @@
               "RelativeDocumentMoniker": "AiAudioRecoder\\MainPage.xaml",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder\\AiAudioRecoder\\MainPage.xaml",
               "RelativeToolTip": "AiAudioRecoder\\MainPage.xaml",
-              "ViewState": "AgIAADsAAAAAAAAAAAAAADsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADkAAAAAAAAAAABBwDsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-10-07T08:12:56.195Z",
               "EditorCaption": ""
@@ -457,7 +483,8 @@
               "RelativeToolTip": "AiAudioRecoder\\Effects\\HoverEffect.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-07T08:17:22.029Z"
+              "WhenOpened": "2025-10-07T08:17:22.029Z",
+              "EditorCaption": ""
             }
           ]
         },
