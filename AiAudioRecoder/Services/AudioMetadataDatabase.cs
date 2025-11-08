@@ -113,131 +113,25 @@ namespace AiAudioRecoder.Services
         public async Task<List<AudioFileMetadata>> SearchAsync(string query, bool useVectorSearch = false)
         {
             await EnsureInitializedAsync();
-
             if (string.IsNullOrWhiteSpace(query))
             {
                 return await GetAllAsync();
             }
-
-            if (useVectorSearch)
+            var words = query.Split(new char[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var sb = new System.Text.StringBuilder();
+            sb.Append("SELECT * FROM AudioFileMetadata WHERE IsTranscribed = 1");
+            var parameters = new List<object>();
+            foreach (var w in words)
             {
-                return await SearchWithVectorSimilarityAsync(query);
+                sb.Append(" AND (Transcription LIKE ? OR Summary LIKE ?)");
+                var pattern = "%" + w + "%";
+                parameters.Add(pattern);
+                parameters.Add(pattern);
             }
-            else
-            {
-                // Simple keyword search as fallback
-                var records = await _db.Table<AudioFileMetadata>()
-                    .Where(x => !string.IsNullOrEmpty(x.Transcription) && 
-                               (x.Transcription.Contains(query) || x.Summary.Contains(query)))
-                    .OrderByDescending(x => x.EndTime)
-                    .ToListAsync();
-                _logger?.LogDebug("Keyword search for '{Query}' returned {Count} results", query, records.Count);
-                return records;
-            }
-        }
-
-        private async Task<List<AudioFileMetadata>> SearchWithVectorSimilarityAsync(string query)
-        {
-            try
-            {
-                var allRecords = await _db.Table<AudioFileMetadata>()
-                    .Where(x => !string.IsNullOrEmpty(x.Transcription))
-                    .ToListAsync();
-
-                if (allRecords.Count == 0)
-                {
-                    _logger?.LogDebug("No records available for vector search");
-                    return new List<AudioFileMetadata>();
-                }
-
-                var queryVector = GenerateTextVector(query.ToLower());
-                var results = new List<(AudioFileMetadata Record, double Similarity)>();
-
-                foreach (var record in allRecords)
-                {
-                    if (!string.IsNullOrEmpty(record.Transcription))
-                    {
-                        var recordVector = GenerateTextVector(record.Transcription.ToLower());
-                        var similarity = CalculateCosineSimilarity(queryVector, recordVector);
-                        
-                        // Only include relevant results (similarity > 0.1)
-                        if (similarity > 0.1)
-                        {
-                            results.Add((record, similarity));
-                        }
-                    }
-                }
-
-                // Sort by similarity descending
-                var searchResults = results
-                    .OrderByDescending(x => x.Similarity)
-                    .Take(50) // Limit results
-                    .Select(x => x.Record)
-                    .ToList();
-
-                _logger?.LogDebug("Vector search for '{Query}' returned {Count} results", query, searchResults.Count);
-                return searchResults;
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Vector search failed, falling back to keyword search for '{Query}'", query);
-                return await SearchAsync(query, false);
-            }
-        }
-
-        private double[] GenerateTextVector(string text)
-        {
-            // Simple TF-IDF like vector generation
-            // In production, use a proper embedding model like SentenceTransformers
-            var words = text.Split(new char[] { ' ', '.', ',', '!', '?', ';', ':' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var uniqueWords = words.Distinct().ToArray();
-            
-            // Use a fixed-size vector (e.g., 100 dimensions)
-            var vector = new double[100];
-            
-            foreach (var word in uniqueWords)
-            {
-                if (!string.IsNullOrWhiteSpace(word))
-                {
-                    var hash = Math.Abs(word.GetHashCode()) % 100;
-                    vector[hash] += 1.0 / (words.Length + 1); // Simple frequency weighting
-                }
-            }
-            
-            // Normalize vector
-            var magnitude = Math.Sqrt(vector.Sum(x => x * x));
-            if (magnitude > 0)
-            {
-                for (int i = 0; i < vector.Length; i++)
-                {
-                    vector[i] /= magnitude;
-                }
-            }
-            
-            return vector;
-        }
-
-        private double CalculateCosineSimilarity(double[] vectorA, double[] vectorB)
-        {
-            if (vectorA.Length != vectorB.Length) return 0.0;
-            
-            double dotProduct = 0.0;
-            double magnitudeA = 0.0;
-            double magnitudeB = 0.0;
-            
-            for (int i = 0; i < vectorA.Length; i++)
-            {
-                dotProduct += vectorA[i] * vectorB[i];
-                magnitudeA += vectorA[i] * vectorA[i];
-                magnitudeB += vectorB[i] * vectorB[i];
-            }
-            
-            magnitudeA = Math.Sqrt(magnitudeA);
-            magnitudeB = Math.Sqrt(magnitudeB);
-            
-            if (magnitudeA == 0 || magnitudeB == 0) return 0.0;
-            
-            return dotProduct / (magnitudeA * magnitudeB);
+            sb.Append(" ORDER BY EndTime DESC");
+            var results = await _db.QueryAsync<AudioFileMetadata>(sb.ToString(), parameters.ToArray());
+            _logger?.LogDebug("Plain search '{Query}' words={Words} results={Count}", query, words.Length, results.Count);
+            return results;
         }
 
         public async Task<AudioFileMetadata?> GetByIdAsync(int id)
