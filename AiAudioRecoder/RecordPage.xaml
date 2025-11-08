@@ -15,7 +15,9 @@
             <!-- Table header style added to ensure sticky header has consistent appearance -->
             <Style x:Key="TableHeaderStyle" TargetType="Label">
                 <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="BackgroundColor" Value="LightBlue" />
+                <!-- Use themed background for contrast instead of LightBlue -->
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                 <Setter Property="Padding" Value="6,4" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
                 <Setter Property="VerticalTextAlignment" Value="Center" />
@@ -30,24 +32,24 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20">
         
-    <Border Grid.Row="0" BackgroundColor="LightGray" Padding="10" Margin="0,0,0,10" StrokeThickness="0">
+    <Border Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}" Padding="10" Margin="0,0,0,10" StrokeThickness="0">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                 
                 <VerticalStackLayout Grid.ColumnSpan="2" Margin="0,0,0,10">
-                    <Label Text="Record Source:" FontAttributes="Bold" />
+                    <Label Text="Record Source:" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                     <!-- Changed: use FlexLayout to keep checkboxes in one line and wrap when needed -->
                     <FlexLayout Direction="Row" Wrap="Wrap" AlignItems="Center" JustifyContent="Start" Margin="0,5,0,10">
                         <HorizontalStackLayout Spacing="6" Margin="0,0,30,0">
                             <CheckBox x:Name="MicrophoneCheckBox" IsChecked="True" VerticalOptions="Center" />
-                            <Label Text="Microphone" VerticalOptions="Center" />
+                            <Label Text="Microphone" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Spacing="6" Margin="0,0,30,0">
                             <CheckBox x:Name="SystemAudioCheckBox" IsChecked="False" VerticalOptions="Center" />
-                            <Label Text="System Audio" VerticalOptions="Center" />
+                            <Label Text="System Audio" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                         </HorizontalStackLayout>
                         <HorizontalStackLayout Spacing="6" Margin="0,0,30,0">
                             <CheckBox x:Name="AutoTranscribeCheckBox" IsChecked="True" CheckedChanged="OnAutoTranscribeChanged" VerticalOptions="Center" />
-                            <Label Text="Transcribe after" VerticalOptions="Center" />
+                            <Label Text="Transcribe after" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
                         </HorizontalStackLayout>
                     </FlexLayout>
                     
@@ -101,7 +103,7 @@
 
         <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="0,0,0,10">
             <!-- Sticky header row: labels now clickable for sorting -->
-            <Grid Grid.Row="0" BackgroundColor="LightBlue" RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" RowSpacing="1">
+            <Grid Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" RowSpacing="1">
                 <Label x:Name="DateHeader" Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
