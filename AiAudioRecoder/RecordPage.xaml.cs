@@ -95,10 +95,11 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
 
         bool recordMic = MicrophoneCheckBox?.IsChecked == true;
         bool recordSystem = SystemAudioCheckBox?.IsChecked == true;
+        _recorder.SetMicEnabled(recordMic);
+        _recorder.SetSystemEnabled(recordSystem);
         if (!recordMic && !recordSystem)
         {
-            await DisplayAlertAsync("Ошибка", "Выберите хотя бы один источник записи", "OK");
-            return;
+            await DisplayAlertAsync("Информация", "Источники отключены: будет записан файл тишины", "OK");
         }
 
         try
@@ -114,13 +115,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             RecordButton.IsEnabled = false;
             RecordButton.Text = "Запись...";
 
-            string? filePath = null;
-            if (recordMic && recordSystem)
-                filePath = await _recorder.StartMixedRecordingAsync(string.Empty, string.Empty);
-            else if (recordMic)
-                filePath = await _recorder.StartRecordingAsync(string.Empty, string.Empty, "mic");
-            else
-                filePath = await _recorder.StartRecordingAsync(string.Empty, string.Empty, "system");
+            string? filePath = await _recorder.StartMixedRecordingAsync(string.Empty, string.Empty);
 
             if (string.IsNullOrEmpty(filePath))
             {
@@ -142,6 +137,10 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             RecordButton.IsEnabled = true;
             RecordButton.Text = "Остановить запись";
             RecordButton.BackgroundColor = Colors.Red;
+
+            // Allow toggling sources on the fly
+            MicrophoneCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
+            SystemAudioCheckBox.CheckedChanged += OnSourceToggleDuringRecording;
 
             await _recordingTcs.Task; // wait stop
             RecordButton.IsEnabled = false;
@@ -442,4 +441,12 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     }
 
     #endregion
+    
+    // Dynamic source toggle during recording
+    private void OnSourceToggleDuringRecording(object? sender, CheckedChangedEventArgs e)
+    {
+        if (!_isRecordingInProgress) return;
+        _recorder.SetMicEnabled(MicrophoneCheckBox?.IsChecked == true);
+        _recorder.SetSystemEnabled(SystemAudioCheckBox?.IsChecked == true);
+    }
 }

@@ -11,9 +11,9 @@ namespace AiAudioRecoder.Services;
 
 public partial class AudioRecorderService
 {
-    private WaveInEvent? _waveIn;
-    private WasapiLoopbackCapture? _loopback;
-    private WaveFileWriter? _writer;
+    private WaveInEvent? _waveIn; // legacy single-source (unused now)
+    private WasapiLoopbackCapture? _loopback; // legacy single-source (unused now)
+    private WaveFileWriter? _writer; // legacy single-source (unused now)
 
     // Mixed recording
     private WaveInEvent? _mixedMic;
@@ -26,51 +26,30 @@ public partial class AudioRecorderService
     private Task? _mixTask;
     private MediaFoundationResampler? _systemResampler;
 
-    public Task<string?> StartRecordingAsync(string? folderName = null, string? fileName = null, string source = "mic")
+    private class MutingSampleProvider : ISampleProvider
     {
-        if (_isRecording) return Task.FromResult<string?>(null);
-        var dateFolder = string.IsNullOrEmpty(folderName) ? DateTime.Now.ToString("yyyy-MM-dd") : folderName;
-        var root = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var dir = Path.Combine(root, "AiAudioRecoder", "audioData", dateFolder);
-        Directory.CreateDirectory(dir);
-        var name = string.IsNullOrEmpty(fileName) ? $"audio_{DateTime.Now:yyyyMMdd_HHmmss}" : fileName;
-        if (source == "system") name += "_system";
-        name += ".wav";
-        _filePath = Path.Combine(dir, name);
-
-        if (source == "system")
+        private readonly ISampleProvider _source;
+        private readonly Func<bool> _enabledFunc;
+        public MutingSampleProvider(ISampleProvider source, Func<bool> enabledFunc)
         {
-            try
-            {
-                _loopback = new WasapiLoopbackCapture();
-                _loopback.DataAvailable += (s, e) => _writer?.Write(e.Buffer, 0, e.BytesRecorded);
-                _writer = new WaveFileWriter(_filePath, _loopback.WaveFormat);
-                _loopback.StartRecording();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Loopback start error: {ex.Message}");
-                return Task.FromResult<string?>(null);
-            }
+            _source = source;
+            _enabledFunc = enabledFunc;
         }
-        else
+        public WaveFormat WaveFormat => _source.WaveFormat;
+        public int Read(float[] buffer, int offset, int count)
         {
-            try
+            int read = _source.Read(buffer, offset, count);
+            if (!_enabledFunc())
             {
-                _waveIn = new WaveInEvent { WaveFormat = new WaveFormat(44100, 1) };
-                _waveIn.DataAvailable += (s, e) => _writer?.Write(e.Buffer, 0, e.BytesRecorded);
-                _writer = new WaveFileWriter(_filePath, _waveIn.WaveFormat);
-                _waveIn.StartRecording();
+                Array.Clear(buffer, offset, read); // mute samples
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Mic start error: {ex.Message}");
-                return Task.FromResult<string?>(null);
-            }
+            return read;
         }
-        _isRecording = true;
-        return Task.FromResult<string?>(_filePath);
     }
+
+    // Always route through mixed API for consistency
+    public Task<string?> StartRecordingAsync(string? folderName = null, string? fileName = null, string source = "mic")
+        => StartMixedRecordingAsync(folderName, fileName);
 
     public Task<string?> StartMixedRecordingAsync(string? folderName = null, string? fileName = null)
     {
@@ -86,14 +65,14 @@ public partial class AudioRecorderService
             var mixerFloat = WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
             var outputFormat = new WaveFormat(44100, 16, 2);
 
-            // Mic
+            // Mic capture device always started to allow enabling later
             _mixedMic = new WaveInEvent { WaveFormat = new WaveFormat(44100, 1) };
             var micBuffer = new BufferedWaveProvider(_mixedMic.WaveFormat) { DiscardOnBufferOverflow = true };
             _mixedMic.DataAvailable += (s, e) => micBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
-            ISampleProvider micSample = new MonoToStereoSampleProvider(micBuffer.ToSampleProvider());
-            _micSampleProvider = micSample;
+            var micStereo = new MonoToStereoSampleProvider(micBuffer.ToSampleProvider());
+            _micSampleProvider = new MutingSampleProvider(micStereo, () => _micEnabled);
 
-            // System
+            // System capture device always started to allow enabling later
             _mixedSystem = new WasapiLoopbackCapture();
             var sysFormat = _mixedSystem.WaveFormat;
             var sysBuffer = new BufferedWaveProvider(sysFormat) { DiscardOnBufferOverflow = true };
@@ -101,10 +80,10 @@ public partial class AudioRecorderService
             ISampleProvider sysSample = sysBuffer.ToSampleProvider();
             if (sysFormat.SampleRate != 44100 || sysFormat.Channels != 2 || sysFormat.Encoding != WaveFormatEncoding.IeeeFloat)
             {
-                _systemResampler = new MediaFoundationResampler(sysBuffer, WaveFormat.CreateIeeeFloatWaveFormat(44100, 2)) { ResamplerQuality = 60 };
+                _systemResampler = new MediaFoundationResampler(sysBuffer, WaveFormat.CreateIeeeFloatWaveFormat(44100, 2)) { ResamplerQuality = 60 }; // 44.1k stereo float
                 sysSample = _systemResampler.ToSampleProvider();
             }
-            _systemSampleProvider = sysSample;
+            _systemSampleProvider = new MutingSampleProvider(sysSample, () => _systemEnabled);
 
             _mixer = new MixingSampleProvider(mixerFloat) { ReadFully = true };
             _mixer.AddMixerInput(_micSampleProvider);
@@ -117,7 +96,7 @@ public partial class AudioRecorderService
 
             _mixTask = Task.Run(async () =>
             {
-                var floatBuffer = new float[mixerFloat.SampleRate / 10 * mixerFloat.Channels];
+                var floatBuffer = new float[mixerFloat.SampleRate / 10 * mixerFloat.Channels]; // ~100ms
                 var pcmBuffer = new byte[floatBuffer.Length * 2];
                 try
                 {
@@ -165,11 +144,10 @@ public partial class AudioRecorderService
     public Task StopRecordingAsync()
     {
         if (!_isRecording) return Task.CompletedTask;
-        // stop mixed
         if (_mixCts != null)
         {
             try { _mixCts.Cancel(); } catch { }
-            try { _mixTask?.Wait(2000); } catch { }
+            try { _mixTask?.Wait(1500); } catch { }
         }
         _mixedMic?.StopRecording(); _mixedMic?.Dispose(); _mixedMic = null;
         _mixedSystem?.StopRecording(); _mixedSystem?.Dispose(); _mixedSystem = null;
@@ -177,12 +155,7 @@ public partial class AudioRecorderService
         _mixedWriter?.Dispose(); _mixedWriter = null;
         _mixer = null; _micSampleProvider = null; _systemSampleProvider = null;
         _mixCts?.Dispose(); _mixCts = null;
-
-        // single
-        _loopback?.StopRecording(); _loopback?.Dispose(); _loopback = null;
-        _waveIn?.StopRecording(); _waveIn?.Dispose(); _waveIn = null;
-        _writer?.Dispose(); _writer = null;
-
+        _waveIn = null; _loopback = null; _writer = null;
         _isRecording = false;
         return Task.CompletedTask;
     }

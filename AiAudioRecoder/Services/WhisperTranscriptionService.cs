@@ -101,5 +101,68 @@ namespace AiAudioRecoder.Services
                 }
             }
         }
+
+        public async Task<string> TranscribeAsync(string audioFilePath, System.Threading.CancellationToken cancellationToken)
+        {
+            if (!File.Exists(ModelPath))
+            {
+                System.Diagnostics.Debug.WriteLine($"Model not found: {ModelPath}. Skipping transcription.");
+                return "Транскрипция недоступна: модель не загружена.";
+            }
+
+            string? tempPath = null;
+            try
+            {
+                tempPath = Path.GetTempFileName() + ".wav";
+                using (var reader = new WaveFileReader(audioFilePath))
+                {
+                    IWaveProvider provider = reader;
+                    if (reader.WaveFormat.SampleRate != 16000 || reader.WaveFormat.Channels != 1)
+                    {
+                        provider = new MediaFoundationResampler(provider, new WaveFormat(16000, 1));
+                    }
+                    using (var output = new WaveFileWriter(tempPath, new WaveFormat(16000, 1)))
+                    {
+                        var buffer = new float[4096];
+                        int samplesRead;
+                        while ((samplesRead = provider.ToSampleProvider().Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            output.WriteSamples(buffer, 0, samplesRead);
+                        }
+                    }
+                }
+
+                using var factory = WhisperFactory.FromPath(ModelPath, new WhisperFactoryOptions()
+                {
+                    UseGpu = Device == DeviceType.Gpu,
+                    GpuDevice = DeviceIndex
+                });
+                using var processor = factory.CreateBuilder().WithLanguage("auto").Build();
+                using var audioStream = File.OpenRead(tempPath);
+                var text = string.Empty;
+                await foreach (var result in processor.ProcessAsync(audioStream, cancellationToken))
+                {
+                    text += result.Text + " ";
+                }
+                return text.Trim();
+            }
+            catch (OperationCanceledException)
+            {
+                return string.Empty; // cancellation path
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Transcription error: {ex.Message}");
+                return "Ошибка транскрипции.";
+            }
+            finally
+            {
+                if (tempPath != null && File.Exists(tempPath))
+                {
+                    try { File.Delete(tempPath); } catch { }
+                }
+            }
+        }
     }
 }
