@@ -5,26 +5,43 @@
              Title="Record Detail"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray950}}">
     <ContentPage.Content>
-        <VerticalStackLayout Padding="24" Spacing="16">
-            <Label x:Name="TitleLabel"
+        <Grid Padding="24" RowSpacing="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0"
+                   x:Name="TitleLabel"
                    Text="Details"
                    FontAttributes="Bold"
                    FontSize="22"
                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
-            <ScrollView x:Name="ContentScroll" IsVisible="False">
+            <ScrollView Grid.Row="1"
+                        x:Name="ContentScroll"
+                        IsVisible="False"
+                        VerticalScrollBarVisibility="Always">
                 <Label x:Name="ContentLabel"
                        FontSize="16"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
+                       LineBreakMode="WordWrap" />
             </ScrollView>
 
-            <ScrollView x:Name="TranscriptionScroll" IsVisible="False">
+            <ScrollView Grid.Row="1"
+                        x:Name="TranscriptionScroll"
+                        IsVisible="False"
+                        VerticalScrollBarVisibility="Always">
                 <Label x:Name="TranscriptionLabel"
                        FontSize="16"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
+                       LineBreakMode="WordWrap" />
             </ScrollView>
 
-            <Border x:Name="PlaybackPanel"
+            <Border Grid.Row="2"
+                    x:Name="PlaybackPanel"
                     IsVisible="False"
                     StrokeThickness="1"
                     Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
@@ -32,12 +49,12 @@
                     Padding="16">
                 <VerticalStackLayout Spacing="12">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalOptions="Center">
-            <Button x:Name="PlayPauseButton"
-                WidthRequest="48"
-                HeightRequest="48"
-                CornerRadius="24"
-                Text="Play"
-                Clicked="OnPlayPauseClicked" />
+                        <Button x:Name="PlayPauseButton"
+                                WidthRequest="48"
+                                HeightRequest="48"
+                                CornerRadius="24"
+                                Text="Play"
+                                Clicked="OnPlayPauseClicked" />
                         <VerticalStackLayout Grid.Column="1" Spacing="8">
                             <Slider x:Name="PositionSlider"
                                     Minimum="0"
@@ -48,23 +65,30 @@
                                 <Label x:Name="CurrentTimeLabel"
                                        Text="00:00"
                                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
                                 <Label Grid.Column="1"
                                        x:Name="DurationLabel"
                                        Text="00:00"
                                        FontSize="12"
                                        HorizontalOptions="End"
-                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
                             </Grid>
                         </VerticalStackLayout>
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Button Text="Закрыть"
-                    Clicked="OnCloseClicked"
-                    HorizontalOptions="End"
-                    WidthRequest="140" />
-        </VerticalStackLayout>
+        <HorizontalStackLayout Grid.Row="3" Spacing="12" HorizontalOptions="End">
+        <Button Text="Копировать текст"
+            Clicked="OnCopyTextClicked"
+            WidthRequest="160" />
+        <Button Text="Назад к записям"
+            Clicked="OnReturnToRecordsClicked"
+            WidthRequest="160" />
+        <Button Text="Закрыть"
+            Clicked="OnCloseClicked"
+            WidthRequest="120" />
+            </HorizontalStackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

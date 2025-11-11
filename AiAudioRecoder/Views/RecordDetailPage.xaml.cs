@@ -19,9 +19,12 @@ public partial class RecordDetailPage : ContentPage
     private readonly List<Span> _transcriptionSpans = new();
     private readonly List<double> _segmentThresholds = new();
     private readonly AudioPlaybackService _playbackService = new();
+    private readonly Color _highlightColor = Color.FromArgb("#264F78");
     private TimeSpan _duration;
     private int _lastHighlightedIndex = -1;
     private bool _playbackReady;
+    private Color _baseTextColor = Colors.White;
+    private string _currentText = string.Empty;
 
     public RecordDetailPage(AudioFileMetadata metadata, string column, string displayValue)
     {
@@ -61,6 +64,7 @@ public partial class RecordDetailPage : ContentPage
             ContentScroll.IsVisible = false;
             TranscriptionScroll.IsVisible = true;
             BuildTranscriptionView(_metadata.Transcription);
+            _currentText = _metadata.Transcription;
             await SetupPlaybackAsync();
         }
         else
@@ -68,6 +72,7 @@ public partial class RecordDetailPage : ContentPage
             ContentScroll.IsVisible = true;
             TranscriptionScroll.IsVisible = false;
             ContentLabel.Text = resolvedValue;
+            _currentText = resolvedValue;
             PlaybackPanel.IsVisible = false;
         }
     }
@@ -96,6 +101,7 @@ public partial class RecordDetailPage : ContentPage
         var formatted = new FormattedString();
         _transcriptionSpans.Clear();
         _segmentThresholds.Clear();
+        _baseTextColor = ResolveSecondaryTextColor();
 
         for (int i = 0; i < segments.Count; i++)
         {
@@ -114,7 +120,7 @@ public partial class RecordDetailPage : ContentPage
             var span = new Span
             {
                 Text = text,
-                TextColor = ResolveSecondaryTextColor()
+                TextColor = _baseTextColor
             };
 
             formatted.Spans.Add(span);
@@ -194,9 +200,19 @@ public partial class RecordDetailPage : ContentPage
                 return;
 
             var ratio = Math.Clamp(position.TotalMilliseconds / duration.TotalMilliseconds, 0, 1);
-            PositionSlider.Value = ratio;
-            CurrentTimeLabel.Text = FormatTime(position);
-            UpdateHighlight(position, duration);
+
+            if (Math.Abs(PositionSlider.Value - ratio) > 0.005)
+            {
+                PositionSlider.Value = ratio;
+            }
+
+            var timeText = FormatTime(position);
+            if (!string.Equals(CurrentTimeLabel.Text, timeText, StringComparison.Ordinal))
+            {
+                CurrentTimeLabel.Text = timeText;
+            }
+
+            UpdateHighlight(ratio);
         });
     }
 
@@ -211,36 +227,49 @@ public partial class RecordDetailPage : ContentPage
         });
     }
 
-    private void UpdateHighlight(TimeSpan position, TimeSpan duration)
+    private void UpdateHighlight(double ratio)
     {
-        if (_segmentThresholds.Count == 0 || duration <= TimeSpan.Zero)
+        if (_segmentThresholds.Count == 0)
             return;
 
-        var ratio = Math.Clamp(position.TotalMilliseconds / duration.TotalMilliseconds, 0, 1);
+        int index = GetSegmentIndex(ratio);
+        HighlightSegment(index);
+    }
 
-        int index = -1;
-        for (int i = 0; i < _segmentThresholds.Count; i++)
+    private int GetSegmentIndex(double ratio)
+    {
+        var thresholds = _segmentThresholds;
+        int index = thresholds.BinarySearch(ratio);
+        if (index < 0)
         {
-            if (ratio <= _segmentThresholds[i])
-            {
-                index = i;
-                break;
-            }
+            index = ~index;
         }
 
-        HighlightSegment(index);
+        if (index >= thresholds.Count)
+        {
+            index = thresholds.Count - 1;
+        }
+
+        return index;
     }
 
     private void HighlightSegment(int index)
     {
-        var highlightColor = Color.FromArgb("#264F78");
-        var baseColor = ResolveSecondaryTextColor();
+        if (_lastHighlightedIndex == index)
+            return;
 
-        for (int i = 0; i < _transcriptionSpans.Count; i++)
+        if (_lastHighlightedIndex >= 0 && _lastHighlightedIndex < _transcriptionSpans.Count)
         {
-            var span = _transcriptionSpans[i];
-            span.BackgroundColor = i == index ? highlightColor : Colors.Transparent;
-            span.TextColor = baseColor;
+            var previous = _transcriptionSpans[_lastHighlightedIndex];
+            previous.BackgroundColor = Colors.Transparent;
+            previous.TextColor = _baseTextColor;
+        }
+
+        if (index >= 0 && index < _transcriptionSpans.Count)
+        {
+            var current = _transcriptionSpans[index];
+            current.BackgroundColor = _highlightColor;
+            current.TextColor = _baseTextColor;
         }
 
         _lastHighlightedIndex = index;
@@ -281,14 +310,52 @@ public partial class RecordDetailPage : ContentPage
         UpdatePlayButtonIcon();
     }
 
-    private async void OnCloseClicked(object sender, EventArgs e)
+    private async void OnCloseClicked(object sender, EventArgs e) => await CloseAsync(false);
+
+    private async void OnReturnToRecordsClicked(object sender, EventArgs e) => await CloseAsync(true);
+
+    private async void OnCopyTextClicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(_currentText))
+            return;
+
+        try
+        {
+            await Clipboard.SetTextAsync(_currentText);
+            await DisplayAlertAsync("Скопировано", "Текст скопирован в буфер обмена.", "OK");
+        }
+        catch
+        {
+            await DisplayAlertAsync("Ошибка", "Не удалось скопировать текст.", "OK");
+        }
+    }
+
+    private async Task CloseAsync(bool navigateToRecords)
     {
         _playbackService.Stop();
         UpdatePlayButtonIcon();
-        PositionSlider.Value = 0;
+
+        if (PositionSlider != null)
+        {
+            PositionSlider.Value = 0;
+        }
+
         CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
         HighlightSegment(-1);
+
         await Navigation.PopModalAsync();
+
+        if (navigateToRecords && Shell.Current is not null)
+        {
+            try
+            {
+                await Shell.Current.GoToAsync("//records");
+            }
+            catch
+            {
+                // Ignore navigation failures and remain on current page
+            }
+        }
     }
 
     protected override void OnDisappearing()
@@ -299,6 +366,8 @@ public partial class RecordDetailPage : ContentPage
         _playbackService.PlaybackEnded -= OnPlaybackEnded;
         _playbackService.Dispose();
         _playbackReady = false;
+        _lastHighlightedIndex = -1;
+        _currentText = string.Empty;
     }
 
     private static string FormatTime(TimeSpan time)

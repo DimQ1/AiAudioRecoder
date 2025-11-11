@@ -8,13 +8,13 @@
 
     <TabBar>
         <Tab Title="Запись" Icon="record.png">
-            <ShellContent ContentTemplate="{DataTemplate local:RecordPage}" />
+            <ShellContent Route="records" ContentTemplate="{DataTemplate local:RecordPage}" />
         </Tab>
         <Tab Title="Транскрибировать" Icon="transcribe.png">
-            <ShellContent ContentTemplate="{DataTemplate local:TranscribePage}" />
+            <ShellContent Route="transcribe" ContentTemplate="{DataTemplate local:TranscribePage}" />
         </Tab>
         <Tab Title="Модели" Icon="model.png">
-            <ShellContent ContentTemplate="{DataTemplate local:ModelsPage}" />
+            <ShellContent Route="models" ContentTemplate="{DataTemplate local:ModelsPage}" />
         </Tab>
     </TabBar>
 
