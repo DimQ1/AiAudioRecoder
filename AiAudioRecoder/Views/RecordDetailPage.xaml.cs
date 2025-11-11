@@ -18,6 +18,7 @@ public partial class RecordDetailPage : ContentPage
     private readonly string _displayValue;
     private readonly List<Span> _transcriptionSpans = new();
     private readonly List<double> _segmentThresholds = new();
+    private readonly List<(double Start, double End)> _wordBoundaries = new();
     private readonly AudioPlaybackService _playbackService = new();
     private readonly Color _highlightColor = Color.FromArgb("#264F78");
     private TimeSpan _duration;
@@ -92,16 +93,24 @@ public partial class RecordDetailPage : ContentPage
 
     private void BuildTranscriptionView(string transcription)
     {
+        var formatted = new FormattedString();
+        _transcriptionSpans.Clear();
+        _segmentThresholds.Clear();
+        _wordBoundaries.Clear();
+        _baseTextColor = ResolveSecondaryTextColor();
+
+        if (TryBuildWordTimingView(formatted))
+        {
+            TranscriptionLabel.FormattedText = formatted;
+            HighlightSpan(-1);
+            return;
+        }
+
         var segments = SplitIntoSegments(transcription);
         if (segments.Count == 0)
         {
             segments.Add(transcription);
         }
-
-        var formatted = new FormattedString();
-        _transcriptionSpans.Clear();
-        _segmentThresholds.Clear();
-        _baseTextColor = ResolveSecondaryTextColor();
 
         for (int i = 0; i < segments.Count; i++)
         {
@@ -129,7 +138,42 @@ public partial class RecordDetailPage : ContentPage
         }
 
         TranscriptionLabel.FormattedText = formatted;
-        HighlightSegment(-1);
+        HighlightSpan(-1);
+    }
+
+    private bool TryBuildWordTimingView(FormattedString formatted)
+    {
+        var timings = _metadata.WordTimings;
+        if (timings == null || timings.Count == 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < timings.Count; i++)
+        {
+            var timing = timings[i];
+            if (string.IsNullOrWhiteSpace(timing.Word))
+            {
+                continue;
+            }
+
+            var span = new Span
+            {
+                Text = timing.Word,
+                TextColor = _baseTextColor
+            };
+
+            formatted.Spans.Add(span);
+            _transcriptionSpans.Add(span);
+            _wordBoundaries.Add((Math.Max(0, timing.Start), Math.Max(timing.End, timing.Start)));
+
+            if (i < timings.Count - 1)
+            {
+                formatted.Spans.Add(new Span { Text = " ", TextColor = _baseTextColor });
+            }
+        }
+
+        return _transcriptionSpans.Count > 0;
     }
 
     private static List<string> SplitIntoSegments(string transcription)
@@ -212,7 +256,7 @@ public partial class RecordDetailPage : ContentPage
                 CurrentTimeLabel.Text = timeText;
             }
 
-            UpdateHighlight(ratio);
+            UpdateHighlight(position);
         });
     }
 
@@ -222,18 +266,34 @@ public partial class RecordDetailPage : ContentPage
         {
             PositionSlider.Value = 0;
             CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
-            HighlightSegment(-1);
+            HighlightSpan(-1);
             UpdatePlayButtonIcon();
         });
     }
 
-    private void UpdateHighlight(double ratio)
+    private void UpdateHighlight(TimeSpan position)
     {
+        if (_wordBoundaries.Count > 0)
+        {
+            var seconds = Math.Max(0, position.TotalSeconds);
+            int index = GetWordIndex(seconds);
+            HighlightSpan(index);
+            return;
+        }
+
         if (_segmentThresholds.Count == 0)
             return;
 
-        int index = GetSegmentIndex(ratio);
-        HighlightSegment(index);
+        var duration = _duration > TimeSpan.Zero ? _duration : _playbackService.Duration;
+        if (duration <= TimeSpan.Zero)
+        {
+            HighlightSpan(-1);
+            return;
+        }
+
+        var ratio = Math.Clamp(position.TotalMilliseconds / duration.TotalMilliseconds, 0, 1);
+        int segmentIndex = GetSegmentIndex(ratio);
+        HighlightSpan(segmentIndex);
     }
 
     private int GetSegmentIndex(double ratio)
@@ -253,7 +313,29 @@ public partial class RecordDetailPage : ContentPage
         return index;
     }
 
-    private void HighlightSegment(int index)
+    private int GetWordIndex(double seconds)
+    {
+        if (_wordBoundaries.Count == 0)
+            return -1;
+
+        for (int i = 0; i < _wordBoundaries.Count; i++)
+        {
+            var (start, end) = _wordBoundaries[i];
+            if (seconds >= start && seconds <= end)
+            {
+                return i;
+            }
+
+            if (seconds < start)
+            {
+                return Math.Max(0, i - 1);
+            }
+        }
+
+        return _wordBoundaries.Count - 1;
+    }
+
+    private void HighlightSpan(int index)
     {
         if (_lastHighlightedIndex == index)
             return;
@@ -341,7 +423,7 @@ public partial class RecordDetailPage : ContentPage
         }
 
         CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
-        HighlightSegment(-1);
+    HighlightSpan(-1);
 
         await Navigation.PopModalAsync();
 

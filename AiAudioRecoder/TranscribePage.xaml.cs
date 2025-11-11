@@ -65,21 +65,22 @@ public partial class TranscribePage : ContentPage
             TranscribeProgress.Progress = 0;
             TranscribeButton.IsEnabled = false;
 
-            var transcription = await _whisper.TranscribeAsync(_selectedFilePath);
-            var summary = GenerateSummary(transcription);
+            var transcriptionOutput = await _whisper.TranscribeAsync(_selectedFilePath);
+            var summary = GenerateSummary(transcriptionOutput.Text);
             var start = DateTime.Now;
             var end = DateTime.Now;
             var meta = new Models.AudioFileMetadata
             {
                 FilePath = _selectedFilePath,
-                Transcription = transcription,
+                Transcription = transcriptionOutput.Text,
                 Summary = summary,
+                WordTimings = transcriptionOutput.WordTimings,
                 StartTime = start,
                 EndTime = end
             };
             await _db.AddMetadataAsync(meta);
 
-            ResultLabel.Text = $"Транскрипция: {transcription}\nСуммари: {summary}";
+            ResultLabel.Text = $"Транскрипция: {transcriptionOutput.Text}\nСуммари: {summary}";
             ResultLabel.IsVisible = true;
             await DisplayAlertAsync("Готово", $"Транскрипция сохранена!", "OK");
         }

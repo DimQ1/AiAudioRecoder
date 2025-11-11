@@ -35,6 +35,8 @@ namespace AiAudioRecoder.Services
                 await _db.CreateTableAsync<AudioFileMetadata>();
                 _logger?.LogDebug("Table AudioFileMetadata created");
 
+                await EnsureColumnExistsAsync("AudioFileMetadata", "WordTimingsJson", "TEXT");
+
                 // Add indexes for better performance
                 await _db.ExecuteAsync("CREATE INDEX IF NOT EXISTS idx_audio_date ON AudioFileMetadata(EndTime DESC)");
                 _logger?.LogDebug("Index idx_audio_date created");
@@ -171,6 +173,31 @@ namespace AiAudioRecoder.Services
             {
                 _logger?.LogError(ex, "Error during AudioMetadataDatabase cleanup");
             }
+        }
+
+        private async Task EnsureColumnExistsAsync(string table, string column, string columnDefinition)
+        {
+            try
+            {
+                var pragma = await _db.QueryAsync<TableInfo>($"PRAGMA table_info({table})");
+                if (pragma.Exists(info => info.Name.Equals(column, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return;
+                }
+
+                await _db.ExecuteAsync($"ALTER TABLE {table} ADD COLUMN {column} {columnDefinition} DEFAULT ''");
+                _logger?.LogInformation("Added column {Column} to table {Table}", column, table);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Unable to ensure column {Column} on table {Table}", column, table);
+            }
+        }
+
+        private class TableInfo
+        {
+            [Column("name")]
+            public string Name { get; set; } = string.Empty;
         }
     }
 }

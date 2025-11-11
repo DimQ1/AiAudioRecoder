@@ -25,6 +25,7 @@ namespace AiAudioRecoder.Services
         public bool Success { get; set; }
         public string Transcription { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
+        public List<TranscriptionWordTiming> WordTimings { get; set; } = new();
         public AudioFileMetadata Metadata { get; set; } = null!;
     }
 
@@ -233,16 +234,17 @@ namespace AiAudioRecoder.Services
             try
             {
                 _logger.LogInformation("Starting transcription {File}", task.Metadata.FilePath);
-                var transcript = await _whisperService.TranscribeAsync(task.Metadata.FilePath, task.Cancellation.Token);
+                var transcription = await _whisperService.TranscribeAsync(task.Metadata.FilePath, task.Cancellation.Token);
                 if (task.Cancellation.IsCancellationRequested)
                 {
                     task.Status = TranscriptionTaskStatus.Cancelled;
                     task.Completion.TrySetCanceled();
                     return;
                 }
-                var summary = GenerateSummary(transcript);
-                task.Metadata.Transcription = transcript;
+                var summary = GenerateSummary(transcription.Text);
+                task.Metadata.Transcription = transcription.Text;
                 task.Metadata.Summary = summary;
+                task.Metadata.WordTimings = transcription.WordTimings;
                 task.Metadata.IsTranscribed = true;
                 task.Metadata.TranscriptionDate = DateTime.Now;
                 await _db.UpdateMetadataAsync(task.Metadata);
@@ -250,8 +252,9 @@ namespace AiAudioRecoder.Services
                 task.Completion.TrySetResult(new TranscriptionResult
                 {
                     Success = true,
-                    Transcription = transcript,
+                    Transcription = transcription.Text,
                     Summary = summary,
+                    WordTimings = transcription.WordTimings,
                     Metadata = task.Metadata
                 });
                 _logger.LogInformation("Finished transcription {File}", task.Metadata.FilePath);
@@ -270,9 +273,11 @@ namespace AiAudioRecoder.Services
                     Success = false,
                     Transcription = string.Empty,
                     Summary = string.Empty,
+                    WordTimings = new List<TranscriptionWordTiming>(),
                     Metadata = task.Metadata
                 });
                 task.Metadata.IsTranscribed = false;
+                task.Metadata.WordTimings = new List<TranscriptionWordTiming>();
                 await _db.UpdateMetadataAsync(task.Metadata);
                 _logger.LogError(ex, "Transcription failed {File}" , task.Metadata.FilePath);
             }

@@ -1,5 +1,7 @@
 using SQLite;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace AiAudioRecoder.Models
 {
@@ -17,6 +19,7 @@ namespace AiAudioRecoder.Models
 
         public string Transcription { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
+        public string WordTimingsJson { get; set; } = string.Empty;
 
         // Transcription status
         public bool IsTranscribed { get; set; } = false;
@@ -36,6 +39,33 @@ namespace AiAudioRecoder.Models
             FilePath = string.Empty;
             Transcription = string.Empty;
             Summary = string.Empty;
+            WordTimingsJson = string.Empty;
+        }
+
+        [Ignore]
+        public List<TranscriptionWordTiming> WordTimings
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(WordTimingsJson))
+                    return new List<TranscriptionWordTiming>();
+
+                try
+                {
+                    var data = JsonSerializer.Deserialize<List<TranscriptionWordTiming>>(WordTimingsJson);
+                    return data ?? new List<TranscriptionWordTiming>();
+                }
+                catch
+                {
+                    return new List<TranscriptionWordTiming>();
+                }
+            }
+            set
+            {
+                WordTimingsJson = value is null || value.Count == 0
+                    ? string.Empty
+                    : JsonSerializer.Serialize(value);
+            }
         }
     }
 }
