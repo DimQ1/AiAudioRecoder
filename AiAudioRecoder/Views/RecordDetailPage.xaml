@@ -67,7 +67,7 @@
                                        FontSize="12"
                                        TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
                                 <Label Grid.Column="1"
-                                       x:Name="DurationLabel"
+                                       x:Name="TotalDurationLabel"
                                        Text="00:00"
                                        FontSize="12"
                                        HorizontalOptions="End"

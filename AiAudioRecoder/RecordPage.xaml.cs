@@ -285,7 +285,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
 
     private Task ShowCellDetailAsync(AudioFileMetadata metadata, string column, string displayedText)
     {
-        var detailPage = new Views.RecordDetailPage(metadata, column, displayedText);
+        var detailPage = new Views.RecordDetailPage(metadata);
         return Navigation.PushModalAsync(detailPage);
     }
 
@@ -294,19 +294,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         // Handle transcribe button click from CollectionView
         if (sender is Button button)
         {
-            // Get the metadata from the button's binding context
-            var parentView = button.Parent;
-            AudioFileMetadata? metadata = null;
-            
-            while (parentView != null)
-            {
-                if (parentView.BindingContext is AudioFileMetadata recordMetadata)
-                {
-                    metadata = recordMetadata;
-                    break;
-                }
-                parentView = parentView.Parent;
-            }
+            var metadata = ResolveMetadataFromButton(button);
 
             if (metadata != null)
             {
@@ -322,6 +310,34 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
                 }
             }
         }
+    }
+
+    private async void OnRetranscribeClicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        var metadata = ResolveMetadataFromButton(button);
+        if (metadata == null)
+        {
+            return;
+        }
+
+        if (_transcriptionQueue.IsTranscribing(metadata.FilePath))
+        {
+            await DisplayAlertAsync("Информация", "Файл уже транскрибируется", "OK");
+            return;
+        }
+
+        bool confirm = await DisplayAlertAsync("Повторить", "Перезапустить распознавание текста?", "Да", "Нет");
+        if (!confirm)
+        {
+            return;
+        }
+
+        await StartTranscriptionAsync(metadata, force: true);
     }
 
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
@@ -529,9 +545,51 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async Task StartTranscriptionAsync(AudioFileMetadata metadata)
+    private AudioFileMetadata? ResolveMetadataFromButton(Button button)
     {
-        if (_isTranscribing || metadata.IsTranscribed)
+        var parentView = button.Parent;
+        while (parentView != null)
+        {
+            if (parentView.BindingContext is AudioFileMetadata recordMetadata)
+            {
+                return recordMetadata;
+            }
+            parentView = parentView.Parent;
+        }
+
+        return button.BindingContext as AudioFileMetadata;
+    }
+
+    private void RefreshRecordInCollections(AudioFileMetadata metadata)
+    {
+        var displayedIndex = _displayedRecords.IndexOf(metadata);
+        if (displayedIndex >= 0)
+        {
+            _displayedRecords[displayedIndex] = metadata;
+        }
+
+        var allIndex = _allRecords.IndexOf(metadata);
+        if (allIndex >= 0)
+        {
+            _allRecords[allIndex] = metadata;
+        }
+    }
+
+    private async Task StartTranscriptionAsync(AudioFileMetadata metadata, bool force = false)
+    {
+        if (_isTranscribing)
+        {
+            await DisplayAlertAsync("Информация", "Транскрипция уже выполняется", "OK");
+            return;
+        }
+
+        if (_transcriptionQueue.IsTranscribing(metadata.FilePath))
+        {
+            await DisplayAlertAsync("Информация", "Файл уже транскрибируется", "OK");
+            return;
+        }
+
+        if (!force && metadata.IsTranscribed)
         {
             await DisplayAlertAsync("Информация", "Файл уже транскрибируется или уже распознан", "OK");
             return;
@@ -539,8 +597,10 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            metadata.IsTranscribed = true; // Mark as in progress
+            metadata.IsTranscribed = false; // reset status to show in-progress state
+            metadata.TranscriptionDate = null;
             await _db.UpdateMetadataAsync(metadata);
+            RefreshRecordInCollections(metadata);
 
             // Show progress
             var progressBar = Content?.FindByName("TranscriptionProgress") as ProgressBar;
@@ -553,24 +613,20 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _isTranscribing = true;
 
             // Start transcription in queue
-            var result = await _transcriptionQueue.QueueTranscriptionAsync(metadata);
+            var result = await _transcriptionQueue.QueueTranscriptionAsync(metadata, force ? 1 : 0);
 
             if (result.Success)
             {
                 await DisplayAlertAsync("Успех", $"Транскрипция завершена: {result.Summary}", "OK");
                 
-                // Refresh the specific record
-                var index = _displayedRecords.IndexOf(metadata);
-                if (index >= 0)
-                {
-                    _displayedRecords[index] = result.Metadata;
-                }
+                RefreshRecordInCollections(result.Metadata);
             }
             else
             {
                 await DisplayAlertAsync("Ошибка", "Не удалось выполнить транскрипцию", "OK");
                 metadata.IsTranscribed = false;
                 await _db.UpdateMetadataAsync(metadata);
+                RefreshRecordInCollections(metadata);
             }
         }
         catch (Exception ex)
@@ -581,6 +637,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             {
                 metadata.IsTranscribed = false;
                 await _db.UpdateMetadataAsync(metadata);
+                RefreshRecordInCollections(metadata);
             }
         }
         finally

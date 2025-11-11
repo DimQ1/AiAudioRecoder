@@ -67,6 +67,14 @@ public partial class AudioPlaybackService
         return _waveOut?.PlaybackState == PlaybackState.Playing;
     }
 
+    private partial void PlatformSetPosition(TimeSpan position)
+    {
+        if (_audioFile != null)
+        {
+            _audioFile.CurrentTime = position;
+        }
+    }
+
     private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
     {
         _positionTimer.Stop();

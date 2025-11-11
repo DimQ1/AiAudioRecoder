@@ -5,13 +5,15 @@ using Microsoft.Maui.ApplicationModel;
 
 namespace AiAudioRecoder.Services;
 
-public partial class AudioPlaybackService : IDisposable
+public partial class AudioPlaybackService : IAudioPlaybackService, IDisposable
 {
     private readonly System.Timers.Timer _positionTimer;
     private bool _isLoaded;
 
     public event EventHandler<TimeSpan>? PositionChanged;
     public event EventHandler? PlaybackEnded;
+    public event EventHandler? PlaybackStopped;
+
 
     public AudioPlaybackService()
     {
@@ -33,14 +35,13 @@ public partial class AudioPlaybackService : IDisposable
         return loaded;
     }
 
-    public async Task<bool> PlayAsync()
+    public async Task PlayAsync()
     {
         if (!_isLoaded)
-            return false;
+            return;
 
         await PlatformPlayAsync();
         _positionTimer.Start();
-        return true;
     }
 
     public void Pause()
@@ -65,6 +66,20 @@ public partial class AudioPlaybackService : IDisposable
     public TimeSpan Duration => _isLoaded ? PlatformGetDuration() : TimeSpan.Zero;
     public TimeSpan Position => _isLoaded ? PlatformGetPosition() : TimeSpan.Zero;
     public bool IsPlaying => _isLoaded && PlatformIsPlaying();
+    public bool IsLoaded => _isLoaded;
+    public TimeSpan TotalDuration => Duration;
+    public TimeSpan CurrentPosition
+    {
+        get => Position;
+        set
+        {
+            if (_isLoaded)
+            {
+                PlatformSetPosition(value);
+            }
+        }
+    }
+
 
     private void RaisePositionChanged()
     {
@@ -99,4 +114,5 @@ public partial class AudioPlaybackService : IDisposable
     private partial TimeSpan PlatformGetPosition();
     private partial bool PlatformIsPlaying();
     private partial void PlatformDispose();
+    private partial void PlatformSetPosition(TimeSpan position);
 }

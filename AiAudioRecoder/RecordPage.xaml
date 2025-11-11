@@ -170,7 +170,8 @@
                                     </Label.GestureRecognizers>
                                 </Label>
                                 <HorizontalStackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
-                                    <Button Text="Transcribe" FontSize="10" Padding="4" Clicked="OnTranscribeClicked" IsEnabled="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Button Text="Распознать" FontSize="10" Padding="4" Clicked="OnTranscribeClicked" IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Button Text="Повторить" FontSize="10" Padding="4" Clicked="OnRetranscribeClicked" IsVisible="{Binding IsTranscribed}" />
                                     <Button Text="Delete" FontSize="10" Padding="4" BackgroundColor="Tomato" TextColor="White" Clicked="OnDeleteClicked" />
                                 </HorizontalStackLayout>
                                 <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" ClassId="File">

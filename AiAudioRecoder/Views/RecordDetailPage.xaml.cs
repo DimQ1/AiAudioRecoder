@@ -1,464 +1,393 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AiAudioRecoder.Models;
 using AiAudioRecoder.Services;
-using Microsoft.Maui.ApplicationModel;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls;
 
-namespace AiAudioRecoder.Views;
-
-public partial class RecordDetailPage : ContentPage
+namespace AiAudioRecoder.Views
 {
-    private readonly AudioFileMetadata _metadata;
-    private readonly string _column;
-    private readonly string _displayValue;
-    private readonly List<Span> _transcriptionSpans = new();
-    private readonly List<double> _segmentThresholds = new();
-    private readonly List<(double Start, double End)> _wordBoundaries = new();
-    private readonly AudioPlaybackService _playbackService = new();
-    private readonly Color _highlightColor = Color.FromArgb("#264F78");
-    private TimeSpan _duration;
-    private int _lastHighlightedIndex = -1;
-    private bool _playbackReady;
-    private Color _baseTextColor = Colors.White;
-    private string _currentText = string.Empty;
-
-    public RecordDetailPage(AudioFileMetadata metadata, string column, string displayValue)
+    public partial class RecordDetailPage : ContentPage
     {
-        InitializeComponent();
-        _metadata = metadata;
-        _column = column;
-        _displayValue = displayValue;
-        TitleLabel.Text = GetTitle(column);
-        Loaded += OnPageLoaded;
-        _playbackService.PositionChanged += OnPlaybackPositionChanged;
-        _playbackService.PlaybackEnded += OnPlaybackEnded;
-    }
+        private readonly IAudioPlaybackService _playbackService;
+        private readonly AudioFileMetadata _record;
+        private readonly AudioMetadataDatabase _database;
+        private FormattedString? _formattedTranscription;
+        private List<Span> _wordSpans = new();
+        private double[] _wordStartTimes = Array.Empty<double>();
+        private double[] _wordEndTimes = Array.Empty<double>();
+        private int _currentHighlightIndex = -1;
+        private readonly CancellationTokenSource _highlightCts = new();
+        private readonly IDispatcherTimer _highlightTimer;
+        private readonly System.Collections.Concurrent.BlockingCollection<double> _positionQueue = new(1);
+        private Task? _highlightWorker;
 
-    private async void OnPageLoaded(object? sender, EventArgs e)
-    {
-        Loaded -= OnPageLoaded;
-        await ConfigureContentAsync();
-    }
-
-    private string GetTitle(string column) => column switch
-    {
-        "Date" => "Дата записи",
-        "Duration" => "Длительность",
-        "Status" => "Статус",
-        "Summary" => "Распознанный текст",
-        "File" => "Файл",
-        _ => "Данные"
-    };
-
-    private async Task ConfigureContentAsync()
-    {
-        var resolvedValue = ResolveDisplayValue();
-        bool hasTranscription = string.Equals(_column, "Summary", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(_metadata.Transcription);
-
-        if (hasTranscription)
+        public RecordDetailPage(AudioFileMetadata record)
         {
-            ContentScroll.IsVisible = false;
-            TranscriptionScroll.IsVisible = true;
-            BuildTranscriptionView(_metadata.Transcription);
-            _currentText = _metadata.Transcription;
-            await SetupPlaybackAsync();
-        }
-        else
-        {
-            ContentScroll.IsVisible = true;
-            TranscriptionScroll.IsVisible = false;
-            ContentLabel.Text = resolvedValue;
-            _currentText = resolvedValue;
-            PlaybackPanel.IsVisible = false;
-        }
-    }
+            InitializeComponent();
+            _record = record;
+            BindingContext = _record;
 
-    private string ResolveDisplayValue()
-    {
-        return _column switch
-        {
-            "Date" => _metadata.EndTime.ToString("yyyy-MM-dd HH:mm:ss"),
-            "Duration" => _metadata.Duration.ToString(@"hh\:mm\:ss"),
-            "Status" => _metadata.IsTranscribed ? "Распознано" : "Ожидает",
-            "Summary" => _metadata.Summary ?? _displayValue,
-            "File" => _metadata.FilePath ?? _displayValue,
-            _ => _displayValue
-        } ?? string.Empty;
-    }
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+            var logger = loggerFactory.CreateLogger<AudioMetadataDatabase>();
+            var dbRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AiAudioRecoder", "Databases");
+            Directory.CreateDirectory(dbRoot);
+            var dbPath = Path.Combine(dbRoot, "audio_metadata.db3");
+            _database = new AudioMetadataDatabase(dbPath, logger);
 
-    private void BuildTranscriptionView(string transcription)
-    {
-        var formatted = new FormattedString();
-        _transcriptionSpans.Clear();
-        _segmentThresholds.Clear();
-        _wordBoundaries.Clear();
-        _baseTextColor = ResolveSecondaryTextColor();
-
-        if (TryBuildWordTimingView(formatted))
-        {
-            TranscriptionLabel.FormattedText = formatted;
-            HighlightSpan(-1);
-            return;
+            _playbackService = new AudioPlaybackService();
+            InitializePlaybackService();
+            
+            _highlightTimer = Dispatcher.CreateTimer();
+            SetupHighlightTimer();
+            StartHighlightWorker();
         }
 
-        var segments = SplitIntoSegments(transcription);
-        if (segments.Count == 0)
+        private void StartHighlightWorker()
         {
-            segments.Add(transcription);
+            _highlightWorker = Task.Run(() =>
+            {
+                while (!_highlightCts.IsCancellationRequested)
+                {
+                    try
+                    {
+                        double seconds = _positionQueue.Take(_highlightCts.Token);
+                        // Drain the queue to only process the latest position
+                        while (_positionQueue.TryTake(out var latestSeconds))
+                        {
+                            seconds = latestSeconds;
+                        }
+
+                        int index = FindWordIndex(seconds);
+
+                        if (index != _currentHighlightIndex)
+                        {
+                            MainThread.BeginInvokeOnMainThread(() =>
+                            {
+                                if (!_highlightCts.IsCancellationRequested)
+                                {
+                                    HighlightSpan(index);
+                                }
+                            });
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Expected when token is cancelled
+                        break;
+                    }
+                }
+            }, _highlightCts.Token);
         }
 
-        for (int i = 0; i < segments.Count; i++)
+        private void SetupHighlightTimer()
         {
-            var text = segments[i];
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                continue;
-            }
-
-            // Preserve spacing between segments
-            if (formatted.Spans.Count > 0 && !text.StartsWith('\n'))
-            {
-                formatted.Spans.Add(new Span { Text = " " });
-            }
-
-            var span = new Span
-            {
-                Text = text,
-                TextColor = _baseTextColor
-            };
-
-            formatted.Spans.Add(span);
-            _transcriptionSpans.Add(span);
-            _segmentThresholds.Add((i + 1) / (double)segments.Count);
+            _highlightTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _highlightTimer.Tick += HighlightTimer_Tick;
         }
 
-        TranscriptionLabel.FormattedText = formatted;
-        HighlightSpan(-1);
-    }
-
-    private bool TryBuildWordTimingView(FormattedString formatted)
-    {
-        var timings = _metadata.WordTimings;
-        if (timings == null || timings.Count == 0)
+        private void HighlightTimer_Tick(object? sender, EventArgs e)
         {
-            return false;
-        }
-
-        for (int i = 0; i < timings.Count; i++)
-        {
-            var timing = timings[i];
-            if (string.IsNullOrWhiteSpace(timing.Word))
+            if (_playbackService.IsPlaying)
             {
-                continue;
-            }
-
-            var span = new Span
-            {
-                Text = timing.Word,
-                TextColor = _baseTextColor
-            };
-
-            formatted.Spans.Add(span);
-            _transcriptionSpans.Add(span);
-            _wordBoundaries.Add((Math.Max(0, timing.Start), Math.Max(timing.End, timing.Start)));
-
-            if (i < timings.Count - 1)
-            {
-                formatted.Spans.Add(new Span { Text = " ", TextColor = _baseTextColor });
+                UpdateHighlight(_playbackService.CurrentPosition);
             }
         }
 
-        return _transcriptionSpans.Count > 0;
-    }
-
-    private static List<string> SplitIntoSegments(string transcription)
-    {
-        if (string.IsNullOrWhiteSpace(transcription))
-            return new List<string>();
-
-        var segments = new List<string>();
-        var builder = new StringBuilder();
-        foreach (var ch in transcription)
+        protected override async void OnNavigatedTo(NavigatedToEventArgs args)
         {
-            builder.Append(ch);
-            if (IsSentenceTerminator(ch))
+            base.OnNavigatedTo(args);
+            await ConfigureContentAsync();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _playbackService.Stop();
+            _highlightTimer.Stop();
+            _highlightCts.Cancel();
+        }
+
+        private async Task ConfigureContentAsync()
+        {
+            await RefreshMetadataFromDatabaseAsync();
+
+            bool hasTranscription = !string.IsNullOrWhiteSpace(_record.Transcription);
+
+            if (hasTranscription)
             {
-                segments.Add(builder.ToString().Trim());
-                builder.Clear();
+                ContentScroll.IsVisible = false;
+                TranscriptionScroll.IsVisible = true;
+                BuildTranscriptionView(_record.Transcription);
+                await SetupPlaybackAsync();
+            }
+            else
+            {
+                ContentScroll.IsVisible = true;
+                TranscriptionScroll.IsVisible = false;
+                ContentLabel.Text = _record.FilePath; 
+                PlaybackPanel.IsVisible = false;
             }
         }
 
-        if (builder.Length > 0)
+        private async Task RefreshMetadataFromDatabaseAsync()
         {
-            segments.Add(builder.ToString().Trim());
-        }
+            if (_record.Id <= 0) return;
 
-        return segments.Where(s => !string.IsNullOrEmpty(s)).ToList();
-    }
-
-    private static bool IsSentenceTerminator(char ch) => ch == '.' || ch == '!' || ch == '?' || ch == '\n';
-
-    private async Task SetupPlaybackAsync()
-    {
-        if (PlaybackPanel == null)
-            return;
-
-        if (string.IsNullOrEmpty(_metadata.FilePath) || !File.Exists(_metadata.FilePath))
-        {
-            PlaybackPanel.IsVisible = false;
-            _playbackReady = false;
-            return;
-        }
-
-        var loaded = await _playbackService.LoadAsync(_metadata.FilePath);
-        _playbackReady = loaded;
-
-        if (!loaded)
-        {
-            PlaybackPanel.IsVisible = false;
-            return;
-        }
-
-        _duration = _playbackService.Duration;
-        PlaybackPanel.IsVisible = true;
-        PositionSlider.Value = 0;
-        CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
-        DurationLabel.Text = FormatTime(_duration);
-        UpdatePlayButtonIcon();
-    }
-
-    private void OnPlaybackPositionChanged(object? sender, TimeSpan position)
-    {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            if (!_playbackReady)
-                return;
-
-            var duration = _duration > TimeSpan.Zero ? _duration : _playbackService.Duration;
-            if (duration <= TimeSpan.Zero)
-                return;
-
-            var ratio = Math.Clamp(position.TotalMilliseconds / duration.TotalMilliseconds, 0, 1);
-
-            if (Math.Abs(PositionSlider.Value - ratio) > 0.005)
-            {
-                PositionSlider.Value = ratio;
-            }
-
-            var timeText = FormatTime(position);
-            if (!string.Equals(CurrentTimeLabel.Text, timeText, StringComparison.Ordinal))
-            {
-                CurrentTimeLabel.Text = timeText;
-            }
-
-            UpdateHighlight(position);
-        });
-    }
-
-    private void OnPlaybackEnded(object? sender, EventArgs e)
-    {
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            PositionSlider.Value = 0;
-            CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
-            HighlightSpan(-1);
-            UpdatePlayButtonIcon();
-        });
-    }
-
-    private void UpdateHighlight(TimeSpan position)
-    {
-        if (_wordBoundaries.Count > 0)
-        {
-            var seconds = Math.Max(0, position.TotalSeconds);
-            int index = GetWordIndex(seconds);
-            HighlightSpan(index);
-            return;
-        }
-
-        if (_segmentThresholds.Count == 0)
-            return;
-
-        var duration = _duration > TimeSpan.Zero ? _duration : _playbackService.Duration;
-        if (duration <= TimeSpan.Zero)
-        {
-            HighlightSpan(-1);
-            return;
-        }
-
-        var ratio = Math.Clamp(position.TotalMilliseconds / duration.TotalMilliseconds, 0, 1);
-        int segmentIndex = GetSegmentIndex(ratio);
-        HighlightSpan(segmentIndex);
-    }
-
-    private int GetSegmentIndex(double ratio)
-    {
-        var thresholds = _segmentThresholds;
-        int index = thresholds.BinarySearch(ratio);
-        if (index < 0)
-        {
-            index = ~index;
-        }
-
-        if (index >= thresholds.Count)
-        {
-            index = thresholds.Count - 1;
-        }
-
-        return index;
-    }
-
-    private int GetWordIndex(double seconds)
-    {
-        if (_wordBoundaries.Count == 0)
-            return -1;
-
-        for (int i = 0; i < _wordBoundaries.Count; i++)
-        {
-            var (start, end) = _wordBoundaries[i];
-            if (seconds >= start && seconds <= end)
-            {
-                return i;
-            }
-
-            if (seconds < start)
-            {
-                return Math.Max(0, i - 1);
-            }
-        }
-
-        return _wordBoundaries.Count - 1;
-    }
-
-    private void HighlightSpan(int index)
-    {
-        if (_lastHighlightedIndex == index)
-            return;
-
-        if (_lastHighlightedIndex >= 0 && _lastHighlightedIndex < _transcriptionSpans.Count)
-        {
-            var previous = _transcriptionSpans[_lastHighlightedIndex];
-            previous.BackgroundColor = Colors.Transparent;
-            previous.TextColor = _baseTextColor;
-        }
-
-        if (index >= 0 && index < _transcriptionSpans.Count)
-        {
-            var current = _transcriptionSpans[index];
-            current.BackgroundColor = _highlightColor;
-            current.TextColor = _baseTextColor;
-        }
-
-        _lastHighlightedIndex = index;
-    }
-
-    private static Color ResolveSecondaryTextColor()
-    {
-        if (Application.Current?.Resources.TryGetValue("SecondaryDarkText", out var textColor) == true && textColor is Color color)
-        {
-            return color;
-        }
-
-        return Colors.White;
-    }
-
-    private void UpdatePlayButtonIcon()
-    {
-        if (PlayPauseButton == null)
-            return;
-
-        PlayPauseButton.Text = _playbackService.IsPlaying ? "Pause" : "Play";
-    }
-
-    private async void OnPlayPauseClicked(object? sender, EventArgs e)
-    {
-        if (!_playbackReady)
-            return;
-
-        if (_playbackService.IsPlaying)
-        {
-            _playbackService.Pause();
-        }
-        else
-        {
-            await _playbackService.PlayAsync();
-        }
-
-        UpdatePlayButtonIcon();
-    }
-
-    private async void OnCloseClicked(object sender, EventArgs e) => await CloseAsync(false);
-
-    private async void OnReturnToRecordsClicked(object sender, EventArgs e) => await CloseAsync(true);
-
-    private async void OnCopyTextClicked(object sender, EventArgs e)
-    {
-        if (string.IsNullOrEmpty(_currentText))
-            return;
-
-        try
-        {
-            await Clipboard.SetTextAsync(_currentText);
-            await DisplayAlertAsync("Скопировано", "Текст скопирован в буфер обмена.", "OK");
-        }
-        catch
-        {
-            await DisplayAlertAsync("Ошибка", "Не удалось скопировать текст.", "OK");
-        }
-    }
-
-    private async Task CloseAsync(bool navigateToRecords)
-    {
-        _playbackService.Stop();
-        UpdatePlayButtonIcon();
-
-        if (PositionSlider != null)
-        {
-            PositionSlider.Value = 0;
-        }
-
-        CurrentTimeLabel.Text = FormatTime(TimeSpan.Zero);
-    HighlightSpan(-1);
-
-        await Navigation.PopModalAsync();
-
-        if (navigateToRecords && Shell.Current is not null)
-        {
             try
             {
-                await Shell.Current.GoToAsync("//records");
+                var latest = await _database.GetByIdAsync(_record.Id);
+                if (latest == null) return;
+
+                _record.FilePath = latest.FilePath;
+                _record.StartTime = latest.StartTime;
+                _record.EndTime = latest.EndTime;
+                _record.Transcription = latest.Transcription;
+                _record.Summary = latest.Summary;
+                _record.WordTimingsJson = latest.WordTimingsJson;
+                _record.IsTranscribed = latest.IsTranscribed;
+                _record.TranscriptionDate = latest.TranscriptionDate;
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore navigation failures and remain on current page
+                Debug.WriteLine($"Database refresh failed: {ex.Message}");
             }
         }
-    }
 
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _playbackService.Stop();
-        _playbackService.PositionChanged -= OnPlaybackPositionChanged;
-        _playbackService.PlaybackEnded -= OnPlaybackEnded;
-        _playbackService.Dispose();
-        _playbackReady = false;
-        _lastHighlightedIndex = -1;
-        _currentText = string.Empty;
-    }
-
-    private static string FormatTime(TimeSpan time)
-    {
-        if (time.TotalHours >= 1)
+        private void BuildTranscriptionView(string? transcription)
         {
-            return time.ToString(@"hh\:mm\:ss");
+            if (string.IsNullOrEmpty(transcription)) return;
+
+            _formattedTranscription = new FormattedString();
+            _wordSpans.Clear();
+
+            var timings = _record.WordTimings;
+            if (timings == null || timings.Count == 0)
+            {
+                _formattedTranscription.Spans.Add(new Span { Text = transcription });
+                TranscriptionLabel.FormattedText = _formattedTranscription;
+                return;
+            }
+
+            var orderedTimings = timings
+                .Where(t => t != null && !string.IsNullOrWhiteSpace(t.Word))
+                .OrderBy(t => t.Start)
+                .ToList();
+
+            if (orderedTimings.Count == 0)
+            {
+                _formattedTranscription.Spans.Add(new Span { Text = transcription });
+                TranscriptionLabel.FormattedText = _formattedTranscription;
+                return;
+            }
+
+            var wordStarts = new List<double>(orderedTimings.Count);
+            var wordEnds = new List<double>(orderedTimings.Count);
+
+            for (int i = 0; i < orderedTimings.Count; i++)
+            {
+                var timing = orderedTimings[i];
+                var span = new Span { Text = timing.Word };
+                _wordSpans.Add(span);
+                _formattedTranscription.Spans.Add(span);
+                wordStarts.Add(timing.Start);
+                wordEnds.Add(timing.End);
+
+                if (i < orderedTimings.Count - 1)
+                {
+                    _formattedTranscription.Spans.Add(new Span { Text = " " });
+                }
+            }
+
+            _wordStartTimes = wordStarts.ToArray();
+            _wordEndTimes = wordEnds.ToArray();
+            TranscriptionLabel.FormattedText = _formattedTranscription;
+            HighlightSpan(-1);
         }
 
-        return time.ToString(@"mm\:ss");
+        private async Task SetupPlaybackAsync()
+        {
+            if (PlaybackPanel == null || string.IsNullOrEmpty(_record.FilePath) || !File.Exists(_record.FilePath))
+            {
+                if(PlaybackPanel != null) PlaybackPanel.IsVisible = false;
+                return;
+            }
+
+            var loaded = await _playbackService.LoadAsync(_record.FilePath);
+            if (!loaded)
+            {
+                PlaybackPanel.IsVisible = false;
+                return;
+            }
+
+            PlaybackPanel.IsVisible = true;
+            PositionSlider.Value = 0;
+            PositionSlider.IsEnabled = true;
+            CurrentTimeLabel.Text = TimeSpan.Zero.ToString(@"mm\:ss");
+            TotalDurationLabel.Text = _playbackService.TotalDuration.ToString(@"mm\:ss");
+            UpdateHighlight(TimeSpan.Zero);
+        }
+
+        private void InitializePlaybackService()
+        {
+            _playbackService.PlaybackStopped += (s, e) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    PlayPauseButton.Text = "Play";
+                    _highlightTimer.Stop();
+                    PositionSlider.Value = 0;
+                    CurrentTimeLabel.Text = TimeSpan.Zero.ToString(@"mm\:ss");
+                    HighlightSpan(-1);
+                });
+            };
+            _playbackService.PositionChanged += OnPlaybackPositionChanged;
+        }
+
+        private void OnPlaybackPositionChanged(object? sender, TimeSpan position)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (_playbackService.TotalDuration == TimeSpan.Zero) return;
+
+                CurrentTimeLabel.Text = position.ToString(@"mm\:ss");
+                var ratio = position.TotalSeconds / _playbackService.TotalDuration.TotalSeconds;
+
+                if (Math.Abs(PositionSlider.Value - ratio) > 0.01)
+                {
+                    PositionSlider.Value = ratio;
+                }
+            });
+        }
+
+        private async void OnPlayPauseClicked(object sender, EventArgs e)
+        {
+            if (!_playbackService.IsLoaded) return;
+
+            try
+            {
+                if (_playbackService.IsPlaying)
+                {
+                    _playbackService.Pause();
+                    PlayPauseButton.Text = "Play";
+                    _highlightTimer.Stop();
+                }
+                else
+                {
+                    await _playbackService.PlayAsync();
+                    PlayPauseButton.Text = "Pause";
+                    _highlightTimer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Playback error: {ex.Message}");
+                await MainThread.InvokeOnMainThreadAsync(async () => await DisplayAlertAsync("Error", "Could not play audio.", "OK"));
+            }
+        }
+
+        private void OnStopClicked(object sender, EventArgs e)
+        {
+            _playbackService.Stop();
+        }
+
+        private void OnSliderDragStarted(object sender, EventArgs e)
+        {
+            if (_playbackService.IsPlaying)
+            {
+                _highlightTimer.Stop();
+                _playbackService.Pause();
+            }
+        }
+
+        private async void OnSliderDragCompleted(object sender, EventArgs e)
+        {
+            var slider = (Slider)sender;
+            var newPosition = _playbackService.TotalDuration * slider.Value;
+            _playbackService.CurrentPosition = newPosition;
+
+            await _playbackService.PlayAsync();
+            PlayPauseButton.Text = "Pause";
+            _highlightTimer.Start();
+        }
+
+        private void UpdateHighlight(TimeSpan position)
+        {
+            if (_wordStartTimes.Length > 0)
+            {
+                // Non-blocking add to the queue
+                _positionQueue.TryAdd(position.TotalSeconds);
+            }
+        }
+
+        private int FindWordIndex(double seconds)
+        {
+            if (_wordStartTimes.Length == 0) return -1;
+
+            int index = Array.BinarySearch(_wordStartTimes, seconds);
+
+            if (index >= 0)
+            {
+                return index;
+            }
+            
+            index = ~index;
+
+            if (index == 0)
+            {
+                return -1;
+            }
+
+            int candidateIndex = index - 1;
+
+            if (seconds < _wordEndTimes[candidateIndex])
+            {
+                return candidateIndex;
+            }
+
+            return -1;
+        }
+
+        private void HighlightSpan(int index)
+        {
+            if (_wordSpans.Count == 0) return;
+
+            if (_currentHighlightIndex >= 0 && _currentHighlightIndex < _wordSpans.Count)
+            {
+                _wordSpans[_currentHighlightIndex].TextColor = Colors.Gray;
+                _wordSpans[_currentHighlightIndex].FontAttributes = FontAttributes.None;
+            }
+
+            if (index >= 0 && index < _wordSpans.Count)
+            {
+                _wordSpans[index].TextColor = Colors.White;
+                _wordSpans[index].FontAttributes = FontAttributes.Bold;
+                _currentHighlightIndex = index;
+            }
+            else
+            {
+                _currentHighlightIndex = -1;
+            }
+        }
+        
+        private void OnCopyTextClicked(object sender, EventArgs e)
+        {
+            // Implementation for copying text
+        }
+
+        private void OnReturnToRecordsClicked(object sender, EventArgs e)
+        {
+            // Implementation for returning to records
+        }
+
+        private void OnCloseClicked(object sender, EventArgs e)
+        {
+            // Implementation for closing
+        }
     }
 }
