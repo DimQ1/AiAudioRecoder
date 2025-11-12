@@ -18,14 +18,15 @@ namespace AiAudioRecoder.Views
         private readonly AudioFileMetadata _record;
         private readonly AudioMetadataDatabase _database;
         private FormattedString? _formattedTranscription;
-        private List<Span> _wordSpans = new();
-        private double[] _wordStartTimes = Array.Empty<double>();
-        private double[] _wordEndTimes = Array.Empty<double>();
-        private int _currentHighlightIndex = -1;
+        private List<Span> _segmentSpans = new();
+        private double[] _segmentStartTimes = Array.Empty<double>();
+        private double[] _segmentEndTimes = Array.Empty<double>();
+        private int _currentHighlightIndex = -1; // segment index
         private readonly CancellationTokenSource _highlightCts = new();
         private readonly IDispatcherTimer _highlightTimer;
         private readonly System.Collections.Concurrent.BlockingCollection<double> _positionQueue = new(1);
         private Task? _highlightWorker;
+    // Diagnostics removed; highlight logic now minimal
 
         public RecordDetailPage(AudioFileMetadata record)
         {
@@ -42,7 +43,7 @@ namespace AiAudioRecoder.Views
 
             _playbackService = new AudioPlaybackService();
             InitializePlaybackService();
-            
+
             _highlightTimer = Dispatcher.CreateTimer();
             SetupHighlightTimer();
             StartHighlightWorker();
@@ -56,6 +57,11 @@ namespace AiAudioRecoder.Views
                 {
                     try
                     {
+                        if (_positionQueue.Count == 0)
+                        {
+                            continue;
+                        }
+
                         double seconds = _positionQueue.Take(_highlightCts.Token);
                         // Drain the queue to only process the latest position
                         while (_positionQueue.TryTake(out var latestSeconds))
@@ -63,7 +69,7 @@ namespace AiAudioRecoder.Views
                             seconds = latestSeconds;
                         }
 
-                        int index = FindWordIndex(seconds);
+                        int index = FindSegmentIndex(seconds);
 
                         if (index != _currentHighlightIndex)
                         {
@@ -130,7 +136,7 @@ namespace AiAudioRecoder.Views
             {
                 ContentScroll.IsVisible = true;
                 TranscriptionScroll.IsVisible = false;
-                ContentLabel.Text = _record.FilePath; 
+                ContentLabel.Text = _record.FilePath;
                 PlaybackPanel.IsVisible = false;
             }
         }
@@ -164,7 +170,7 @@ namespace AiAudioRecoder.Views
             if (string.IsNullOrEmpty(transcription)) return;
 
             _formattedTranscription = new FormattedString();
-            _wordSpans.Clear();
+            _segmentSpans.Clear();
 
             var timings = _record.WordTimings;
             if (timings == null || timings.Count == 0)
@@ -186,17 +192,17 @@ namespace AiAudioRecoder.Views
                 return;
             }
 
-            var wordStarts = new List<double>(orderedTimings.Count);
-            var wordEnds = new List<double>(orderedTimings.Count);
+            var segmentStarts = new List<double>(orderedTimings.Count);
+            var segmentEnds = new List<double>(orderedTimings.Count);
 
             for (int i = 0; i < orderedTimings.Count; i++)
             {
                 var timing = orderedTimings[i];
                 var span = new Span { Text = timing.Word };
-                _wordSpans.Add(span);
+                _segmentSpans.Add(span);
                 _formattedTranscription.Spans.Add(span);
-                wordStarts.Add(timing.Start);
-                wordEnds.Add(timing.End);
+                segmentStarts.Add(timing.Start);
+                segmentEnds.Add(timing.End);
 
                 if (i < orderedTimings.Count - 1)
                 {
@@ -204,8 +210,8 @@ namespace AiAudioRecoder.Views
                 }
             }
 
-            _wordStartTimes = wordStarts.ToArray();
-            _wordEndTimes = wordEnds.ToArray();
+            _segmentStartTimes = segmentStarts.ToArray();
+            _segmentEndTimes = segmentEnds.ToArray();
             TranscriptionLabel.FormattedText = _formattedTranscription;
             HighlightSpan(-1);
         }
@@ -214,7 +220,7 @@ namespace AiAudioRecoder.Views
         {
             if (PlaybackPanel == null || string.IsNullOrEmpty(_record.FilePath) || !File.Exists(_record.FilePath))
             {
-                if(PlaybackPanel != null) PlaybackPanel.IsVisible = false;
+                if (PlaybackPanel != null) PlaybackPanel.IsVisible = false;
                 return;
             }
 
@@ -318,55 +324,111 @@ namespace AiAudioRecoder.Views
 
         private void UpdateHighlight(TimeSpan position)
         {
-            if (_wordStartTimes.Length > 0)
+            if (_segmentStartTimes.Length > 0)
             {
                 // Non-blocking add to the queue
                 _positionQueue.TryAdd(position.TotalSeconds);
             }
         }
 
-        private int FindWordIndex(double seconds)
+        private int FindSegmentIndex(double seconds)
         {
-            if (_wordStartTimes.Length == 0) return -1;
+            // Interval-based search supporting overlapping word timings.
+            // Strategy:
+            // 1. Fast path: reuse current highlighted word if still covering timestamp.
+            // 2. Binary search for greatest index whose start <= seconds.
+            // 3. Expand a narrow window left/right while starts are still <= seconds to collect overlapping candidates.
+            // 4. Pick the candidate whose interval contains seconds using tie-breakers:
+            //    - earliest start
+            //    - then shortest duration (more precise word boundary)
+            // Returns -1 if no interval contains the timestamp.
 
-            int index = Array.BinarySearch(_wordStartTimes, seconds);
+            var starts = _segmentStartTimes;
+            var ends = _segmentEndTimes;
+            int n = starts.Length;
+            if (n == 0) return -1;
 
-            if (index >= 0)
+            int last = _currentHighlightIndex;
+            if (last >= 0 && last < n && seconds >= starts[last] && seconds <= ends[last])
             {
-                return index;
-            }
-            
-            index = ~index;
-
-            if (index == 0)
-            {
-                return -1;
-            }
-
-            int candidateIndex = index - 1;
-
-            if (seconds < _wordEndTimes[candidateIndex])
-            {
-                return candidateIndex;
+                return last; // fast path
             }
 
-            return -1;
+            // Binary search: largest start <= seconds
+            int lo = 0, hi = n - 1, best = -1;
+            while (lo <= hi)
+            {
+                int mid = (lo + hi) >> 1;
+                if (starts[mid] <= seconds)
+                {
+                    best = mid;
+                    lo = mid + 1;
+                }
+                else
+                {
+                    hi = mid - 1;
+                }
+            }
+
+            if (best == -1)
+            {
+                // All starts are greater than the timestamp. Nothing started yet -> choose 0 as a gentle fallback.
+                return 0; // highlight first word early instead of returning -1
+            }
+
+            // Expand window around 'best' to include any segments starting at same time (overlaps) before and after.
+            int left = best;
+            while (left > 0 && starts[left - 1] <= seconds) left--;
+            int right = best;
+            while (right + 1 < n && starts[right + 1] <= seconds) right++;
+
+            int chosen = -1;
+            double chosenStart = double.MaxValue;
+            double chosenDuration = double.MaxValue;
+            for (int i = left; i <= right; i++)
+            {
+                // Must contain seconds inside interval.
+                if (seconds <= ends[i] && seconds >= starts[i])
+                {
+                    double duration = ends[i] - starts[i];
+                    if (chosen == -1 || starts[i] < chosenStart || (starts[i] == chosenStart && duration < chosenDuration))
+                    {
+                        chosen = i;
+                        chosenStart = starts[i];
+                        chosenDuration = duration;
+                    }
+                }
+            }
+
+            if (chosen != -1) return chosen;
+
+            // Fallback: choose nearest segment start boundary (best is the largest start <= seconds)
+            int fallbackIndex = best;
+            int neighbor = best + 1 < n ? best + 1 : best;
+            if (neighbor != best)
+            {
+                double diffBest = Math.Abs(starts[best] - seconds);
+                double diffNeighbor = Math.Abs(starts[neighbor] - seconds);
+                if (diffNeighbor < diffBest) fallbackIndex = neighbor;
+            }
+            return fallbackIndex;
         }
+
 
         private void HighlightSpan(int index)
         {
-            if (_wordSpans.Count == 0) return;
+            if (_segmentSpans.Count == 0) return;
 
-            if (_currentHighlightIndex >= 0 && _currentHighlightIndex < _wordSpans.Count)
+            if (_currentHighlightIndex >= 0 && _currentHighlightIndex < _segmentSpans.Count)
             {
-                _wordSpans[_currentHighlightIndex].TextColor = Colors.Gray;
-                _wordSpans[_currentHighlightIndex].FontAttributes = FontAttributes.None;
+                _segmentSpans[_currentHighlightIndex].TextColor = Colors.Gray;
+                _segmentSpans[_currentHighlightIndex].FontAttributes = FontAttributes.None;
             }
 
-            if (index >= 0 && index < _wordSpans.Count)
+            if (index >= 0 && index < _segmentSpans.Count)
             {
-                _wordSpans[index].TextColor = Colors.White;
-                _wordSpans[index].FontAttributes = FontAttributes.Bold;
+                _segmentSpans[index].TextColor = Colors.White;
+                _segmentSpans[index].FontAttributes = FontAttributes.Bold;
                 _currentHighlightIndex = index;
             }
             else
@@ -374,7 +436,7 @@ namespace AiAudioRecoder.Views
                 _currentHighlightIndex = -1;
             }
         }
-        
+
         private void OnCopyTextClicked(object sender, EventArgs e)
         {
             // Implementation for copying text
@@ -385,9 +447,23 @@ namespace AiAudioRecoder.Views
             // Implementation for returning to records
         }
 
-        private void OnCloseClicked(object sender, EventArgs e)
+        private async void OnCloseClicked(object sender, EventArgs e)
         {
-            // Implementation for closing
+            try
+            {
+                if (Navigation?.NavigationStack?.Count > 1)
+                {
+                    await Navigation.PopAsync();
+                }
+                else if (Shell.Current != null)
+                {
+                    await Shell.Current.GoToAsync("..");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Navigation error: {ex.Message}");
+            }
         }
     }
 }

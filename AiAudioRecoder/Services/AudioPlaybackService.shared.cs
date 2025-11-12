@@ -9,6 +9,8 @@ public partial class AudioPlaybackService : IAudioPlaybackService, IDisposable
 {
     private readonly System.Timers.Timer _positionTimer;
     private bool _isLoaded;
+    private DateTime _lastPositionRaisedUtc = DateTime.MinValue; // throttle marker
+    private readonly TimeSpan _positionEventMinInterval = TimeSpan.FromMilliseconds(500); // 0.5s
 
     public event EventHandler<TimeSpan>? PositionChanged;
     public event EventHandler? PlaybackEnded;
@@ -85,7 +87,12 @@ public partial class AudioPlaybackService : IAudioPlaybackService, IDisposable
     {
         if (!_isLoaded)
             return;
-
+        var now = DateTime.UtcNow;
+        if (now - _lastPositionRaisedUtc < _positionEventMinInterval)
+        {
+            return; // throttle: skip this tick
+        }
+        _lastPositionRaisedUtc = now;
         var position = PlatformGetPosition();
         MainThread.BeginInvokeOnMainThread(() => PositionChanged?.Invoke(this, position));
     }
@@ -103,7 +110,10 @@ public partial class AudioPlaybackService : IAudioPlaybackService, IDisposable
         PlatformDispose();
     }
 
-    private void OnTimerElapsed(object? sender, ElapsedEventArgs e) => RaisePositionChanged();
+    private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        RaisePositionChanged();
+    }
 
     partial void PlatformInitialize();
     private partial Task<bool> PlatformLoadAsync(string filePath);
@@ -114,5 +124,5 @@ public partial class AudioPlaybackService : IAudioPlaybackService, IDisposable
     private partial TimeSpan PlatformGetPosition();
     private partial bool PlatformIsPlaying();
     private partial void PlatformDispose();
-    private partial void PlatformSetPosition(TimeSpan position);
+    partial void PlatformSetPosition(TimeSpan position);
 }

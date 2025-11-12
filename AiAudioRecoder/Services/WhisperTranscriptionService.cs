@@ -134,32 +134,19 @@ namespace AiAudioRecoder.Services
             }
         }
 
+        // Теперь сохраняем только время всего сегмента (без деления на слова).
+        // Возвращаем один элемент на сегмент: Word = полный текст сегмента, Start/End = границы сегмента.
         private static IEnumerable<TranscriptionWordTiming> ConvertSegmentToWordTimings(string? text, TimeSpan start, TimeSpan end)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                yield break;
-
-            var words = text.Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 0)
-                yield break;
-
+            if (string.IsNullOrWhiteSpace(text)) yield break;
             double segmentStart = start.TotalSeconds;
             double segmentEnd = end.TotalSeconds;
-            double duration = Math.Max(segmentEnd - segmentStart, 0.001);
-            double slice = duration / words.Length;
-
-            for (int i = 0; i < words.Length; i++)
+            yield return new TranscriptionWordTiming
             {
-                double wordStart = segmentStart + (slice * i);
-                double wordEnd = (i == words.Length - 1) ? segmentEnd : segmentStart + (slice * (i + 1));
-
-                yield return new TranscriptionWordTiming
-                {
-                    Word = words[i],
-                    Start = Math.Max(0, wordStart),
-                    End = Math.Max(wordStart, wordEnd)
-                };
-            }
+                Word = text.Trim(),
+                Start = Math.Max(0, segmentStart),
+                End = Math.Max(segmentStart, segmentEnd)
+            };
         }
     }
 }

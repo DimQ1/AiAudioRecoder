@@ -67,7 +67,7 @@ public partial class AudioPlaybackService
         return _waveOut?.PlaybackState == PlaybackState.Playing;
     }
 
-    private partial void PlatformSetPosition(TimeSpan position)
+    partial void PlatformSetPosition(TimeSpan position)
     {
         if (_audioFile != null)
         {
