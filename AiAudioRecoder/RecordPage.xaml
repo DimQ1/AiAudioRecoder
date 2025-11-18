@@ -27,6 +27,18 @@
                 <Setter Property="FontSize" Value="12" />
                 <Setter Property="LineBreakMode" Value="TailTruncation" />
             </Style>
+            <Style x:Key="ActionButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="Margin" Value="0,0,6,0" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+            </Style>
+            <Style x:Key="DeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+                <Setter Property="BackgroundColor" Value="Tomato" />
+                <Setter Property="TextColor" Value="White" />
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -115,8 +127,8 @@
                      Margin="0,10,0,0" />
 
         <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="0,0,0,10">
-            <!-- Sticky header row: labels now clickable for sorting -->
-            <Grid Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" RowSpacing="1">
+            <!-- Sticky header row: labels now clickable for sorting; Action column set to Auto to fit buttons -->
+            <Grid Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" RowDefinitions="40" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" RowSpacing="1">
                 <Label x:Name="DateHeader" Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
@@ -148,7 +160,7 @@
                 <CollectionView x:Name="RecordsView" ItemsSource="{Binding DisplayedRecords}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Grid RowDefinitions="40" ColumnDefinitions="120,120,120,200,150,150" ColumnSpacing="1" Padding="0">
+                            <Grid RowDefinitions="40" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" Padding="0">
                                 <Label Grid.Column="0" Style="{StaticResource TableCellStyle}" Text="{Binding EndTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" ClassId="Date">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCellTapped" />
@@ -169,11 +181,11 @@
                                         <TapGestureRecognizer Tapped="OnCellTapped" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <HorizontalStackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
-                                    <Button Text="Распознать" FontSize="10" Padding="4" Clicked="OnTranscribeClicked" IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
-                                    <Button Text="Повторить" FontSize="10" Padding="4" Clicked="OnRetranscribeClicked" IsVisible="{Binding IsTranscribed}" />
-                                    <Button Text="Delete" FontSize="10" Padding="4" BackgroundColor="Tomato" TextColor="White" Clicked="OnDeleteClicked" />
-                                </HorizontalStackLayout>
+                                <FlexLayout Grid.Column="4" Direction="Row" Wrap="NoWrap" AlignItems="Center" JustifyContent="Start" Margin="6,0,6,0">
+                                    <Button Text="Распознать" Style="{StaticResource ActionButtonStyle}" Clicked="OnTranscribeClicked" IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
+                                    <Button Text="Повторить" Style="{StaticResource ActionButtonStyle}" Clicked="OnRetranscribeClicked" IsVisible="{Binding IsTranscribed}" />
+                                    <Button Text="Delete" Style="{StaticResource DeleteButtonStyle}" Clicked="OnDeleteClicked" />
+                                </FlexLayout>
                                 <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" ClassId="File">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCellTapped" />

@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "E:\\Learning\\AI\\AiAudioRecoder-1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{4A3E2FF9-D495-1E73-7416-95C4440E0139}|AiAudioRecoder\\AiAudioRecoder.csproj|e:\\learning\\ai\\aiaudiorecoder-1\\aiaudiorecoder\\aiaudiorecoder.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{4A3E2FF9-D495-1E73-7416-95C4440E0139}|AiAudioRecoder\\AiAudioRecoder.csproj|solutionrelative:aiaudiorecoder\\aiaudiorecoder.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4A3E2FF9-D495-1E73-7416-95C4440E0139}|AiAudioRecoder\\AiAudioRecoder.csproj|e:\\learning\\ai\\aiaudiorecoder-1\\aiaudiorecoder\\recordpage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{4A3E2FF9-D495-1E73-7416-95C4440E0139}|AiAudioRecoder\\AiAudioRecoder.csproj|solutionrelative:aiaudiorecoder\\recordpage.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
@@ -105,17 +109,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 17,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "RecordPage.xaml",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\RecordPage.xaml",
               "RelativeDocumentMoniker": "AiAudioRecoder\\RecordPage.xaml",
               "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\RecordPage.xaml",
               "RelativeToolTip": "AiAudioRecoder\\RecordPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABAAAAAAAAAAAAArwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-11-08T18:44:04.361Z",
               "IsPinned": true,
@@ -187,7 +191,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
+              "Title": "AiAudioRecoder",
+              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\AiAudioRecoder.csproj",
+              "RelativeDocumentMoniker": "AiAudioRecoder\\AiAudioRecoder.csproj",
+              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\AiAudioRecoder.csproj",
+              "RelativeToolTip": "AiAudioRecoder\\AiAudioRecoder.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-18T16:20:15.3Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "WhisperTranscriptionService.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Services\\WhisperTranscriptionService.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Services\\WhisperTranscriptionService.cs",
@@ -199,7 +216,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "TranscriptionQueueService.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Services\\TranscriptionQueueService.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Services\\TranscriptionQueueService.cs",
@@ -211,7 +228,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "TableConverters.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Converters\\TableConverters.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Converters\\TableConverters.cs",
@@ -223,7 +240,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "Package.appxmanifest",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\Platforms\\Windows\\Package.appxmanifest",
               "RelativeDocumentMoniker": "Platforms\\Windows\\Package.appxmanifest",
@@ -235,7 +252,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "AppShell.xaml.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\AppShell.xaml.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\AppShell.xaml.cs",
@@ -247,7 +264,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "RecordPage.xaml.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\RecordPage.xaml.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\RecordPage.xaml.cs",
@@ -259,7 +276,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "MauiProgram.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MauiProgram.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\MauiProgram.cs",
@@ -271,7 +288,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "AudioMetadataDatabase.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Services\\AudioMetadataDatabase.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Services\\AudioMetadataDatabase.cs",
@@ -283,7 +300,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\App.xaml.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\App.xaml.cs",
@@ -295,7 +312,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "AppShell.xaml",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\AppShell.xaml",
               "RelativeDocumentMoniker": "AiAudioRecoder\\AppShell.xaml",
@@ -307,7 +324,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "App.g.i.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\obj\\Debug\\net10.0-windows10.0.19041.0\\win-x64\\Platforms\\Windows\\App.g.i.cs",
@@ -319,7 +336,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "ModelInfoDatabase.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Models\\ModelInfoDatabase.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Models\\ModelInfoDatabase.cs",
@@ -331,7 +348,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "Square44x44Logo.png",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\Assets\\Square44x44Logo.png",
               "RelativeDocumentMoniker": "Assets\\Square44x44Logo.png",
@@ -343,7 +360,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "LaunchSettings.json",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\Platforms\\Windows\\LaunchSettings.json",
               "RelativeDocumentMoniker": "Platforms\\Windows\\LaunchSettings.json",
@@ -355,7 +372,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "Square150x150Logo.png",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\Assets\\Square150x150Logo.png",
               "RelativeDocumentMoniker": "Assets\\Square150x150Logo.png",
@@ -367,7 +384,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "WhisperProcessor.cs",
               "DocumentMoniker": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\acd510f21c38fa5359c2d1e33e033bafb6f380e5c26f00530ee8534317ac499f\\WhisperProcessor.cs",
               "ToolTip": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\acd510f21c38fa5359c2d1e33e033bafb6f380e5c26f00530ee8534317ac499f\\WhisperProcessor.cs",
@@ -377,7 +394,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "AudioFileMetadata.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Models\\AudioFileMetadata.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Models\\AudioFileMetadata.cs",
@@ -389,7 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "App.xaml",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\App.xaml",
               "RelativeDocumentMoniker": "AiAudioRecoder\\App.xaml",
@@ -401,7 +418,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "ModelsPage.xaml",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\ModelsPage.xaml",
               "RelativeDocumentMoniker": "AiAudioRecoder\\ModelsPage.xaml",
@@ -413,7 +430,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "GlobalXmlns.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\GlobalXmlns.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\GlobalXmlns.cs",
@@ -425,7 +442,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "MainPage.xaml.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MainPage.xaml.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\MainPage.xaml.cs",
@@ -437,7 +454,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MainPage.xaml",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MainPage.xaml",
               "RelativeDocumentMoniker": "AiAudioRecoder\\MainPage.xaml",
@@ -449,7 +466,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "HoverEffect.cs",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Effects\\HoverEffect.cs",
               "RelativeDocumentMoniker": "AiAudioRecoder\\Effects\\HoverEffect.cs",
