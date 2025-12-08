@@ -181,11 +181,11 @@
                                         <TapGestureRecognizer Tapped="OnCellTapped" />
                                     </Label.GestureRecognizers>
                                 </Label>
-                                <FlexLayout Grid.Column="4" Direction="Row" Wrap="NoWrap" AlignItems="Center" JustifyContent="Start" Margin="6,0,6,0">
-                                    <Button Text="Распознать" Style="{StaticResource ActionButtonStyle}" Clicked="OnTranscribeClicked" IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
-                                    <Button Text="Повторить" Style="{StaticResource ActionButtonStyle}" Clicked="OnRetranscribeClicked" IsVisible="{Binding IsTranscribed}" />
-                                    <Button Text="Delete" Style="{StaticResource DeleteButtonStyle}" Clicked="OnDeleteClicked" />
-                                </FlexLayout>
+								<FlexLayout Grid.Column="4" Direction="Row" Wrap="NoWrap" AlignItems="Center" JustifyContent="Start" Margin="6,6,6,6">
+									<Button Text="Распознать" Style="{StaticResource ActionButtonStyle}" Clicked="OnTranscribeClicked" IsVisible="{Binding IsTranscribed, Converter={StaticResource InverseBoolConverter}}" />
+									<Button Text="Повторить" Style="{StaticResource ActionButtonStyle}" Clicked="OnRetranscribeClicked" IsVisible="{Binding IsTranscribed}" />
+									<Button Text="Удалить" Style="{StaticResource DeleteButtonStyle}" Clicked="OnDeleteClicked" />
+								</FlexLayout>
                                 <Label Grid.Column="5" Style="{StaticResource TableCellStyle}" Text="{Binding FilePath, Converter={StaticResource FilePathConverter}}" ClassId="File">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCellTapped" />

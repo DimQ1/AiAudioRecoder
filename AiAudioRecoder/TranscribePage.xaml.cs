@@ -19,6 +19,15 @@ public partial class TranscribePage : ContentPage
         InitializeComponent();
     }
 
+    public TranscribePage(bool resolveServices) : this()
+    {
+        if (resolveServices)
+        {
+            _ = _whisper;
+            _ = _db;
+        }
+    }
+
     private async void OnPickFileClicked(object? sender, EventArgs e)
     {
         try

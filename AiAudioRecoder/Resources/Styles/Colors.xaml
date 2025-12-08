@@ -26,6 +26,7 @@
     <Color x:Key="Gray300">#D4D4D4</Color>
     <Color x:Key="Gray400">#C0C0C0</Color>
     <Color x:Key="Gray500">#858585</Color>
+    <Color x:Key="Gray700">#3A3A3A</Color>
     <Color x:Key="Gray600">#4D4D4D</Color>
     <Color x:Key="Gray900">#252526</Color> <!-- VS Code editor background variant -->
     <Color x:Key="Gray950">#1E1E1E</Color>
@@ -46,6 +47,7 @@
     <SolidColorBrush x:Key="Gray400Brush" Color="{StaticResource Gray400}"/>
     <SolidColorBrush x:Key="Gray500Brush" Color="{StaticResource Gray500}"/>
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
+    <SolidColorBrush x:Key="Gray700Brush" Color="{StaticResource Gray700}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
 </ResourceDictionary>

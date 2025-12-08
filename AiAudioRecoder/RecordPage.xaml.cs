@@ -57,6 +57,14 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             SearchEntry.TextChanged += OnSearchTextChanged;
     }
 
+    // Parameterless constructor for XAML instantiation (Shell ContentTemplate)
+    public RecordPage() : this(
+        (Services.IAudioRecorderService)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.IAudioRecorderService))!,
+        (Services.AudioMetadataDatabase)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.AudioMetadataDatabase))!,
+        (Services.TranscriptionQueueService)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(Services.TranscriptionQueueService))!,
+        (ILogger<RecordPage>)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(ILogger<RecordPage>))!
+    ) { }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();

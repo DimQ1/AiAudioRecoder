@@ -82,6 +82,11 @@ public partial class ModelsPage : ContentPage
         _ = LoadModelsAsync();
     }
 
+    // Parameterless constructor for XAML instantiation
+    public ModelsPage() : this(
+        (ModelInfoDatabase)App.Current?.Handler?.MauiContext?.Services.GetService(typeof(ModelInfoDatabase))!
+    ) { }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
