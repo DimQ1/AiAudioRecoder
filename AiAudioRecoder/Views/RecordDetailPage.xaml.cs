@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AiAudioRecoder.Models;
 using AiAudioRecoder.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Controls;
 
 namespace AiAudioRecoder.Views
@@ -437,9 +438,47 @@ namespace AiAudioRecoder.Views
             }
         }
 
-        private void OnCopyTextClicked(object sender, EventArgs e)
+        private async void OnCopyTextClicked(object sender, EventArgs e)
         {
-            // Implementation for copying text
+            try
+            {
+                string? textToCopy = null;
+
+                if (TranscriptionScroll?.IsVisible == true)
+                {
+                    var formatted = TranscriptionLabel?.FormattedText;
+                    if (formatted?.Spans?.Count > 0)
+                    {
+                        textToCopy = string.Concat(formatted.Spans.Select(span => span.Text));
+                    }
+                    else
+                    {
+                        textToCopy = TranscriptionLabel?.Text ?? _record.Transcription;
+                    }
+                }
+                else if (ContentScroll?.IsVisible == true)
+                {
+                    textToCopy = ContentLabel?.Text ?? _record.Summary;
+                }
+                else
+                {
+                    textToCopy = _record.Transcription ?? _record.Summary;
+                }
+
+                if (string.IsNullOrWhiteSpace(textToCopy))
+                {
+                    await DisplayAlertAsync("Нет текста", "Нет данных для копирования.", "OK");
+                    return;
+                }
+
+                await Clipboard.Default.SetTextAsync(textToCopy);
+                await DisplayAlertAsync("Готово", "Текст скопирован в буфер обмена.", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Clipboard error: {ex.Message}");
+                await DisplayAlertAsync("Ошибка", "Не удалось скопировать текст.", "OK");
+            }
         }
 
         private void OnReturnToRecordsClicked(object sender, EventArgs e)
