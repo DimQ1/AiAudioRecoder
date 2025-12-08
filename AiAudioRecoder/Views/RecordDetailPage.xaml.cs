@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AiAudioRecoder.Models;
 using AiAudioRecoder.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Controls;
@@ -29,6 +32,12 @@ namespace AiAudioRecoder.Views
         private Task? _highlightWorker;
     // Diagnostics removed; highlight logic now minimal
 
+        private readonly ObservableCollection<LocalTextAnalysisModel> _localAnalysisModels = new();
+        private TextAnalysisService? _analysisService;
+        private TextAnalysisOptions _analysisOptions = TextAnalysisOptions.CreateDefault();
+        private CancellationTokenSource? _analysisCts;
+        private bool _analysisInitialized;
+
         public RecordDetailPage(AudioFileMetadata record)
         {
             InitializeComponent();
@@ -48,6 +57,8 @@ namespace AiAudioRecoder.Views
             _highlightTimer = Dispatcher.CreateTimer();
             SetupHighlightTimer();
             StartHighlightWorker();
+
+            InitializeAnalysisFeatures();
         }
 
         private void StartHighlightWorker()
@@ -92,11 +103,344 @@ namespace AiAudioRecoder.Views
             }, _highlightCts.Token);
         }
 
-        private void SetupHighlightTimer()
+        private void InitializeAnalysisFeatures()
         {
-            _highlightTimer.Interval = TimeSpan.FromMilliseconds(100);
-            _highlightTimer.Tick += HighlightTimer_Tick;
+            if (AnalysisPanel == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var services = App.Current?.Handler?.MauiContext?.Services;
+                _analysisService = services?.GetService<TextAnalysisService>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to resolve TextAnalysisService: {ex.Message}");
+            }
+
+            if (_analysisService == null)
+            {
+                AnalysisPanel.IsVisible = false;
+
+                if (AnalysisStatusLabel != null)
+                {
+                    AnalysisStatusLabel.Text = "Сервис анализа недоступен.";
+                }
+
+                if (AnalyzeTextButton != null)
+                {
+                    AnalyzeTextButton.IsEnabled = false;
+                }
+
+                if (SaveAnalysisButton != null)
+                {
+                    SaveAnalysisButton.IsEnabled = false;
+                }
+
+                return;
+            }
+
+            _analysisInitialized = false;
+            _analysisOptions = _analysisService.GetOptions();
+            _localAnalysisModels.Clear();
+            foreach (var model in _analysisService.LocalModels)
+            {
+                _localAnalysisModels.Add(model);
+            }
+
+            if (LocalModelPicker != null)
+            {
+                LocalModelPicker.ItemsSource = _localAnalysisModels;
+                SelectLocalAnalysisModel(_analysisOptions.LocalModelId);
+            }
+
+            if (UseLocalSwitch != null)
+            {
+                UseLocalSwitch.IsToggled = _analysisOptions.UseLocalModel;
+            }
+
+            if (ApiEndpointEntry != null)
+            {
+                ApiEndpointEntry.Text = _analysisOptions.ApiEndpoint;
+            }
+
+            if (ApiKeyEntry != null)
+            {
+                ApiKeyEntry.Text = _analysisOptions.ApiKey;
+            }
+
+            if (RemoteModelEntry != null)
+            {
+                RemoteModelEntry.Text = _analysisOptions.RemoteModel;
+            }
+
+            if (PromptEditor != null)
+            {
+                PromptEditor.Text = _analysisOptions.PromptTemplate;
+            }
+
+            UpdateRemoteInputsVisibility(_analysisOptions.UseLocalModel);
+
+            AnalysisPanel.IsVisible = true;
+            SetAnalysisStatus("Настройки анализа загружены.");
+            _analysisInitialized = true;
         }
+
+    private void SelectLocalAnalysisModel(string modelId)
+    {
+        if (LocalModelPicker == null || _localAnalysisModels.Count == 0)
+        {
+            return;
+        }
+
+        var selected = _localAnalysisModels.FirstOrDefault(m => string.Equals(m.Id, modelId, StringComparison.OrdinalIgnoreCase))
+                       ?? _localAnalysisModels.FirstOrDefault();
+        LocalModelPicker.SelectedItem = selected;
+    }
+
+    private void UpdateRemoteInputsVisibility(bool useLocal)
+    {
+        var visible = !useLocal;
+        if (ApiEndpointEntry != null) ApiEndpointEntry.IsVisible = visible;
+        if (ApiEndpointLabel != null) ApiEndpointLabel.IsVisible = visible;
+        if (ApiKeyEntry != null) ApiKeyEntry.IsVisible = visible;
+        if (ApiKeyLabel != null) ApiKeyLabel.IsVisible = visible;
+        if (RemoteModelEntry != null) RemoteModelEntry.IsVisible = visible;
+        if (RemoteModelLabel != null) RemoteModelLabel.IsVisible = visible;
+    }
+
+    private void SetAnalysisStatus(string message, bool isError = false)
+    {
+        if (AnalysisStatusLabel == null)
+        {
+            return;
+        }
+
+        AnalysisStatusLabel.Text = message;
+        AnalysisStatusLabel.TextColor = isError ? Colors.IndianRed : Colors.Gray;
+    }
+
+    private void SetAnalysisBusy(bool isBusy)
+    {
+        if (AnalysisActivityIndicator != null)
+        {
+            AnalysisActivityIndicator.IsRunning = isBusy;
+            AnalysisActivityIndicator.IsVisible = isBusy;
+        }
+
+        if (AnalyzeTextButton != null)
+        {
+            AnalyzeTextButton.IsEnabled = !isBusy;
+        }
+
+        if (SaveAnalysisButton != null)
+        {
+            SaveAnalysisButton.IsEnabled = !isBusy;
+        }
+
+        if (CancelAnalysisButton != null)
+        {
+            CancelAnalysisButton.IsVisible = isBusy;
+        }
+    }
+
+    private void UpdateOptionsFromUi()
+    {
+        if (UseLocalSwitch != null)
+        {
+            _analysisOptions.UseLocalModel = UseLocalSwitch.IsToggled;
+        }
+
+        if (ApiEndpointEntry != null)
+        {
+            _analysisOptions.ApiEndpoint = ApiEndpointEntry.Text?.Trim() ?? string.Empty;
+        }
+
+        if (ApiKeyEntry != null)
+        {
+            _analysisOptions.ApiKey = ApiKeyEntry.Text?.Trim() ?? string.Empty;
+        }
+
+        if (RemoteModelEntry != null)
+        {
+            _analysisOptions.RemoteModel = RemoteModelEntry.Text?.Trim() ?? string.Empty;
+        }
+
+        if (PromptEditor != null)
+        {
+            _analysisOptions.PromptTemplate = PromptEditor.Text ?? string.Empty;
+        }
+
+        if (LocalModelPicker?.SelectedItem is LocalTextAnalysisModel model)
+        {
+            _analysisOptions.LocalModelId = model.Id;
+        }
+    }
+
+    private string GetActiveText()
+    {
+        if (TranscriptionScroll?.IsVisible == true)
+        {
+            var formatted = TranscriptionLabel?.FormattedText;
+            var concatenated = MergeFormattedText(formatted);
+            if (!string.IsNullOrWhiteSpace(concatenated))
+            {
+                return concatenated;
+            }
+
+            return TranscriptionLabel?.Text ?? _record.Transcription ?? string.Empty;
+        }
+
+        if (ContentScroll?.IsVisible == true)
+        {
+            return ContentLabel?.Text ?? _record.Summary ?? _record.FilePath ?? string.Empty;
+        }
+
+        return _record.Transcription ?? _record.Summary ?? string.Empty;
+    }
+
+    private static string MergeFormattedText(FormattedString? formatted)
+    {
+        if (formatted?.Spans == null || formatted.Spans.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder();
+        foreach (var span in formatted.Spans)
+        {
+            builder.Append(span.Text);
+        }
+
+        return builder.ToString();
+    }
+
+    private void CancelAnalysis(bool updateStatus)
+    {
+        var cts = _analysisCts;
+        if (cts == null)
+        {
+            return;
+        }
+
+        _analysisCts = null;
+        cts.Cancel();
+        cts.Dispose();
+
+        if (updateStatus)
+        {
+            SetAnalysisStatus("Анализ отменён.");
+            SetAnalysisBusy(false);
+        }
+    }
+
+    private void OnUseLocalSwitchToggled(object? sender, ToggledEventArgs e)
+    {
+        if (!_analysisInitialized)
+        {
+            return;
+        }
+
+        _analysisOptions.UseLocalModel = e.Value;
+        UpdateRemoteInputsVisibility(e.Value);
+        SetAnalysisStatus(e.Value ? "Включён режим локальной модели." : "Будет использоваться удалённый API.");
+    }
+
+    private void OnLocalModelChanged(object? sender, EventArgs e)
+    {
+        if (!_analysisInitialized)
+        {
+            return;
+        }
+
+        if (LocalModelPicker?.SelectedItem is LocalTextAnalysisModel model)
+        {
+            _analysisOptions.LocalModelId = model.Id;
+            SetAnalysisStatus($"Выбрана модель {model.Name}.");
+        }
+    }
+
+    private void OnSaveAnalysisConfigClicked(object? sender, EventArgs e)
+    {
+        if (_analysisService == null)
+        {
+            return;
+        }
+
+        UpdateOptionsFromUi();
+        _analysisService.UpdateOptions(_analysisOptions);
+        SetAnalysisStatus("Настройки сохранены.");
+    }
+
+    private async void OnAnalyzeTextClicked(object? sender, EventArgs e)
+    {
+        if (_analysisService == null)
+        {
+            await DisplayAlertAsync("Недоступно", "Сервис анализа не зарегистрирован.", "OK");
+            return;
+        }
+
+        var text = GetActiveText();
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            await DisplayAlertAsync("Нет текста", "Нет данных для анализа.", "OK");
+            return;
+        }
+
+        UpdateOptionsFromUi();
+        _analysisService.UpdateOptions(_analysisOptions);
+
+        CancelAnalysis(false);
+        _analysisCts = new CancellationTokenSource();
+        SetAnalysisBusy(true);
+        SetAnalysisStatus("Выполняется анализ...");
+
+        try
+        {
+            var result = await _analysisService.AnalyzeAsync(text, PromptEditor?.Text, _analysisCts.Token);
+            if (AnalysisResultEditor != null)
+            {
+                AnalysisResultEditor.Text = result.BuildDisplayString();
+            }
+
+            SetAnalysisStatus("Анализ завершён успешно.");
+        }
+        catch (OperationCanceledException)
+        {
+            SetAnalysisStatus("Анализ отменён пользователем.");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Text analysis failed: {ex.Message}");
+            await DisplayAlertAsync("Ошибка", "Не удалось выполнить анализ текста.", "OK");
+            SetAnalysisStatus("Ошибка анализа.", true);
+        }
+        finally
+        {
+            _analysisCts?.Dispose();
+            _analysisCts = null;
+            SetAnalysisBusy(false);
+        }
+    }
+
+    private void OnCancelAnalysisClicked(object? sender, EventArgs e)
+    {
+        if (_analysisCts == null)
+        {
+            return;
+        }
+
+        _analysisCts.Cancel();
+        SetAnalysisStatus("Отмена анализа...");
+    }
+
+    private void SetupHighlightTimer()
+    {
+        _highlightTimer.Interval = TimeSpan.FromMilliseconds(100);
+        _highlightTimer.Tick += HighlightTimer_Tick;
+    }
 
         private void HighlightTimer_Tick(object? sender, EventArgs e)
         {
@@ -118,6 +462,7 @@ namespace AiAudioRecoder.Views
             _playbackService.Stop();
             _highlightTimer.Stop();
             _highlightCts.Cancel();
+            CancelAnalysis(false);
         }
 
         private async Task ConfigureContentAsync()

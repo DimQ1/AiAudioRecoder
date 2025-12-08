@@ -28,6 +28,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+    builder.Services.AddSingleton<HttpClient>();
+
         // Register core services first
         builder.Services.AddSingleton<IAudioRecorderService, AudioRecorderService>();
         
@@ -63,6 +65,7 @@ public static class MauiProgram
             new WhisperTranscriptionService(modelPath, device, deviceIndex));
         
         builder.Services.AddSingleton<TranscriptionQueueService>();
+        builder.Services.AddSingleton<TextAnalysisService>();
         
         var modelDbPath = Path.Combine(dbRoot, "models.db3");
         builder.Services.AddSingleton(new ModelInfoDatabase(modelDbPath));

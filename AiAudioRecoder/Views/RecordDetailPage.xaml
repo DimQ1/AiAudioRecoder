@@ -11,6 +11,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0"
@@ -40,7 +41,7 @@
                        LineBreakMode="WordWrap" />
             </ScrollView>
 
-            <Border Grid.Row="2"
+                <Border Grid.Row="2"
                     x:Name="PlaybackPanel"
                     IsVisible="False"
                     StrokeThickness="1"
@@ -78,17 +79,124 @@
                 </VerticalStackLayout>
             </Border>
 
-        <HorizontalStackLayout Grid.Row="3" Spacing="12" HorizontalOptions="End">
-        <Button Text="Копировать текст"
-            Clicked="OnCopyTextClicked"
-            WidthRequest="160" />
-        <Button Text="Назад к записям"
-            Clicked="OnReturnToRecordsClicked"
-            WidthRequest="160" />
-        <Button Text="Закрыть"
-            Clicked="OnCloseClicked"
-            WidthRequest="120" />
-            </HorizontalStackLayout>
+                 <Border Grid.Row="3"
+                      x:Name="AnalysisPanel"
+                      StrokeThickness="1"
+                      Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                      StrokeShape="RoundRectangle 12"
+                      Padding="16"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                  <VerticalStackLayout Spacing="12">
+                      <Label Text="Анализ текста"
+                          FontAttributes="Bold"
+                          FontSize="18"
+                          TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                      <Grid ColumnDefinitions="Auto,*" RowSpacing="8" ColumnSpacing="12">
+                       <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                       </Grid.RowDefinitions>
+
+                       <Label Grid.Row="0"
+                           Text="Использовать локальную модель"
+                           VerticalOptions="Center" />
+                       <Switch Grid.Row="0"
+                            Grid.Column="1"
+                            x:Name="UseLocalSwitch"
+                            Toggled="OnUseLocalSwitchToggled" />
+
+                       <Label Grid.Row="1"
+                           Text="Локальная модель"
+                           VerticalOptions="Center" />
+                       <Picker Grid.Row="1"
+                            Grid.Column="1"
+                            x:Name="LocalModelPicker"
+                            ItemDisplayBinding="{Binding Name}"
+                            SelectedIndexChanged="OnLocalModelChanged" />
+
+                       <Label Grid.Row="2"
+                           x:Name="ApiEndpointLabel"
+                           Text="API endpoint"
+                           VerticalOptions="Center" />
+                       <Entry Grid.Row="2"
+                           Grid.Column="1"
+                           x:Name="ApiEndpointEntry"
+                           Placeholder="https://api.example.com/v1/analyze" />
+
+                       <Label Grid.Row="3"
+                           x:Name="ApiKeyLabel"
+                           Text="API ключ"
+                           VerticalOptions="Center" />
+                       <Entry Grid.Row="3"
+                           Grid.Column="1"
+                           x:Name="ApiKeyEntry"
+                           Placeholder="Ваш ключ"
+                           IsPassword="True" />
+
+                       <Label Grid.Row="4"
+                           x:Name="RemoteModelLabel"
+                           Text="Модель API"
+                           VerticalOptions="Center" />
+                       <Entry Grid.Row="4"
+                           Grid.Column="1"
+                           x:Name="RemoteModelEntry"
+                           Placeholder="gpt-4o-mini" />
+                      </Grid>
+
+                      <Label Text="Промпт"
+                          FontAttributes="Bold"
+                          TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
+                      <Editor x:Name="PromptEditor"
+                        AutoSize="TextChanges"
+                        HeightRequest="120"
+                        Placeholder="Опишите каким образом нужно анализировать текст" />
+
+                      <Label x:Name="AnalysisStatusLabel"
+                          FontSize="12"
+                          TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource SecondaryDarkText}}"
+                          Text="Настройки не загружены" />
+
+                      <HorizontalStackLayout Spacing="12" HorizontalOptions="Start">
+                       <Button x:Name="SaveAnalysisButton"
+                            Text="Сохранить настройки"
+                            Clicked="OnSaveAnalysisConfigClicked" />
+                       <Button x:Name="AnalyzeTextButton"
+                            Text="Анализировать"
+                            Clicked="OnAnalyzeTextClicked" />
+                       <Button x:Name="CancelAnalysisButton"
+                            Text="Отменить"
+                            Clicked="OnCancelAnalysisClicked"
+                            IsVisible="False" />
+                      </HorizontalStackLayout>
+
+                      <ActivityIndicator x:Name="AnalysisActivityIndicator"
+                                IsVisible="False"
+                                IsRunning="False"
+                                HeightRequest="24" />
+
+                      <Editor x:Name="AnalysisResultEditor"
+                        IsReadOnly="True"
+                        AutoSize="Disabled"
+                        HeightRequest="200"
+                        Placeholder="Результаты анализа появятся здесь" />
+                  </VerticalStackLayout>
+                 </Border>
+
+                 <HorizontalStackLayout Grid.Row="4" Spacing="12" HorizontalOptions="End">
+                  <Button Text="Копировать текст"
+                       Clicked="OnCopyTextClicked"
+                       WidthRequest="160" />
+                  <Button Text="Назад к записям"
+                       Clicked="OnReturnToRecordsClicked"
+                       WidthRequest="160" />
+                  <Button Text="Закрыть"
+                       Clicked="OnCloseClicked"
+                       WidthRequest="120" />
+                 </HorizontalStackLayout>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
