@@ -8,6 +8,7 @@ public class ModelInfoDb : INotifyPropertyChanged
 {
     [PrimaryKey]
     public string? Name { get; set; }
+    public string? Sha { get; set; }
     public double SizeMB { get; set; }
     public long SizeBytes { get; set; }
     private bool _isDownloaded;
@@ -29,6 +30,16 @@ public class ModelInfoDb : INotifyPropertyChanged
         set
         {
             _isDownloading = value;
+            OnPropertyChanged();
+        }
+    }
+    private bool _isPaused;
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            _isPaused = value;
             OnPropertyChanged();
         }
     }

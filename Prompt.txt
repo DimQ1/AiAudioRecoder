@@ -1,0 +1,99 @@
+ Contribution/Achievements: 4
+ Development:               3
+ Feedback:					4
+ Potential:					3
+ 
+ 
+ 
+ 
+подведи итоги one-two-one сотрудник Дмитрий и менеджер
+сделай фокус на разработчике 
+добавь  раздел необходимые действия 
+результат представь на русском и английском языках:
+{input}
+
+
+подведи итоги performance review:
+В ревью участвовали HR, сотрудник Дмитрий и менеджер
+сделай фокус на разработчике 
+добавь  раздел необходимые действия 
+результат представь на русском и английском языках:
+
+Дополнительно создай таблицу с оценко основываясь на следующих  критериях оценки 
+After the PR meeting, RM and HRM evaluate the employee’s performance based on the criteria below. 
+
+Performance criteria 
+
+What to assess: 
+
+Consider: 
+
+ Contribution/Achievements 
+
+Contribution to project, team or business outcomes
+
+ 
+
+ Scale 1–4: 
+
+ 1 – Significant gaps; low performance
+
+ 2 – Efforts are visible, but improvement is needed
+
+ 3 – Solid and consistent performance
+
+ 4 – Exceeds expectations; high impact and contribution
+
+Quantity and quality of completed work 
+Proactivity in reaching goals 
+Complexity of tasks handled 
+Business or team impact 
+
+Development 
+
+Professional growth, skill improvement, learning ability
+ 
+Scale 1–4: 
+1 – No visible development or growth 
+2 – Some growth, but inconsistent or slow 
+3 – Steady development and application of new skills 
+4 – Fast growth, strong learning mindset, surpassing expectations 
+
+Learning new tools, technologies, or methods 
+Progress in soft or leadership skills 
+Application of new knowledge 
+Initiative in personal development 
+
+Feedback  
+
+Overall performance quality and behavior, based on your feedback and input from peers or clients
+ 
+Scale 1–4: 
+1 – Frequent issues with performance or behavior 
+2 – Some concerns, generally meets minimum expectations 
+3 – Consistently good quality of work and collaboration 
+4 – Strong positive influence, high professionalism and maturity 
+
+Timeliness and accuracy of deliverables 
+Team collaboration and communication 
+Openness to feedback and ability to act on it 
+Accountability and initiative 
+
+Potential 
+
+Readiness and ability to grow into more responsibility or a higher role
+ 
+Scale 1–4: 
+1 – Limited potential, best fit in current role 
+2 – Shows some potential but requires considerable development; intentions are visible but not yet translated into consistent actions or results
+3 – Demonstrates readiness for the next step within 12–18 months; potential is evident and already supported by consistent actions and visible progress
+4 – High potential, could be promoted or upskilled now 
+
+Strategic thinking and problem solving 
+Ownership and initiative 
+Leadership capabilities 
+Motivation and aspiration for growth 
+
+результат выведи в mermaid формате
+
+{input}

@@ -9,6 +9,8 @@
     <ContentPage.Resources>
         <local:BoolToTextConverter x:Key="BoolToTextConverter" />
         <local:DownloadButtonTextConverter x:Key="DownloadButtonTextConverter" />
+        <local:PauseResumeTextConverter x:Key="PauseResumeTextConverter" />
+        <local:PauseResumeVisibleConverter x:Key="PauseResumeVisibleConverter" />
         <Style x:Key="ModelBorderStyle" TargetType="Border">
             <Setter Property="Stroke" Value="Transparent" />
             <Setter Property="StrokeThickness" Value="0" />
@@ -48,28 +50,36 @@
                     </x:Array>
                 </Picker.ItemsSource>
             </Picker>
-            <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="0,10">
+            <Grid ColumnDefinitions="50,*,100,100,100,100,120" ColumnSpacing="10" Padding="0,10">
                 <Label Grid.Column="0" Text="" FontAttributes="Bold" HorizontalOptions="Center" />
                 <Label Grid.Column="1" Text="Название" FontAttributes="Bold" />
                 <Label Grid.Column="2" Text="Размер" FontAttributes="Bold" />
                 <Label Grid.Column="3" Text="Статус" FontAttributes="Bold" />
                 <Label Grid.Column="4" Text="Действие" FontAttributes="Bold" />
-                <Label Grid.Column="5" Text="Удалить" FontAttributes="Bold" />
+                <Label Grid.Column="5" Text="Пауза" FontAttributes="Bold" />
+                <Label Grid.Column="6" Text="Удалить" FontAttributes="Bold" />
             </Grid>
             <CollectionView x:Name="ModelsCollectionView" ItemsSource="{Binding Models}" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ModelInfoDb">
                         <Border Style="{StaticResource ModelBorderStyle}">
-                            <Grid ColumnDefinitions="50,*,100,100,100,100" ColumnSpacing="10" Padding="5,10">
+                            <Grid ColumnDefinitions="50,*,100,100,100,100,120" ColumnSpacing="10" Padding="5,10">
                                 <Label Grid.Column="0" Text="✓" IsVisible="{Binding IsCurrent}" HorizontalOptions="Center" VerticalOptions="Center" />
                                 <StackLayout Grid.Column="1" VerticalOptions="Center">
                                     <Label Text="{Binding Name}" />
-                                    <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5" />
+                                    <ProgressBar IsVisible="{Binding IsDownloading}" Progress="{Binding Progress}" HeightRequest="5">
+                                        <ProgressBar.Triggers>
+                                            <DataTrigger TargetType="ProgressBar" Binding="{Binding IsPaused}" Value="True">
+                                                <Setter Property="IsVisible" Value="True" />
+                                            </DataTrigger>
+                                        </ProgressBar.Triggers>
+                                    </ProgressBar>
                                 </StackLayout>
                                 <Label Grid.Column="2" Text="{Binding SizeMB, StringFormat='{0:F1} MB'}" VerticalOptions="Center" />
                                 <Label Grid.Column="3" Text="{Binding Status}" VerticalOptions="Center" />
                                 <Button Grid.Column="4" Text="{Binding ., Converter={StaticResource DownloadButtonTextConverter}}" Clicked="OnModelActionClicked" CommandParameter="{Binding Name}" />
-                                <Button Grid.Column="5" Text="Удалить" IsVisible="{Binding IsDownloaded}" Clicked="OnDeleteClicked" CommandParameter="{Binding Name}" />
+                                <Button Grid.Column="5" Text="{Binding ., Converter={StaticResource PauseResumeTextConverter}}" IsVisible="{Binding ., Converter={StaticResource PauseResumeVisibleConverter}}" Clicked="OnPauseResumeClicked" CommandParameter="{Binding Name}" />
+                                <Button Grid.Column="6" Text="Удалить" IsVisible="{Binding IsDownloaded}" Clicked="OnDeleteClicked" CommandParameter="{Binding Name}" />
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -77,6 +87,7 @@
             </CollectionView>
             <Label Text="{Binding Models.Count, StringFormat='Количество моделей: {0}'}" />
             <ProgressBar x:Name="DownloadProgress" IsVisible="False" Progress="0" />
+            <Button Text="Импортировать модель из файла" Clicked="OnImportClicked" Margin="0,10,0,0" />
         </VerticalStackLayout>
     </ScrollView>
     </Grid>

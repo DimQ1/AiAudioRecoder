@@ -73,6 +73,8 @@ public static class MauiProgram
         // Register pages
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<RecordPage>();
+        builder.Services.AddTransient<TranscribePage>();
+        builder.Services.AddTransient<ModelsPage>();
         
         // Register converters
         builder.Services.AddTransient<DurationConverter>();
