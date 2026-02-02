@@ -29,8 +29,12 @@
             </Style>
             <Style x:Key="ActionButtonStyle" TargetType="Button">
                 <Setter Property="FontSize" Value="11" />
-                <Setter Property="Padding" Value="8,4" />
-                <Setter Property="Margin" Value="0,0,6,0" />
+                <Setter Property="Padding" Value="6,2" />
+                <Setter Property="HeightRequest" Value="28" />
+                <Setter Property="MinimumHeightRequest" Value="28" />
+                <Setter Property="MinimumWidthRequest" Value="70" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="VerticalOptions" Value="Center" />
                 <Setter Property="CornerRadius" Value="6" />
                 <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}" />
                 <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
@@ -128,7 +132,7 @@
 
         <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="0,0,0,10">
             <!-- Sticky header row: labels now clickable for sorting; Action column set to Auto to fit buttons -->
-            <Grid Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" RowDefinitions="40" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" RowSpacing="1">
+            <Grid Grid.Row="0" BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Tertiary}}" RowDefinitions="44" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" RowSpacing="1">
                 <Label x:Name="DateHeader" Grid.Column="0" Text="Date" ClassId="Date" Style="{StaticResource TableHeaderStyle}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnHeaderTapped" />
@@ -160,7 +164,7 @@
                 <CollectionView x:Name="RecordsView" ItemsSource="{Binding DisplayedRecords}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Grid RowDefinitions="40" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" Padding="0">
+                            <Grid RowDefinitions="44" ColumnDefinitions="120,120,120,200,Auto,150" ColumnSpacing="1" Padding="0">
                                 <Label Grid.Column="0" Style="{StaticResource TableCellStyle}" Text="{Binding EndTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" ClassId="Date">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnCellTapped" />
