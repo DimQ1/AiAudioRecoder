@@ -236,7 +236,7 @@ namespace AiAudioRecoder.Views
         }
 
         var settingsPage = new AnalysisSettingsPage(_analysisService);
-        await Navigation.PushAsync(settingsPage);
+        await Navigation.PushModalAsync(settingsPage);
     }
 
     private async void OnAnalyzeTextClicked(object? sender, EventArgs e)
@@ -767,7 +767,11 @@ namespace AiAudioRecoder.Views
         {
             try
             {
-                if (Navigation?.NavigationStack?.Count > 1)
+                if (Navigation?.ModalStack?.Count > 0)
+                {
+                    await Navigation.PopModalAsync();
+                }
+                else if (Navigation?.NavigationStack?.Count > 1)
                 {
                     await Navigation.PopAsync();
                 }

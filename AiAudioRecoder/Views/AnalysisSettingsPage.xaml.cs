@@ -119,7 +119,11 @@ namespace AiAudioRecoder.Views
         {
             try
             {
-                if (Navigation?.NavigationStack?.Count > 1)
+                if (Navigation?.ModalStack?.Count > 0)
+                {
+                    await Navigation.PopModalAsync();
+                }
+                else if (Navigation?.NavigationStack?.Count > 1)
                 {
                     await Navigation.PopAsync();
                 }

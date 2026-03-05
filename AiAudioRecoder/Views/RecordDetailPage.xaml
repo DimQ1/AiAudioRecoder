@@ -48,7 +48,7 @@
                         </Grid.RowDefinitions>
 
                         <!-- Recognized text — always visible -->
-                        <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                        <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Default">
                             <VerticalStackLayout Spacing="4">
                                 <Label x:Name="ContentLabel"
                                        FontSize="16"
