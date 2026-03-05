@@ -127,7 +127,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 30,
+          "SelectedChildIndex": 27,
           "Children": [
             {
               "$type": "Document",
@@ -220,39 +220,8 @@
               "Name": "ST:139:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ExceptionHelpers.cs",
-              "DocumentMoniker": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\d8f31e5b7056d162072de784882d69aef3073a5d50fe7a9ed4ffac936ba48296\\ExceptionHelpers.cs",
-              "ToolTip": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\d8f31e5b7056d162072de784882d69aef3073a5d50fe7a9ed4ffac936ba48296\\ExceptionHelpers.cs [Read Only]",
-              "ViewState": "AgIAAHEAAAAAAAAAAAAvwIUAAAADAAAAAQAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-02T12:51:10.262Z",
-              "EditorCaption": " [Read Only]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Colors.xaml",
-              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
-              "RelativeDocumentMoniker": "AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
-              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
-              "RelativeToolTip": "AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAADEAAABMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-11-18T18:52:57.696Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Styles.xaml",
-              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
-              "RelativeDocumentMoniker": "AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
-              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
-              "RelativeToolTip": "AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
-              "ViewState": "AgIAACYBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-11-18T18:52:42.103Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
@@ -331,6 +300,43 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MauiProgram.cs",
+              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MauiProgram.cs",
+              "RelativeDocumentMoniker": "AiAudioRecoder\\MauiProgram.cs",
+              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MauiProgram.cs",
+              "RelativeToolTip": "AiAudioRecoder\\MauiProgram.cs",
+              "ViewState": "AgIAADsAAAAAAAAAAAAzwB8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-03T21:09:04.536Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Styles.xaml",
+              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
+              "RelativeDocumentMoniker": "AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
+              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
+              "RelativeToolTip": "AiAudioRecoder\\Resources\\Styles\\Styles.xaml",
+              "ViewState": "AgIAACYBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-11-18T18:52:42.103Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Colors.xaml",
+              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
+              "RelativeDocumentMoniker": "AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
+              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
+              "RelativeToolTip": "AiAudioRecoder\\Resources\\Styles\\Colors.xaml",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAADEAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-11-18T18:52:57.696Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 22,
               "Title": "Package.appxmanifest",
               "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\Platforms\\Windows\\Package.appxmanifest",
@@ -343,16 +349,14 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MauiProgram.cs",
-              "DocumentMoniker": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MauiProgram.cs",
-              "RelativeDocumentMoniker": "AiAudioRecoder\\MauiProgram.cs",
-              "ToolTip": "E:\\Learning\\AI\\AiAudioRecoder-1\\AiAudioRecoder\\MauiProgram.cs",
-              "RelativeToolTip": "AiAudioRecoder\\MauiProgram.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAzwB8AAAAAAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "ExceptionHelpers.cs",
+              "DocumentMoniker": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\d8f31e5b7056d162072de784882d69aef3073a5d50fe7a9ed4ffac936ba48296\\ExceptionHelpers.cs",
+              "ToolTip": "C:\\Users\\dzmitry.shchamialiou\\AppData\\Local\\Temp\\.vsdbgsrc\\d8f31e5b7056d162072de784882d69aef3073a5d50fe7a9ed4ffac936ba48296\\ExceptionHelpers.cs [Read Only]",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAvwIUAAAADAAAAAQAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-03T21:09:04.536Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-02T12:51:10.262Z",
+              "EditorCaption": " [Read Only]"
             },
             {
               "$type": "Document",
