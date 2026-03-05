@@ -46,9 +46,13 @@ public sealed class TextAnalysisResult
             lines.Add("\nОбщий тон: " + Sentiment.Trim());
         }
 
-        if (!string.IsNullOrWhiteSpace(RawResponse))
+        // Show raw response only when no structured fields were parsed
+        bool hasParsedData = !string.IsNullOrWhiteSpace(Summary)
+                             || KeyPoints.Count > 0
+                             || !string.IsNullOrWhiteSpace(Sentiment);
+        if (!hasParsedData && !string.IsNullOrWhiteSpace(RawResponse))
         {
-            lines.Add("\nСырые данные:");
+            lines.Add("\nОтвет:");
             lines.Add(RawResponse.Trim());
         }
 

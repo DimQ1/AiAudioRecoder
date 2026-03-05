@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AiAudioRecoder.Views.AnalysisSettingsPage"
+             Title="Настройки анализа"
+             BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray950}}">
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid Padding="24" RowSpacing="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0"
+                       Text="Настройки анализа текста"
+                       FontAttributes="Bold"
+                       FontSize="20"
+                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+
+                <Border Grid.Row="1"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}">
+                    <Grid ColumnDefinitions="Auto,*" RowSpacing="12" ColumnSpacing="12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0"
+                               Text="Использовать локальную модель"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Switch Grid.Row="0"
+                                Grid.Column="1"
+                                x:Name="UseLocalSwitch"
+                                HorizontalOptions="Start"
+                                Toggled="OnUseLocalSwitchToggled" />
+
+                        <Label Grid.Row="1"
+                               Text="Локальная модель"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Picker Grid.Row="1"
+                                Grid.Column="1"
+                                x:Name="LocalModelPicker"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedIndexChanged="OnLocalModelChanged" />
+
+                        <Label Grid.Row="2"
+                               x:Name="ApiEndpointLabel"
+                               Text="API endpoint"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Entry Grid.Row="2"
+                               Grid.Column="1"
+                               x:Name="ApiEndpointEntry"
+                               Placeholder="https://api.example.com/v1/analyze" />
+
+                        <Label Grid.Row="3"
+                               x:Name="ApiKeyLabel"
+                               Text="API ключ"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Entry Grid.Row="3"
+                               Grid.Column="1"
+                               x:Name="ApiKeyEntry"
+                               Placeholder="Ваш ключ"
+                               IsPassword="True" />
+
+                        <Label Grid.Row="4"
+                               x:Name="RemoteModelLabel"
+                               Text="Модель API"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Entry Grid.Row="4"
+                               Grid.Column="1"
+                               x:Name="RemoteModelEntry"
+                               Placeholder="gpt-4o-mini" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray800}}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Промпт"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+                        <Editor x:Name="PromptEditor"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="120"
+                                Placeholder="Опишите каким образом нужно анализировать текст" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <HorizontalStackLayout Grid.Row="3" Spacing="12" HorizontalOptions="End">
+                    <Label x:Name="SaveStatusLabel"
+                           VerticalOptions="Center"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource SecondaryDarkText}}" />
+                    <Button x:Name="SaveButton"
+                            Text="Сохранить"
+                            Clicked="OnSaveClicked" />
+                    <Button Text="Закрыть"
+                            Clicked="OnCloseClicked" />
+                </HorizontalStackLayout>
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
