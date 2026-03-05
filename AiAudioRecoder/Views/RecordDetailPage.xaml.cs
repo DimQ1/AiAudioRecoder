@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,6 +17,8 @@ namespace AiAudioRecoder.Views
 {
     public partial class RecordDetailPage : ContentPage
     {
+        private const double WideLayoutThreshold = 700;
+
         private readonly IAudioPlaybackService _playbackService;
         private readonly AudioFileMetadata _record;
         private readonly AudioMetadataDatabase _database;
@@ -25,18 +26,16 @@ namespace AiAudioRecoder.Views
         private List<Span> _segmentSpans = new();
         private double[] _segmentStartTimes = Array.Empty<double>();
         private double[] _segmentEndTimes = Array.Empty<double>();
-        private int _currentHighlightIndex = -1; // segment index
+        private int _currentHighlightIndex = -1;
         private readonly CancellationTokenSource _highlightCts = new();
         private readonly IDispatcherTimer _highlightTimer;
         private readonly System.Collections.Concurrent.BlockingCollection<double> _positionQueue = new(1);
         private Task? _highlightWorker;
-    // Diagnostics removed; highlight logic now minimal
 
-        private readonly ObservableCollection<LocalTextAnalysisModel> _localAnalysisModels = new();
         private TextAnalysisService? _analysisService;
-        private TextAnalysisOptions _analysisOptions = TextAnalysisOptions.CreateDefault();
         private CancellationTokenSource? _analysisCts;
-        private bool _analysisInitialized;
+
+        private bool _isWideLayout;
 
         public RecordDetailPage(AudioFileMetadata record)
         {
@@ -134,82 +133,12 @@ namespace AiAudioRecoder.Views
                     AnalyzeTextButton.IsEnabled = false;
                 }
 
-                if (SaveAnalysisButton != null)
-                {
-                    SaveAnalysisButton.IsEnabled = false;
-                }
-
                 return;
             }
 
-            _analysisInitialized = false;
-            _analysisOptions = _analysisService.GetOptions();
-            _localAnalysisModels.Clear();
-            foreach (var model in _analysisService.LocalModels)
-            {
-                _localAnalysisModels.Add(model);
-            }
-
-            if (LocalModelPicker != null)
-            {
-                LocalModelPicker.ItemsSource = _localAnalysisModels;
-                SelectLocalAnalysisModel(_analysisOptions.LocalModelId);
-            }
-
-            if (UseLocalSwitch != null)
-            {
-                UseLocalSwitch.IsToggled = _analysisOptions.UseLocalModel;
-            }
-
-            if (ApiEndpointEntry != null)
-            {
-                ApiEndpointEntry.Text = _analysisOptions.ApiEndpoint;
-            }
-
-            if (ApiKeyEntry != null)
-            {
-                ApiKeyEntry.Text = _analysisOptions.ApiKey;
-            }
-
-            if (RemoteModelEntry != null)
-            {
-                RemoteModelEntry.Text = _analysisOptions.RemoteModel;
-            }
-
-            if (PromptEditor != null)
-            {
-                PromptEditor.Text = _analysisOptions.PromptTemplate;
-            }
-
-            UpdateRemoteInputsVisibility(_analysisOptions.UseLocalModel);
-
             AnalysisPanel.IsVisible = true;
-            SetAnalysisStatus("Настройки анализа загружены.");
-            _analysisInitialized = true;
+            SetAnalysisStatus("Готов к анализу.");
         }
-
-    private void SelectLocalAnalysisModel(string modelId)
-    {
-        if (LocalModelPicker == null || _localAnalysisModels.Count == 0)
-        {
-            return;
-        }
-
-        var selected = _localAnalysisModels.FirstOrDefault(m => string.Equals(m.Id, modelId, StringComparison.OrdinalIgnoreCase))
-                       ?? _localAnalysisModels.FirstOrDefault();
-        LocalModelPicker.SelectedItem = selected;
-    }
-
-    private void UpdateRemoteInputsVisibility(bool useLocal)
-    {
-        var visible = !useLocal;
-        if (ApiEndpointEntry != null) ApiEndpointEntry.IsVisible = visible;
-        if (ApiEndpointLabel != null) ApiEndpointLabel.IsVisible = visible;
-        if (ApiKeyEntry != null) ApiKeyEntry.IsVisible = visible;
-        if (ApiKeyLabel != null) ApiKeyLabel.IsVisible = visible;
-        if (RemoteModelEntry != null) RemoteModelEntry.IsVisible = visible;
-        if (RemoteModelLabel != null) RemoteModelLabel.IsVisible = visible;
-    }
 
     private void SetAnalysisStatus(string message, bool isError = false)
     {
@@ -235,67 +164,29 @@ namespace AiAudioRecoder.Views
             AnalyzeTextButton.IsEnabled = !isBusy;
         }
 
-        if (SaveAnalysisButton != null)
-        {
-            SaveAnalysisButton.IsEnabled = !isBusy;
-        }
-
         if (CancelAnalysisButton != null)
         {
             CancelAnalysisButton.IsVisible = isBusy;
         }
     }
 
-    private void UpdateOptionsFromUi()
-    {
-        if (UseLocalSwitch != null)
-        {
-            _analysisOptions.UseLocalModel = UseLocalSwitch.IsToggled;
-        }
-
-        if (ApiEndpointEntry != null)
-        {
-            _analysisOptions.ApiEndpoint = ApiEndpointEntry.Text?.Trim() ?? string.Empty;
-        }
-
-        if (ApiKeyEntry != null)
-        {
-            _analysisOptions.ApiKey = ApiKeyEntry.Text?.Trim() ?? string.Empty;
-        }
-
-        if (RemoteModelEntry != null)
-        {
-            _analysisOptions.RemoteModel = RemoteModelEntry.Text?.Trim() ?? string.Empty;
-        }
-
-        if (PromptEditor != null)
-        {
-            _analysisOptions.PromptTemplate = PromptEditor.Text ?? string.Empty;
-        }
-
-        if (LocalModelPicker?.SelectedItem is LocalTextAnalysisModel model)
-        {
-            _analysisOptions.LocalModelId = model.Id;
-        }
-    }
-
     private string GetActiveText()
     {
-        if (TranscriptionScroll?.IsVisible == true)
+        if (TranscriptionLabel?.IsVisible == true)
         {
-            var formatted = TranscriptionLabel?.FormattedText;
+            var formatted = TranscriptionLabel.FormattedText;
             var concatenated = MergeFormattedText(formatted);
             if (!string.IsNullOrWhiteSpace(concatenated))
             {
                 return concatenated;
             }
 
-            return TranscriptionLabel?.Text ?? _record.Transcription ?? string.Empty;
+            return TranscriptionLabel.Text ?? _record.Transcription ?? string.Empty;
         }
 
-        if (ContentScroll?.IsVisible == true)
+        if (ContentLabel?.IsVisible == true)
         {
-            return ContentLabel?.Text ?? _record.Summary ?? _record.FilePath ?? string.Empty;
+            return ContentLabel.Text ?? _record.Summary ?? _record.FilePath ?? string.Empty;
         }
 
         return _record.Transcription ?? _record.Summary ?? string.Empty;
@@ -336,42 +227,16 @@ namespace AiAudioRecoder.Views
         }
     }
 
-    private void OnUseLocalSwitchToggled(object? sender, ToggledEventArgs e)
-    {
-        if (!_analysisInitialized)
-        {
-            return;
-        }
-
-        _analysisOptions.UseLocalModel = e.Value;
-        UpdateRemoteInputsVisibility(e.Value);
-        SetAnalysisStatus(e.Value ? "Включён режим локальной модели." : "Будет использоваться удалённый API.");
-    }
-
-    private void OnLocalModelChanged(object? sender, EventArgs e)
-    {
-        if (!_analysisInitialized)
-        {
-            return;
-        }
-
-        if (LocalModelPicker?.SelectedItem is LocalTextAnalysisModel model)
-        {
-            _analysisOptions.LocalModelId = model.Id;
-            SetAnalysisStatus($"Выбрана модель {model.Name}.");
-        }
-    }
-
-    private void OnSaveAnalysisConfigClicked(object? sender, EventArgs e)
+    private async void OnAnalysisSettingsClicked(object? sender, EventArgs e)
     {
         if (_analysisService == null)
         {
+            await DisplayAlertAsync("Недоступно", "Сервис анализа не зарегистрирован.", "OK");
             return;
         }
 
-        UpdateOptionsFromUi();
-        _analysisService.UpdateOptions(_analysisOptions);
-        SetAnalysisStatus("Настройки сохранены.");
+        var settingsPage = new AnalysisSettingsPage(_analysisService);
+        await Navigation.PushModalAsync(settingsPage);
     }
 
     private async void OnAnalyzeTextClicked(object? sender, EventArgs e)
@@ -389,9 +254,6 @@ namespace AiAudioRecoder.Views
             return;
         }
 
-        UpdateOptionsFromUi();
-        _analysisService.UpdateOptions(_analysisOptions);
-
         CancelAnalysis(false);
         _analysisCts = new CancellationTokenSource();
         SetAnalysisBusy(true);
@@ -399,7 +261,7 @@ namespace AiAudioRecoder.Views
 
         try
         {
-            var result = await _analysisService.AnalyzeAsync(text, PromptEditor?.Text, _analysisCts.Token);
+            var result = await _analysisService.AnalyzeAsync(text, null, _analysisCts.Token);
             if (AnalysisResultEditor != null)
             {
                 AnalysisResultEditor.Text = result.BuildDisplayString();
@@ -425,6 +287,27 @@ namespace AiAudioRecoder.Views
         }
     }
 
+    private async void OnCopyAnalysisClicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            var text = AnalysisResultEditor?.Text;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                await DisplayAlertAsync("Нет текста", "Результаты анализа отсутствуют.", "OK");
+                return;
+            }
+
+            await Clipboard.Default.SetTextAsync(text);
+            await DisplayAlertAsync("Готово", "Результат анализа скопирован в буфер обмена.", "OK");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Clipboard error: {ex.Message}");
+            await DisplayAlertAsync("Ошибка", "Не удалось скопировать текст.", "OK");
+        }
+    }
+
     private void OnCancelAnalysisClicked(object? sender, EventArgs e)
     {
         if (_analysisCts == null)
@@ -434,6 +317,55 @@ namespace AiAudioRecoder.Views
 
         _analysisCts.Cancel();
         SetAnalysisStatus("Отмена анализа...");
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+
+        if (width <= 0 || MainContentGrid == null)
+        {
+            return;
+        }
+
+        bool shouldBeWide = width >= WideLayoutThreshold;
+        if (shouldBeWide == _isWideLayout)
+        {
+            return;
+        }
+
+        _isWideLayout = shouldBeWide;
+
+        if (shouldBeWide)
+        {
+            // Side-by-side: 2 columns, 1 row
+            MainContentGrid.RowDefinitions.Clear();
+            MainContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+
+            MainContentGrid.ColumnDefinitions.Clear();
+            MainContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+            MainContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+            Grid.SetRow(DetailsBorder, 0);
+            Grid.SetColumn(DetailsBorder, 0);
+            Grid.SetRow(AnalysisPanel, 0);
+            Grid.SetColumn(AnalysisPanel, 1);
+        }
+        else
+        {
+            // Stacked: 1 column, 2 rows
+            MainContentGrid.ColumnDefinitions.Clear();
+            MainContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+
+            MainContentGrid.RowDefinitions.Clear();
+            MainContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+            MainContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+
+            Grid.SetRow(DetailsBorder, 0);
+            Grid.SetColumn(DetailsBorder, 0);
+            Grid.SetRow(AnalysisPanel, 1);
+            Grid.SetColumn(AnalysisPanel, 0);
+        }
     }
 
     private void SetupHighlightTimer()
@@ -473,15 +405,15 @@ namespace AiAudioRecoder.Views
 
             if (hasTranscription)
             {
-                ContentScroll.IsVisible = false;
-                TranscriptionScroll.IsVisible = true;
+                ContentLabel.IsVisible = false;
+                TranscriptionLabel.IsVisible = true;
                 BuildTranscriptionView(_record.Transcription);
                 await SetupPlaybackAsync();
             }
             else
             {
-                ContentScroll.IsVisible = true;
-                TranscriptionScroll.IsVisible = false;
+                ContentLabel.IsVisible = true;
+                TranscriptionLabel.IsVisible = false;
                 ContentLabel.Text = _record.FilePath;
                 PlaybackPanel.IsVisible = false;
             }
@@ -789,21 +721,21 @@ namespace AiAudioRecoder.Views
             {
                 string? textToCopy = null;
 
-                if (TranscriptionScroll?.IsVisible == true)
+                if (TranscriptionLabel?.IsVisible == true)
                 {
-                    var formatted = TranscriptionLabel?.FormattedText;
+                    var formatted = TranscriptionLabel.FormattedText;
                     if (formatted?.Spans?.Count > 0)
                     {
                         textToCopy = string.Concat(formatted.Spans.Select(span => span.Text));
                     }
                     else
                     {
-                        textToCopy = TranscriptionLabel?.Text ?? _record.Transcription;
+                        textToCopy = TranscriptionLabel.Text ?? _record.Transcription;
                     }
                 }
-                else if (ContentScroll?.IsVisible == true)
+                else if (ContentLabel?.IsVisible == true)
                 {
-                    textToCopy = ContentLabel?.Text ?? _record.Summary;
+                    textToCopy = ContentLabel.Text ?? _record.Summary;
                 }
                 else
                 {
@@ -835,7 +767,11 @@ namespace AiAudioRecoder.Views
         {
             try
             {
-                if (Navigation?.NavigationStack?.Count > 1)
+                if (Navigation?.ModalStack?.Count > 0)
+                {
+                    await Navigation.PopModalAsync();
+                }
+                else if (Navigation?.NavigationStack?.Count > 1)
                 {
                     await Navigation.PopAsync();
                 }

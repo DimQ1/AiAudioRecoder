@@ -5,15 +5,14 @@
              Title="Record Detail"
              BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray950}}">
     <ContentPage.Content>
-        <Grid Padding="24" RowSpacing="16">
+        <Grid Padding="16" RowSpacing="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!-- Title -->
             <Label Grid.Row="0"
                    x:Name="TitleLabel"
                    Text="Details"
@@ -21,182 +20,173 @@
                    FontSize="22"
                    TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
 
-            <ScrollView Grid.Row="1"
-                        x:Name="ContentScroll"
-                        IsVisible="False"
-                        VerticalScrollBarVisibility="Always">
-                <Label x:Name="ContentLabel"
-                       FontSize="16"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
-                       LineBreakMode="WordWrap" />
-            </ScrollView>
+            <!-- Adaptive main content: side-by-side on wide screens, stacked on narrow screens -->
+            <Grid Grid.Row="1"
+                  x:Name="MainContentGrid"
+                  ColumnSpacing="16"
+                  RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <ScrollView Grid.Row="1"
-                        x:Name="TranscriptionScroll"
-                        IsVisible="False"
-                        VerticalScrollBarVisibility="Always">
-                <Label x:Name="TranscriptionLabel"
-                       FontSize="16"
-                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
-                       LineBreakMode="WordWrap" />
-            </ScrollView>
+                <!-- Details panel (recognized text + audio player) -->
+                <Border x:Name="DetailsBorder"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <Border Grid.Row="2"
-                    x:Name="PlaybackPanel"
-                    IsVisible="False"
-                    StrokeThickness="1"
-                    Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="16">
-                <VerticalStackLayout Spacing="12">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" VerticalOptions="Center">
-                        <Button x:Name="PlayPauseButton"
-                                WidthRequest="48"
-                                HeightRequest="48"
-                                CornerRadius="24"
-                                Text="Play"
-                                Clicked="OnPlayPauseClicked" />
-                        <VerticalStackLayout Grid.Column="1" Spacing="8">
-                            <Slider x:Name="PositionSlider"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Value="0"
-                                    IsEnabled="False" />
-                            <Grid ColumnDefinitions="Auto,*">
-                                <Label x:Name="CurrentTimeLabel"
-                                       Text="00:00"
-                                       FontSize="12"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
-                                <Label Grid.Column="1"
-                                       x:Name="TotalDurationLabel"
-                                       Text="00:00"
-                                       FontSize="12"
-                                       HorizontalOptions="End"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
-                            </Grid>
-                        </VerticalStackLayout>
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
+                        <!-- Recognized text — always visible -->
+                        <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Default">
+                            <VerticalStackLayout Spacing="4">
+                                <Label x:Name="ContentLabel"
+                                       FontSize="16"
+                                       IsVisible="False"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
+                                       LineBreakMode="WordWrap" />
+                                <Label x:Name="TranscriptionLabel"
+                                       FontSize="16"
+                                       IsVisible="False"
+                                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </ScrollView>
 
-                 <Border Grid.Row="3"
-                      x:Name="AnalysisPanel"
-                      StrokeThickness="1"
-                      Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
-                      StrokeShape="RoundRectangle 12"
-                      Padding="16"
-                      BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
-                  <VerticalStackLayout Spacing="12">
-                      <Label Text="Анализ текста"
-                          FontAttributes="Bold"
-                          FontSize="18"
-                          TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
-
-                      <Grid ColumnDefinitions="Auto,*" RowSpacing="8" ColumnSpacing="12">
-                       <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                       </Grid.RowDefinitions>
-
-                       <Label Grid.Row="0"
-                           Text="Использовать локальную модель"
-                           VerticalOptions="Center" />
-                       <Switch Grid.Row="0"
-                            Grid.Column="1"
-                            x:Name="UseLocalSwitch"
-                            Toggled="OnUseLocalSwitchToggled" />
-
-                       <Label Grid.Row="1"
-                           Text="Локальная модель"
-                           VerticalOptions="Center" />
-                       <Picker Grid.Row="1"
-                            Grid.Column="1"
-                            x:Name="LocalModelPicker"
-                            ItemDisplayBinding="{Binding Name}"
-                            SelectedIndexChanged="OnLocalModelChanged" />
-
-                       <Label Grid.Row="2"
-                           x:Name="ApiEndpointLabel"
-                           Text="API endpoint"
-                           VerticalOptions="Center" />
-                       <Entry Grid.Row="2"
-                           Grid.Column="1"
-                           x:Name="ApiEndpointEntry"
-                           Placeholder="https://api.example.com/v1/analyze" />
-
-                       <Label Grid.Row="3"
-                           x:Name="ApiKeyLabel"
-                           Text="API ключ"
-                           VerticalOptions="Center" />
-                       <Entry Grid.Row="3"
-                           Grid.Column="1"
-                           x:Name="ApiKeyEntry"
-                           Placeholder="Ваш ключ"
-                           IsPassword="True" />
-
-                       <Label Grid.Row="4"
-                           x:Name="RemoteModelLabel"
-                           Text="Модель API"
-                           VerticalOptions="Center" />
-                       <Entry Grid.Row="4"
-                           Grid.Column="1"
-                           x:Name="RemoteModelEntry"
-                           Placeholder="gpt-4o-mini" />
-                      </Grid>
-
-                      <Label Text="Промпт"
-                          FontAttributes="Bold"
-                          TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource SecondaryDarkText}}" />
-                      <Editor x:Name="PromptEditor"
-                        AutoSize="TextChanges"
-                        HeightRequest="120"
-                        Placeholder="Опишите каким образом нужно анализировать текст" />
-
-                      <Label x:Name="AnalysisStatusLabel"
-                          FontSize="12"
-                          TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource SecondaryDarkText}}"
-                          Text="Настройки не загружены" />
-
-                      <HorizontalStackLayout Spacing="12" HorizontalOptions="Start">
-                       <Button x:Name="SaveAnalysisButton"
-                            Text="Сохранить настройки"
-                            Clicked="OnSaveAnalysisConfigClicked" />
-                       <Button x:Name="AnalyzeTextButton"
-                            Text="Анализировать"
-                            Clicked="OnAnalyzeTextClicked" />
-                       <Button x:Name="CancelAnalysisButton"
-                            Text="Отменить"
-                            Clicked="OnCancelAnalysisClicked"
-                            IsVisible="False" />
-                      </HorizontalStackLayout>
-
-                      <ActivityIndicator x:Name="AnalysisActivityIndicator"
+                        <!-- Audio playback panel -->
+                        <Border Grid.Row="1"
+                                x:Name="PlaybackPanel"
                                 IsVisible="False"
-                                IsRunning="False"
-                                HeightRequest="24" />
+                                StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="12">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalOptions="Center">
+                                    <Button x:Name="PlayPauseButton"
+                                            WidthRequest="48"
+                                            HeightRequest="48"
+                                            CornerRadius="24"
+                                            Text="Play"
+                                            Clicked="OnPlayPauseClicked" />
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Slider x:Name="PositionSlider"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                Value="0"
+                                                IsEnabled="False" />
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <Label x:Name="CurrentTimeLabel"
+                                                   Text="00:00"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                                            <Label Grid.Column="1"
+                                                   x:Name="TotalDurationLabel"
+                                                   Text="00:00"
+                                                   FontSize="12"
+                                                   HorizontalOptions="End"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource SecondaryDarkText}}" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </Border>
 
-                      <Editor x:Name="AnalysisResultEditor"
-                        IsReadOnly="True"
-                        AutoSize="Disabled"
-                        HeightRequest="200"
-                        Placeholder="Результаты анализа появятся здесь" />
-                  </VerticalStackLayout>
-                 </Border>
+                <!-- Analysis panel -->
+                <Border x:Name="AnalysisPanel"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                        StrokeShape="RoundRectangle 12"
+                        Padding="16"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                 <HorizontalStackLayout Grid.Row="4" Spacing="12" HorizontalOptions="End">
-                  <Button Text="Копировать текст"
-                       Clicked="OnCopyTextClicked"
-                       WidthRequest="160" />
-                  <Button Text="Назад к записям"
-                       Clicked="OnReturnToRecordsClicked"
-                       WidthRequest="160" />
-                  <Button Text="Закрыть"
-                       Clicked="OnCloseClicked"
-                       WidthRequest="120" />
-                 </HorizontalStackLayout>
+                        <Label Grid.Row="0"
+                               Text="Анализ текста"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" />
+
+                        <!-- Action buttons -->
+                        <FlexLayout Grid.Row="1"
+                                    Wrap="Wrap"
+                                    JustifyContent="Start"
+                                    AlignItems="Center"
+                                    AlignContent="Start">
+                            <Button Text="Настройки"
+                                    Margin="0,0,8,4"
+                                    Clicked="OnAnalysisSettingsClicked" />
+                            <Button x:Name="AnalyzeTextButton"
+                                    Text="Анализировать"
+                                    Margin="0,0,8,4"
+                                    Clicked="OnAnalyzeTextClicked" />
+                            <Button Text="Копировать текст"
+                                    Margin="0,0,8,4"
+                                    Clicked="OnCopyAnalysisClicked" />
+                            <Button x:Name="CancelAnalysisButton"
+                                    Text="Отменить"
+                                    Margin="0,0,0,4"
+                                    IsVisible="False"
+                                    Clicked="OnCancelAnalysisClicked" />
+                        </FlexLayout>
+
+                        <ActivityIndicator Grid.Row="2"
+                                           x:Name="AnalysisActivityIndicator"
+                                           IsVisible="False"
+                                           IsRunning="False"
+                                           HeightRequest="24"
+                                           HorizontalOptions="Start" />
+
+                        <Label Grid.Row="3"
+                               x:Name="AnalysisStatusLabel"
+                               FontSize="12"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource SecondaryDarkText}}"
+                               Text="Настройки не загружены" />
+
+                        <ScrollView Grid.Row="4">
+                            <Editor x:Name="AnalysisResultEditor"
+                                    IsReadOnly="True"
+                                    AutoSize="TextChanges"
+                                    MinimumHeightRequest="160"
+                                    Placeholder="Результаты анализа появятся здесь" />
+                        </ScrollView>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Bottom action buttons -->
+            <HorizontalStackLayout Grid.Row="2" Spacing="12" HorizontalOptions="End">
+                <Button Text="Копировать текст"
+                        Clicked="OnCopyTextClicked"
+                        WidthRequest="160" />
+                <Button Text="Назад к записям"
+                        Clicked="OnReturnToRecordsClicked"
+                        WidthRequest="160" />
+                <Button Text="Закрыть"
+                        Clicked="OnCloseClicked"
+                        WidthRequest="120" />
+            </HorizontalStackLayout>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
