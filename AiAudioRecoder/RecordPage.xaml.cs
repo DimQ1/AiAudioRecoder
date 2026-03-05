@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.Essentials;
 using AiAudioRecoder.Models;
@@ -34,6 +35,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private double _micLevel;
     private double _systemLevel;
     private bool _levelEventsAttached;
+    private Timer? _queueStatusTimer;
 
     public RecordPage(Services.IAudioRecorderService recorder, 
                      Services.AudioMetadataDatabase db,
@@ -74,6 +76,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _recorder.SystemLevelChanged += OnRecorderSystemLevelChanged;
             _levelEventsAttached = true;
         }
+        _queueStatusTimer = new Timer(_ => UpdateQueueStatusUI(), null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
     }
 
     protected override void OnDisappearing()
@@ -85,6 +88,8 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _recorder.SystemLevelChanged -= OnRecorderSystemLevelChanged;
             _levelEventsAttached = false;
         }
+        _queueStatusTimer?.Dispose();
+        _queueStatusTimer = null;
     }
 
     #region Properties
