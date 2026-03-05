@@ -34,6 +34,7 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
     private double _micLevel;
     private double _systemLevel;
     private bool _levelEventsAttached;
+    private IDispatcherTimer? _queueStatusTimer;
 
     public RecordPage(Services.IAudioRecorderService recorder, 
                      Services.AudioMetadataDatabase db,
@@ -74,6 +75,11 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _recorder.SystemLevelChanged += OnRecorderSystemLevelChanged;
             _levelEventsAttached = true;
         }
+
+        _queueStatusTimer = Dispatcher.CreateTimer();
+        _queueStatusTimer.Interval = TimeSpan.FromSeconds(2);
+        _queueStatusTimer.Tick += OnQueueStatusTimerTick;
+        _queueStatusTimer.Start();
     }
 
     protected override void OnDisappearing()
@@ -85,6 +91,18 @@ public partial class RecordPage : ContentPage, INotifyPropertyChanged
             _recorder.SystemLevelChanged -= OnRecorderSystemLevelChanged;
             _levelEventsAttached = false;
         }
+
+        if (_queueStatusTimer != null)
+        {
+            _queueStatusTimer.Tick -= OnQueueStatusTimerTick;
+            _queueStatusTimer.Stop();
+            _queueStatusTimer = null;
+        }
+    }
+
+    private void OnQueueStatusTimerTick(object? sender, EventArgs e)
+    {
+        UpdateQueueStatusUI();
     }
 
     #region Properties
